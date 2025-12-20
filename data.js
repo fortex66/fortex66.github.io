@@ -84,16 +84,21 @@ window.siteContent = {
     categories: [
       {
         label: "Strong",
-        items: "JS(ES5+) / React.js / Node.js / Express.js / C++ / C# / MySQL",
+        items: "C++ / JS / React.js / Node.js / Express.js / C# / MySQL",
       },
       {
         label: "Knowledgeable",
         items:
-          "Java / Spring / PHP / Python / TensorFlow / DL(LSTM, CNN) / Matplotlib / Numpy / Pandas / Beautiful Soup 4",
+          "Java / Spring / PHP / R / Python / TensorFlow / ML Basics (Linear Regression, MLP) / Matplotlib / Numpy / Pandas / Beautiful Soup 4",
       },
       {
         label: "ETC",
-        items: "Git / PLC / RPI / Docker / TOEIC Speaking-IH(23.09.13)",
+        items: "Git / Linux / Docker / PLC / Raspberry Pi",
+      },
+      {
+        label: "Certifications",
+        items:
+          "Engineer Information Processing / SQLD / Computer Specialist in Spreadsheet & Database (Level-1) / TOEIC Speaking IH (2023.09.13)",
       },
     ],
   },
