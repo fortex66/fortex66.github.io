@@ -521,7 +521,7 @@ p.text-intro {
   }
 
   .project-image {
-    background-size: 50%;
+    background-size: contain;
   }
 
   .project--mobile-auto-image .project-image {
