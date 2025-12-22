@@ -93,7 +93,7 @@ window.siteContent = {
       },
       {
         label: "ETC",
-        items: "Git / Linux / Docker / PLC(LS, mitsubishi, Yaskawa) / Industrial 6-Axis Robot(Yaskawa) / Raspberry Pi",
+        items: "Git / Linux / Docker / PLC(LS, Mitsubishi, Yaskawa) / Industrial 6-Axis Robot(Yaskawa) / Raspberry Pi",
       },
       {
         label: "Certifications",
