@@ -22,11 +22,9 @@ window.siteContent = {
   },
   hero: {
     intro: {
-      text: "Hi I'm",
-      link: { label: "Eonsang Son", href: "https://github.com/fortex66" },
+      text: "산업용 시스템을 실시간 모니터링·제어 소프트웨어로 연결하는 엔지니어 ",
+      link: { label: "손언상", href: "https://github.com/fortex66" },
     },
-    subtitle:
-      "Connecting industrial systems to real-time monitoring and control",
     achievements: [
       { suffix: "Industrial Systems" },
       { suffix: "PLC & Device Integration" },
