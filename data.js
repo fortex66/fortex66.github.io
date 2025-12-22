@@ -22,12 +22,12 @@ window.siteContent = {
   },
   hero: {
     intro: {
-      text: "산업용 시스템을 실시간 모니터링·제어 소프트웨어로 연결하는 엔지니어 ",
+      text: "소프트웨어를 통해 산업 시스템을 지능화하고, 현장의 데이터를 가치로 전환하는 엔지니어",
       link: { label: "손언상", href: "https://github.com/fortex66" },
     },
     achievements: [
       { suffix: "Industrial Systems" },
-      { suffix: "PLC & Device Integration" },
+      { suffix: "Device Integration" },
       { suffix: "Real-time Monitoring & Control" },
       { suffix: "Energy & Sensor-based Systems" },
     ],
@@ -43,7 +43,7 @@ window.siteContent = {
     },
     {
       title: "ForTex-DIF",
-      description: "산업용 임베디드 컨트롤러 제품 개발",
+      description: "산업 환경을 위한 전용 임베디드 제어 인터페이스 제품 개발",
       url: "https://fortex66.tistory.com/",
       backgroundImage: "./imgs/fortex_dif.gif",
       backgroundColor: "#290c3dff",
@@ -71,43 +71,43 @@ window.siteContent = {
     },
   ],
   about: {
-    title: "About",
+    title: "소개",
     paragraphs: [
-      "I started programming by building project-based systems that connect software with real-world environments. My work has focused on industrial automation, including PLC-based HMI development, remote monitoring systems, and sensor-driven platforms such as energy and battery management systems.",
-      "Through these projects, I have improved system reliability and operational efficiency with measurable results. I reduced PLC reconnection time from up to 7 minutes to under 1 minute (about 86% improvement) by redesigning communication logic, and replaced manual USB-based data collection with a real-time monitoring system, eliminating over 90% of on-site data retrieval work.",
+      "저는 소프트웨어를 통해 실제 현장의 문제를 해결하는 데 관심을 가져온 엔지니어입니다. 산업 설비, 에너지 시스템, 센서 기반 환경에서 발생하는 데이터를 소프트웨어로 연결하고, 이를 모니터링·제어할 수 있는 시스템을 직접 설계하고 구현해왔습니다.",
+      "프로젝트 과정에서는 시스템 구조 개선과 로직 최적화를 통해 가시적인 성과를 만들어냈습니다. 통신 구조를 재설계하여 장비 재연결 시간을 최대 7분에서 1분 이내로 단축했으며(약 86% 개선), 수동 데이터 수집 방식은 실시간 시각화·알람 기반 시스템으로 전환해 현장 방문 없이도 운영이 가능하도록 개선했습니다. 이러한 경험을 바탕으로, 현재는 데이터와 AI 모델을 활용해 시스템의 효율과 판단을 고도화하는 방향에 관심을 두고 있습니다.",
     ],
   },
   tech: {
-    title: "Tech",
+    title: "기술 스택",
     categories: [
       {
-        label: "Strong",
+        label: "주력 기술",
         items: "C++ / JS / React.js / Node.js / Express.js / C# / MySQL",
       },
       {
-        label: "Knowledgeable",
+        label: "활용 가능",
         items:
           "Java / Spring / PHP / R / Python / TensorFlow / ML Basics (Linear Regression, MLP) / Matplotlib / Numpy / Pandas / Beautiful Soup 4",
       },
       {
-        label: "ETC",
+        label: "기타",
         items: "Git / Linux / Docker / PLC(LS, Mitsubishi, Yaskawa) / Industrial 6-Axis Robot(Yaskawa) / Raspberry Pi",
       },
       {
-        label: "Certifications",
+        label: "자격증",
         items:
-          "Engineer Information Processing / SQLD / Computer Specialist in Spreadsheet & Database (Level-1) / TOEIC Speaking IH (2023.09.13)",
+          "정보처리기사(Engineer Information Processing) / SQLD / 컴퓨터활용능력 1급(Computer Specialist in Spreadsheet & Database (Level-1)) / 토익 스피킹(TOEIC Speaking) IH (2023.09.13)",
       },
     ],
   },
   awards: {
-    title: "Awards",
+    title: "수상 및 성과",
     items: [
       {
-        label: "Korea Information Industry Association Award",
+        label: "한국정보산업연합회장상(Korea Information Industry Association Award)",
         detail: "Dec 2023 / ICT Mentoring Program",
         suffix:
-          " – Developed a React-based collaboration platform with real-time chat, infinite scrolling, and dynamic input features.",
+          " – React 기반 협업 플랫폼을 설계·구현하며 실시간 통신 및 대용량 UI 처리를 담당",
       },
     ],
   },
