@@ -1,215 +1,117 @@
-const siteContent = window.siteContent || {};
-
-const addClassOnScroll = (element) => element && element.classList.add("come-in");
-
-const renderNavigation = (navData) => {
-    const navRoot = document.getElementById("site-nav");
-    if (!navRoot || !navData) return;
-
-    const logoAccent = navData.logoAccent || "";
-    const linksMarkup = (navData.links || [])
-        .map((item) => {
-            const classes = [
-                item.noUnderline ? "no-link" : "",
-                item.iconClass ? "no-link" : ""
-            ]
-                .filter(Boolean)
-                .join(" ");
-            const content = item.iconClass ? `<i class="${item.iconClass}"></i>` : item.label;
-            const target = item.external ? ' target="_blank" rel="noopener noreferrer"' : "";
-            return `<li><a href="${item.href}" class="${classes.trim()}"${target}>${content}</a></li>`;
-        })
-        .join("");
-
-    navRoot.innerHTML = `
-        <div class="nav-wrapper">
-            <h1 class="nav-logo">${navData.logo}<span class="logo-end">${logoAccent}</span></h1>
-            <ul class="nav-menu">${linksMarkup}</ul>
-        </div>
-    `;
+const projects = window.portfolioProjects || [];
+const archive = document.querySelector("#project-archive");
+const dialog = document.querySelector("#project-dialog");
+const content = document.querySelector("#dialog-content");
+const escapeHTML = (value) =>
+  String(value).replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+const flowMarkup = (flow) =>
+  `<div class="system-flow">${flow.map((label, i) => `<span><small class="mono">0${i + 1}</small>${escapeHTML(label)}</span>`).join("")}</div>`;
+let previousFocus;
+function openProject(id) {
+  const project = projects.find((p) => p.id === id);
+  if (!project) return;
+  previousFocus = document.activeElement;
+  content.innerHTML = `<p class="eyebrow">${escapeHTML(project.label)}</p><h2 id="dialog-title">${escapeHTML(project.title)}</h2><p class="dialog-summary">${escapeHTML(project.summary)}</p>${flowMarkup(project.flow)}<p class="project-detail">${escapeHTML(project.details)}</p><dl class="project-facts"><div><dt>ROLE</dt><dd>${escapeHTML(project.role)}</dd></div><div><dt>TOOLS</dt><dd>${project.stack.map(escapeHTML).join(" · ")}</dd></div>${project.status ? `<div><dt>STATUS</dt><dd>${escapeHTML(project.status)}</dd></div>` : ""}</dl><div class="dialog-links">${(project.links || []).map((link) => `<a class="button button-dark" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(link.label)} ↗</a>`).join("")}</div>${project.demo ? '<div class="demo-area"><button type="button" class="demo-button text-link">기존 프로젝트 데모 보기 ↓</button><p class="demo-note">실제 프로젝트 기록 · 애니메이션 이미지가 로드됩니다.</p></div>' : ""}`;
+  if (project.demo) {
+    content.querySelector(".demo-button").addEventListener(
+      "click",
+      (event) => {
+        const image = document.createElement("img");
+        image.src = project.demo;
+        image.alt = `${project.title} 프로젝트 실행 화면`;
+        image.className = "project-demo";
+        event.currentTarget.replaceWith(image);
+      },
+      { once: true },
+    );
+  }
+  dialog.showModal();
+  document.body.classList.add("dialog-open");
+  dialog.querySelector(".dialog-close").focus();
+}
+function renderArchive(filter = "all") {
+  const visible = projects.filter(
+    (p) => filter === "all" || p.category === filter,
+  );
+  archive.innerHTML = visible
+    .map(
+      (p) =>
+        `<button class="archive-item" type="button" data-project="${p.id}"><span class="archive-number mono">${String(projects.indexOf(p) + 1).padStart(2, "0")}</span><span class="archive-main"><strong>${escapeHTML(p.title)}</strong><span>${escapeHTML(p.summary)}</span></span><span class="archive-category mono">${escapeHTML(p.category.toUpperCase())}</span><span class="archive-arrow" aria-hidden="true">↗</span></button>`,
+    )
+    .join("");
+  document.querySelector("#filter-status").textContent =
+    `${visible.length}개 프로젝트 표시`;
+}
+document.querySelector("#featured-projects").innerHTML = projects
+  .filter((p) => p.featured)
+  .map(
+    (p, i) =>
+      `<button type="button" class="featured-project ${i === 0 ? "featured-ai" : "featured-water"}" data-project="${p.id}"><div class="featured-art" aria-hidden="true"><span class="art-label mono">${i === 0 ? "ANALYZE / STRUCTURE / REVIEW" : "OBSERVE / CONNECT / CONTROL"}</span><div class="art-diagram">${i === 0 ? '<div class="diagram-window"><span>PLC AI STUDIO</span><div class="ladder"><i></i><i></i><i></i></div></div><div class="art-cube">AI</div>' : '<div class="water-pipe"></div><div class="water-tank"><span></span></div><div class="water-metric"><small>LIVE DATA</small><svg viewBox="0 0 160 60"><path d="M0 48L25 42L45 50L70 20L92 30L110 8L132 22L160 12"/></svg></div>'}</div><span class="art-caption mono">${i === 0 ? "AI + RULES → HUMAN REVIEW" : "PLC → SERVER → WEB"}</span></div><div class="featured-copy"><span class="eyebrow">${escapeHTML(p.label)}</span><h3>${escapeHTML(p.title)} <span aria-hidden="true">↗</span></h3><p>${escapeHTML(p.summary)}</p><div class="tag-list">${p.stack
+        .slice(0, 3)
+        .map((t) => `<span>${escapeHTML(t)}</span>`)
+        .join("")}</div></div></button>`,
+  )
+  .join("");
+renderArchive();
+document.querySelector("#project-count").textContent = `/ ${projects.length}`;
+document.querySelector("#projects").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-project]");
+  if (button) openProject(button.dataset.project);
+});
+document.querySelectorAll("[data-filter]").forEach((button) =>
+  button.addEventListener("click", () => {
+    document
+      .querySelectorAll("[data-filter]")
+      .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+    renderArchive(button.dataset.filter);
+  }),
+);
+dialog
+  .querySelector(".dialog-close")
+  .addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", (event) => {
+  const bounds = dialog.getBoundingClientRect();
+  if (
+    event.target === dialog &&
+    (event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom)
+  )
+    dialog.close();
+});
+dialog.addEventListener("close", () => {
+  content.querySelectorAll("img").forEach((img) => img.removeAttribute("src"));
+  document.body.classList.remove("dialog-open");
+  previousFocus?.focus();
+});
+const captions = {
+  ot: "설비와 제어 시스템을 이해하고, 현장에서 동작하는 소프트웨어를 만듭니다.",
+  it: "장비의 신호를 연결하고 구조화해, 모니터링과 데이터 시스템으로 확장합니다.",
+  ai: "공정 지식과 AI를 결합해, 엔지니어의 해석과 의사결정을 지원합니다.",
 };
-
-const renderHero = (heroData) => {
-    const heroRoot = document.getElementById("hero");
-    if (!heroRoot || !heroData) return;
-
-    const introLink = heroData.intro?.link;
-    const introMarkup = heroData.intro
-        ? `<h3>${heroData.intro.text || ""} ${
-              introLink ? `<a href="${introLink.href}" target="_blank">${introLink.label}</a>` : ""
-          }</h3>`
-        : "";
-    const subtitleMarkup = heroData.subtitle ? `<h3>${heroData.subtitle}</h3>` : "";
-    const achievementsMarkup = (heroData.achievements || [])
-        .map((item) => `<span class="hero-tag">${item.suffix}</span>`)
-        .join("");
-
-    const achievementBlock = achievementsMarkup
-        ? `<div class="hero-tags">${achievementsMarkup}</div>`
-        : "";
-
-    heroRoot.innerHTML = `${introMarkup}${subtitleMarkup}${achievementBlock}`;
-};
-
-const createProjectItem = (project) => {
-    const listItem = document.createElement("li");
-    const classNames = ["project", "ripple", "load-bg"];
-    if (project.featured) classNames.push("project--featured");
-    if (Array.isArray(project.extraClasses)) {
-        classNames.push(...project.extraClasses);
-    }
-    listItem.className = classNames.join(" ");
-
-    if (project.backgroundColor) {
-        listItem.style.backgroundColor = project.backgroundColor;
-    }
-
-    const image = document.createElement("div");
-    image.className = "project-image";
-    if (project.backgroundImage) {
-        image.style.backgroundImage = `url(${project.backgroundImage})`;
-    }
-
-    const link = document.createElement("a");
-    link.className = "project-content";
-    link.href = project.url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-
-    const title = document.createElement("h3");
-    title.className = "project-title";
-    title.innerHTML = `<span>${project.title}</span>`;
-
-    const underline = document.createElement("span");
-    underline.className = "project-underline";
-
-    const description = document.createElement("div");
-    description.className = "project-description";
-    description.innerHTML = `<span>${project.description}</span>`;
-
-    link.appendChild(title);
-    link.appendChild(underline);
-    link.appendChild(description);
-    listItem.appendChild(image);
-    listItem.appendChild(link);
-
-    return listItem;
-};
-
-const renderProjects = (projects) => {
-    const projectsRoot = document.getElementById("projects");
-    if (!projectsRoot || !projects || !projects.length) return;
-    projectsRoot.innerHTML = "";
-    const fragment = document.createDocumentFragment();
-    projects.forEach((project) => fragment.appendChild(createProjectItem(project)));
-    projectsRoot.appendChild(fragment);
-};
-
-const buildSectionWrapper = (sectionData) => {
-    const wrapper = document.createElement("div");
-    wrapper.className = "text-wrap animate-text";
-    if (sectionData.title) {
-        const heading = document.createElement("h2");
-        heading.innerHTML = `${sectionData.title}<span class="logo-end">_</span>`;
-        wrapper.appendChild(heading);
-    }
-    return wrapper;
-};
-
-const renderAbout = (aboutData) => {
-    const aboutRoot = document.getElementById("about");
-    if (!aboutRoot || !aboutData) return;
-    const wrapper = buildSectionWrapper(aboutData);
-    (aboutData.paragraphs || []).forEach((text) => {
-        const paragraph = document.createElement("p");
-        paragraph.className = "text-intro";
-        paragraph.textContent = text;
-        wrapper.appendChild(paragraph);
-    });
-    aboutRoot.innerHTML = "";
-    aboutRoot.appendChild(wrapper);
-};
-
-const renderTech = (techData) => {
-    const techRoot = document.getElementById("Tech");
-    if (!techRoot || !techData) return;
-    const wrapper = buildSectionWrapper(techData);
-    (techData.categories || []).forEach((category) => {
-        const label = document.createElement("p");
-        label.className = "text-intro";
-        label.textContent = category.label;
-        const items = document.createElement("p");
-        items.textContent = category.items;
-        wrapper.appendChild(label);
-        wrapper.appendChild(items);
-    });
-    techRoot.innerHTML = "";
-    techRoot.appendChild(wrapper);
-};
-
-const renderAwards = (awardsData) => {
-    const awardsRoot = document.getElementById("awards");
-    if (!awardsRoot || !awardsData) return;
-    const wrapper = buildSectionWrapper(awardsData);
-    (awardsData.items || []).forEach((award) => {
-        const title = document.createElement("p");
-        title.className = "text-intro";
-        title.textContent = award.label;
-
-        const detail = document.createElement("p");
-        let detailHTML = award.detail || "";
-        if (award.link) {
-            detailHTML += `<a href="${award.link.href}" target="_blank">${award.link.text}</a>`;
-        }
-        if (award.stars) {
-            detailHTML += ` ${'<i class="fas fa-star"></i>'.repeat(award.stars)}`;
-        }
-        if (award.suffix) {
-            detailHTML += award.suffix;
-        }
-        detail.innerHTML = detailHTML;
-
-        wrapper.appendChild(title);
-        wrapper.appendChild(detail);
-    });
-    awardsRoot.innerHTML = "";
-    awardsRoot.appendChild(wrapper);
-};
-
-const initScrollAnimations = () => {
-    let scrollPos = window.scrollY;
-    const about = document.querySelector("#about > .text-wrap");
-    const tech = document.querySelector("#Tech > .text-wrap");
-    const awards = document.querySelector("#awards > .text-wrap");
-    const sections = [
-        { element: about, offset: () => about?.offsetHeight - 200 || 0 },
-        { element: tech, offset: () => (tech?.offsetHeight || 0) + 300 },
-        { element: awards, offset: () => (awards?.offsetHeight || 0) + 700 }
-    ];
-
-    const handleScroll = () => {
-        scrollPos = window.scrollY;
-        sections.forEach((section) => {
-            if (section.element && scrollPos >= section.offset()) {
-                addClassOnScroll(section.element);
-            }
-        });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-};
-
-const renderSite = (data) => {
-    renderNavigation(data.navigation);
-    renderHero(data.hero);
-    renderProjects(data.projects);
-    renderAbout(data.about);
-    renderTech(data.tech);
-    renderAwards(data.awards);
-    initScrollAnimations();
-};
-
-window.addEventListener("DOMContentLoaded", () => {
-    renderSite(siteContent);
+document.querySelectorAll("[data-layer]").forEach((button) =>
+  button.addEventListener("click", () => {
+    document
+      .querySelectorAll("[data-layer]")
+      .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+    document.querySelector("#scene-caption").textContent =
+      captions[button.dataset.layer];
+    window.dispatchEvent(
+      new CustomEvent("identity-layer", { detail: button.dataset.layer }),
+    );
+  }),
+);
+// The readable SVG remains available if a browser cannot run the 3D scene.
+window.addEventListener("identity-scene-unavailable", () => {
+  const motion = document.querySelector("#motion-toggle");
+  motion.hidden = true;
+  document.querySelector(".scene-footnote span").textContent =
+    "EQUIPMENT → DATA → INTELLIGENCE";
 });
