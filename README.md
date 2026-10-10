@@ -12,9 +12,13 @@ A GitHub Pages portfolio connecting industrial control, software, and manufactur
 - Walk to the information terminal (or select its shortcut) to open Identity, Projects, Experience, and Contact without leaving the island.
 - Station cards also link to these terminal sections. Project details open in a second dialog; Escape returns one level at a time.
 - The background world pauses while a terminal or project dialog is open. Closing it resumes exploration.
-- Reset restarts the three-station discovery. Progress is session-only and no account is needed.
+- Collect five golden data chips by walking into them or clicking them to navigate. Each chip grants 20 XP; each first-time station connection grants 100 XP. All five chips and three stations earn the **System Architect** badge at 400 XP. Rewards are optional and never lock portfolio content.
+- Hold Shift while moving, or toggle the boost button on desktop/mobile, for faster travel.
+- Reset clears discovery, chips, XP, and boost. Progress is session-only and no account is needed.
 
 Reduced motion pauses ambient animation and makes section shortcuts jump directly to their destination; intentional keyboard/touch movement remains available. Without WebGL, section buttons still reveal the zone descriptions and projects alongside a static illustration, and the terminal shortcut opens the portfolio directly. Legacy section URLs open the matching terminal tab.
+
+High quality uses 2× supersampling on ordinary displays (up to 2.5× on high-density screens, capped at an 8-million-pixel framebuffer), antialiasing, smoother curved geometry, and 2048px soft shadows. The **High / Standard** toggle reduces resolution and disables shadows for slower devices.
 
 ## Work locally
 

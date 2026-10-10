@@ -21,10 +21,10 @@
     <meta property="og:url" content="https://fortex66.github.io/" />
     <title>Eonsang Son — Manufacturing Software Engineer</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./main-188f7a519b70.css" />
+    <link rel="stylesheet" href="./main-65733ff7c092.css" />
     <script defer src="./data-16697dca69e7.js"></script>
-    <script defer src="./main-9cf432757e7b.js"></script>
-    <script type="module" src="./scene-dd61680d5331.js"></script>
+    <script defer src="./main-adbd05ac721b.js"></script>
+    <script type="module" src="./scene-dad6293b91d6.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#world-terminal">안내 단말로 바로 가기</a>
@@ -42,6 +42,8 @@
             <div class="scene-topline">
               <span class="mono"
                 >ENGINEERING ISLAND / INTERACTIVE PORTFOLIO</span
+              ><button id="quality-toggle" type="button" aria-pressed="true">
+                화질 · High</button
               ><button
                 id="motion-toggle"
                 type="button"
@@ -104,6 +106,19 @@
                 aria-label="안내 단말로 이동"
               >
                 <small>PORTFOLIO / INFO</small>안내 단말 <span>↗</span>
+              </button>
+              <aside class="game-hud" aria-label="탐험 점수">
+                <span class="eyebrow" id="game-rank">EXPLORER</span>
+                <strong
+                  ><span id="game-score">0</span
+                  ><small> / 400 XP</small></strong
+                >
+                <span id="game-chips">데이터 칩 0 / 5</span>
+                <p id="game-hint">빛나는 칩을 모으고 세 시스템을 연결하세요.</p>
+              </aside>
+              <div id="game-toast" role="status" aria-live="polite"></div>
+              <button id="boost-toggle" type="button" aria-pressed="false">
+                ⚡ 부스트 <span>Shift</span>
               </button>
               <div class="world-start">
                 <button

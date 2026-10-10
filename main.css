@@ -2446,8 +2446,404 @@ body:has(.library-body) {
   }
 }
 @media (max-height: 620px) and (min-width: 651px) {
-  .hero-world .world-start { bottom: 16px; }
-  .hero-world .world-start > span { display: none; }
-  .hero-world .world-marker { min-width: 82px; padding: 9px; font-size: 10px; }
-  .hero-world .world-marker small { font-size: 6px; }
+  .hero-world .world-start {
+    bottom: 16px;
+  }
+  .hero-world .world-start > span {
+    display: none;
+  }
+  .hero-world .world-marker {
+    min-width: 82px;
+    padding: 9px;
+    font-size: 10px;
+  }
+  .hero-world .world-marker small {
+    font-size: 6px;
+  }
+}
+
+/* Sharper world, readable HUD, and optional exploration rewards. */
+.hero-world .world-intro .eyebrow {
+  font-size: 12px;
+}
+.hero-world .world-intro h1 {
+  font-size: 30px;
+}
+.hero-world .world-intro h1 span {
+  font-size: 12px;
+}
+.hero-world .world-intro .hero-description {
+  font-size: 14px;
+}
+.hero-world .world-quest {
+  top: 136px;
+}
+.hero-world .world-quest strong {
+  font-size: 15px;
+}
+.hero-world .world-quest p,
+.hero-world .world-quest .eyebrow {
+  font-size: 11px;
+}
+.hero-world .world-marker {
+  font-size: 15px;
+}
+.hero-world .world-marker small {
+  font-size: 10px;
+}
+.hero-world .scene-topline .mono,
+.hero-world .scene-topline button {
+  font-size: 11px;
+}
+.hero-world .scene-topline {
+  gap: 16px;
+}
+#quality-toggle {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.hero-world .scene-tabs button {
+  font-size: 15px;
+}
+.hero-world .scene-tabs button > span {
+  font-size: 10px;
+}
+.hero-world .world-toolbar p,
+.hero-world .world-toolbar button,
+.hero-world .world-interact {
+  font-size: 13px;
+}
+.hero-world .world-toolbar kbd {
+  font-size: 11px;
+}
+.hero-world .world-card p,
+.hero-world .world-card button {
+  font-size: 14px;
+}
+.library-tabs button,
+#library-close {
+  font-size: 14px;
+}
+.library-body .archive-main > span,
+.library-body .contact-links span {
+  font-size: 14px;
+}
+.game-hud {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  right: 24px;
+  width: 228px;
+  padding: 17px 20px;
+  background: #102623ec;
+  border: 1px solid #42665a;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px #03110c33;
+  pointer-events: none;
+}
+.game-hud .eyebrow {
+  display: block;
+  color: #f4d59a;
+  font-size: 10px;
+  margin: 0 0 8px;
+}
+.game-hud > strong {
+  display: block;
+  color: #e2f3ea;
+  font: 27px var(--mono);
+}
+.game-hud strong small {
+  font-size: 12px;
+  color: #a1bdaf;
+}
+#game-chips {
+  display: block;
+  color: #f4d59a;
+  font-size: 13px;
+  margin-top: 8px;
+}
+#game-hint {
+  color: #b3cdbf;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 8px 0 0;
+}
+.game-hud.is-complete {
+  border-color: #f4d59a;
+  box-shadow: 0 0 30px #f4d59a22;
+}
+.scene-viewport:has(.world-card:not([hidden])) .game-hud {
+  visibility: hidden;
+}
+#game-toast {
+  position: absolute;
+  z-index: 7;
+  bottom: 86px;
+  left: 50%;
+  transform: translate(-50%, 8px);
+  max-width: calc(100% - 32px);
+  width: max-content;
+  padding: 12px 20px;
+  background: #f6dda6;
+  color: #17362c;
+  border: 1px solid #ffeecb;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+  pointer-events: none;
+}
+#game-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+#boost-toggle {
+  position: absolute;
+  z-index: 4;
+  bottom: 24px;
+  left: 26px;
+  border: 1px solid #58735f;
+  border-radius: 6px;
+  color: #d7e9df;
+  background: #162c27;
+  padding: 11px 16px;
+  font-size: 13px;
+}
+#boost-toggle span {
+  margin-left: 9px;
+  font: 10px var(--mono);
+  color: #a6beb0;
+}
+#boost-toggle[aria-pressed="true"] {
+  background: #f4d59a;
+  color: #17362c;
+}
+.scene-viewport:has(.world-start:not(.is-started)) #boost-toggle {
+  bottom: 88px;
+}
+[hidden].game-hud,
+[hidden]#boost-toggle,
+[hidden]#quality-toggle {
+  display: none;
+}
+@media (max-width: 650px) {
+  .hero-world .world-intro {
+    top: 59px;
+    max-width: calc(100% - 32px);
+  }
+  .hero-world .world-intro .eyebrow {
+    font-size: 10px;
+  }
+  .hero-world .world-intro h1 {
+    font-size: 24px;
+  }
+  .hero-world .world-intro h1 span {
+    font-size: 10px;
+  }
+  .hero-world .world-intro .hero-description {
+    font-size: 12px;
+  }
+  .hero-world .world-quest {
+    top: 110px;
+    height: 85px;
+  }
+  .hero-world .world-quest strong {
+    font-size: 12px;
+  }
+  .hero-world .world-quest p {
+    font-size: 9px;
+    top: 36px;
+  }
+  .hero-world .world-marker {
+    font-size: 13px;
+    padding: 10px;
+  }
+  .hero-world .world-marker small {
+    font-size: 9px;
+  }
+  .hero-world .scene-topline {
+    padding-inline: 12px;
+    gap: 12px;
+  }
+  .hero-world .scene-topline .mono {
+    font-size: 9px;
+    max-width: 105px;
+    line-height: 1.4;
+  }
+  .hero-world .scene-topline button {
+    font-size: 10px;
+  }
+  .hero-world .world-experience {
+    grid-template-rows: 44px minmax(0, 1fr) 48px 64px;
+  }
+  .hero-world .scene-tabs {
+    margin-inline: 12px;
+  }
+  .hero-world .scene-tabs button {
+    font-size: 12px;
+  }
+  .hero-world .scene-tabs button > span {
+    font-size: 8px;
+  }
+  .hero-world .world-toolbar p {
+    font-size: 9px;
+  }
+  .hero-world .world-toolbar kbd {
+    font-size: 8px;
+  }
+  .hero-world #world-terminal,
+  .hero-world #world-reset {
+    font-size: 11px;
+  }
+  .hero-world .world-interact {
+    font-size: 11px;
+    max-width: 174px;
+  }
+  .hero-world .world-card {
+    top: 205px;
+    max-height: calc(100% - 300px);
+  }
+  .game-hud {
+    top: auto;
+    bottom: 112px;
+    right: 16px;
+    width: 151px;
+    padding: 12px;
+  }
+  .game-hud .eyebrow {
+    font-size: 9px;
+  }
+  .game-hud > strong {
+    font-size: 22px;
+  }
+  #game-chips {
+    font-size: 12px;
+  }
+  #game-hint {
+    display: none;
+  }
+  #boost-toggle,
+  .scene-viewport:has(.world-start:not(.is-started)) #boost-toggle {
+    left: 18px;
+    bottom: 174px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  #boost-toggle span {
+    display: none;
+  }
+  #game-toast {
+    bottom: 228px;
+    font-size: 12px;
+  }
+  .library-tabs button,
+  #library-close {
+    font-size: 12px;
+  }
+  .library-body .contact-links span {
+    font-size: 12px;
+  }
+}
+@media (max-height: 620px) {
+  .hero-world .world-intro h1 {
+    font-size: 21px;
+  }
+  .hero-world .world-quest {
+    top: 92px;
+  }
+  .game-hud {
+    top: 12px;
+    bottom: auto;
+    width: 145px;
+    padding: 10px;
+  }
+  #game-hint {
+    display: none;
+  }
+  .game-hud > strong {
+    font-size: 20px;
+  }
+  #game-toast {
+    bottom: 75px;
+  }
+  .hero-world .world-card {
+    top: 12px;
+    max-height: calc(100% - 75px);
+  }
+}
+@media (max-height: 620px) and (max-width: 650px) {
+  .game-hud {
+    top: auto;
+    bottom: 98px;
+    right: 12px;
+    width: 132px;
+  }
+  #boost-toggle,
+  .scene-viewport:has(.world-start:not(.is-started)) #boost-toggle {
+    bottom: 166px;
+  }
+  .hero-world .world-marker {
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #game-toast {
+    transition: none;
+  }
+}
+@media (max-width: 650px) {
+  .hero-world .scene-topline .mono {
+    font-size: 0;
+    width: 99px;
+    max-width: none;
+    flex-shrink: 0;
+  }
+  .hero-world .scene-topline .mono::before {
+    content: "ENGINEERING ISLAND";
+    font-size: 8px;
+    white-space: nowrap;
+  }
+  .hero-world .scene-topline button {
+    white-space: nowrap;
+  }
+  .hero-world .world-intro {
+    width: calc(100% - 32px);
+  }
+}
+.hero-world .world-experience {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (max-width: 360px) {
+  .hero-world .scene-topline {
+    gap: 8px;
+  }
+  .hero-world .scene-topline .mono {
+    width: 90px;
+  }
+  .hero-world .scene-topline .mono::before {
+    font-size: 7px;
+  }
+  .hero-world .world-intro h1 span {
+    display: none;
+  }
+}
+@media (max-height: 620px) and (min-width: 651px) {
+  .hero-world .world-marker {
+    min-width: 82px;
+    font-size: 12px;
+    padding: 8px;
+  }
+  .hero-world .world-marker small,
+  .hero-world .world-marker > span {
+    display: none;
+  }
+}
+@media (max-height: 620px) and (max-width: 650px) {
+  .hero-world .world-marker {
+    display: none;
+  }
 }
