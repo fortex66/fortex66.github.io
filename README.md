@@ -1,6 +1,6 @@
 # Eonsang Son — Portfolio
 
-A GitHub Pages portfolio connecting industrial control, software, and manufacturing AI. The first screen is a playable Three.js **Engineering Island**: move a small explorer between Equipment, Data, and Intelligence to discover career context and related projects. Connecting all three stations lights up the island's engineering circuit. This is a conceptual identity map; it does not display live equipment data.
+A GitHub Pages portfolio connecting industrial control, software, and manufacturing AI. The main page is a fixed, fullscreen playable Three.js **Engineering Island**: move a small explorer between Equipment, Data, and Intelligence to discover career context and related projects. Connecting all three stations lights up the island's engineering circuit. This is a conceptual identity map; it does not display live equipment data.
 
 ## Explore the island
 
@@ -9,10 +9,12 @@ A GitHub Pages portfolio connecting industrial control, software, and manufactur
 - Click a station, its label, or a section shortcut to walk there automatically.
 - Click a reachable floor position to move; station bases and island edges block movement.
 - Mobile visitors can hold the directional buttons. The camera follows the explorer.
-- Project buttons open the same accessible dialogs as the regular project archive.
+- Walk to the information terminal (or select its shortcut) to open Identity, Projects, Experience, and Contact without leaving the island.
+- Station cards also link to these terminal sections. Project details open in a second dialog; Escape returns one level at a time.
+- The background world pauses while a terminal or project dialog is open. Closing it resumes exploration.
 - Reset restarts the three-station discovery. Progress is session-only and no account is needed.
 
-Reduced motion pauses ambient animation and makes section shortcuts jump directly to their destination; intentional keyboard/touch movement remains available. Without WebGL, section buttons still reveal the zone descriptions and projects alongside a static illustration.
+Reduced motion pauses ambient animation and makes section shortcuts jump directly to their destination; intentional keyboard/touch movement remains available. Without WebGL, section buttons still reveal the zone descriptions and projects alongside a static illustration, and the terminal shortcut opens the portfolio directly. Legacy section URLs open the matching terminal tab.
 
 ## Work locally
 
@@ -25,7 +27,7 @@ npm run preview
 
 Open http://localhost:4173. GitHub Pages can serve the root files directly; `dist/` is an optional static deployment artifact. Keep the existing GitHub Pages publishing configuration when merging.
 
-- `index.html`: identity, experience, education, and contact
+- `index.html`: fullscreen world and terminal dialog with identity, experience, education, and contact
 - `data.js`: all 11 projects, roles, tools, sources, and optional demos
 - `main.js`: zone descriptions, discovery progress, archive filters, project dialogs
 - `scene.js`: 3D island, explorer movement/collisions, click navigation, camera, ambient animation

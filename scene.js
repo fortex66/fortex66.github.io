@@ -262,6 +262,37 @@ function initializeScene() {
   });
   // A playable island: the explorer connects the three engineering stations.
   const deck = box(root, 12, 0.32, 8.5, mat(0x162c2c, 0.4), 0, -0.32, 0.5);
+  // The in-world information terminal opens the rest of the portfolio.
+  const terminal = new THREE.Group();
+  terminal.position.set(4.45, 0, 2);
+  root.add(terminal);
+  const terminalBase = box(terminal, 0.85, 0.14, 0.8, dark, 0, -0.02, 0);
+  edge(terminalBase, 0xb0e4d2);
+  box(terminal, 0.22, 0.65, 0.22, metal, 0, 0.32, 0);
+  const terminalScreen = box(
+    terminal,
+    0.78,
+    0.52,
+    0.1,
+    mat(0x173b36),
+    0,
+    0.84,
+    0,
+  );
+  terminalScreen.rotation.x = -0.2;
+  edge(terminalScreen, 0xb0e4d2);
+  for (let i = 0; i < 3; i++)
+    box(
+      terminal,
+      0.46 - i * 0.08,
+      0.025,
+      0.02,
+      glow(0xb0e4d2),
+      -0.06,
+      0.97 - i * 0.1,
+      0.1,
+    );
+  pads.terminal = terminal;
   edge(deck, 0x4b8171, 0.8);
   const floor = new THREE.GridHelper(12, 24, 0x3b6759, 0x28473e);
   floor.position.set(0, -0.15, 0.5);
@@ -347,6 +378,7 @@ function initializeScene() {
       new THREE.Vector3(p.x, -0.1, p.z + 1.75),
     ]),
   );
+  destinations.terminal = new THREE.Vector3(4.45, -0.1, 3.6);
   const viewCenter = new THREE.Vector3(0, 0.4, 0.5);
   let paused = reducedMotion.matches,
     inViewport = true,
@@ -363,9 +395,7 @@ function initializeScene() {
   const direction = new THREE.Vector3(),
     destinationPoint = new THREE.Vector3();
   const focusable = () =>
-    !document.querySelector("#project-dialog").open &&
-    !document.hidden &&
-    inViewport;
+    !document.querySelector("dialog[open]") && !document.hidden && inViewport;
   function cameraPose() {
     if (innerWidth < 650) {
       viewCenter.x = explorer.position.x;
@@ -397,16 +427,26 @@ function initializeScene() {
       const marker = markers.find((m) => m.dataset.destination === id);
       marker.style.left = `${(p.x + 1) * 0.5 * container.clientWidth}px`;
       const projectedY = (1 - p.y) * 0.5 * container.clientHeight;
-      marker.style.top = `${innerWidth < 650 ? Math.max(155, projectedY) : projectedY}px`;
+      marker.style.top = `${innerWidth < 650 ? Math.max(195, projectedY) : projectedY}px`;
       marker.classList.add("positioned");
       marker.hidden = Math.abs(p.x) > 0.78 || p.y > 1 || p.y < -0.75;
     });
+    const label = document.querySelector("#terminal-marker");
+    const point = new THREE.Vector3(4.45, 1.8, 2).project(camera);
+    label.style.left = `${(point.x + 1) * 0.5 * container.clientWidth}px`;
+    label.style.top = `${(1 - point.y) * 0.5 * container.clientHeight}px`;
+    label.hidden = Math.abs(point.x) > 0.82 || Math.abs(point.y) > 0.85;
+    label.classList.add("positioned");
   }
   function render() {
     renderer.render(scene, camera);
     updateMarkers();
   }
   function selectZone(id) {
+    if (id === "terminal") {
+      window.dispatchEvent(new Event("world-library"));
+      return;
+    }
     visited.add(id);
     nearby = undefined;
     updateNearby();
@@ -441,7 +481,9 @@ function initializeScene() {
       nearby = next;
       interact.disabled = !next;
       interact.textContent = next
-        ? `${visited.has(next) ? "다시 보기" : "연결하기"} / ${next.toUpperCase()} ↗`
+        ? next === "terminal"
+          ? "안내 단말 열기 ↗"
+          : `${visited.has(next) ? "다시 보기" : "연결하기"} / ${next.toUpperCase()} ↗`
         : "구역 가까이 이동하세요";
     }
   }
@@ -467,6 +509,7 @@ function initializeScene() {
   }
   function blocked(x, z) {
     if (Math.abs(x) > 5.55 || z < -3.25 || z > 4.35) return true;
+    if (Math.abs(x - 4.45) < 0.6 && Math.abs(z - 2) < 0.55) return true;
     return Object.values(positions).some(
       (p) => Math.abs(x - p.x) < 1.48 && Math.abs(z - p.z) < 1.35,
     );
@@ -549,7 +592,11 @@ function initializeScene() {
   }
   function frame(now) {
     raf = 0;
-    if (document.hidden || !inViewport) {
+    if (
+      document.hidden ||
+      !inViewport ||
+      document.querySelector("dialog[open]")
+    ) {
       previous = 0;
       return;
     }
@@ -622,6 +669,15 @@ function initializeScene() {
     keys.delete(event.key.toLowerCase()),
   );
   canvas.addEventListener("blur", clearInput);
+  window.addEventListener("world-overlay-open", () => {
+    clearInput();
+    autopilot = null;
+    targetRing.visible = false;
+    cancelAnimationFrame(raf);
+    raf = 0;
+    previous = 0;
+  });
+  window.addEventListener("world-overlay-close", sync);
   window.addEventListener("blur", clearInput);
   document.querySelectorAll("[data-move]").forEach((button) => {
     button.addEventListener("pointerdown", (e) => {
