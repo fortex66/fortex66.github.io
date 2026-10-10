@@ -10,7 +10,7 @@ try {
     canvas,
     alpha: true,
     antialias: true,
-    powerPreference: "low-power",
+    powerPreference: "high-performance",
   });
 } catch {
   window.dispatchEvent(new Event("identity-scene-unavailable"));
@@ -18,9 +18,9 @@ try {
 if (renderer) initializeScene();
 
 function initializeScene() {
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio, innerWidth < 600 ? 1.25 : 1.5),
-  );
+  let highQuality = true;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.3;
@@ -31,6 +31,18 @@ function initializeScene() {
   scene.add(new THREE.HemisphereLight(0xd5f2ed, 0x142631, 3));
   const key = new THREE.DirectionalLight(0xffe1c7, 4);
   key.position.set(-3, 8, 6);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  Object.assign(key.shadow.camera, {
+    left: -9,
+    right: 9,
+    top: 9,
+    bottom: -9,
+    near: 0.5,
+    far: 30,
+  });
+  key.shadow.normalBias = 0.035;
+  key.shadow.bias = -0.0002;
   scene.add(key);
   const rim = new THREE.DirectionalLight(0xa3c8ff, 3);
   rim.position.set(6, 5, -4);
@@ -55,15 +67,19 @@ function initializeScene() {
   function box(parent, w, h, d, material, x = 0, y = 0, z = 0) {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
     mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     parent.add(mesh);
     return mesh;
   }
   function cylinder(parent, r, h, material, x = 0, y = 0, z = 0) {
     const mesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(r, r, h, 24),
+      new THREE.CylinderGeometry(r, r, h, 48),
       material,
     );
     mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     parent.add(mesh);
     return mesh;
   }
@@ -78,7 +94,7 @@ function initializeScene() {
   function segment(parent, a, b, r, material) {
     const delta = b.clone().sub(a);
     const mesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(r, r, delta.length(), 12),
+      new THREE.CylinderGeometry(r, r, delta.length(), 24),
       material,
     );
     mesh.position.copy(a.clone().add(b).multiplyScalar(0.5));
@@ -86,6 +102,8 @@ function initializeScene() {
       new THREE.Vector3(0, 1, 0),
       delta.normalize(),
     );
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     parent.add(mesh);
     return mesh;
   }
@@ -293,6 +311,7 @@ function initializeScene() {
       0.1,
     );
   pads.terminal = terminal;
+  deck.castShadow = false;
   edge(deck, 0x4b8171, 0.8);
   const floor = new THREE.GridHelper(12, 24, 0x3b6759, 0x28473e);
   floor.position.set(0, -0.15, 0.5);
@@ -366,6 +385,71 @@ function initializeScene() {
   targetRing.position.y = -0.1;
   targetRing.visible = false;
   root.add(targetRing);
+  // Optional exploration rewards never lock portfolio content.
+  const chips = [-4.8, -2.4, 0, 2.4, 4.8].map((x, index) => {
+    const mesh = new THREE.Mesh(
+      new THREE.OctahedronGeometry(0.16),
+      glow(0xffd88b),
+    );
+    mesh.position.set(x, 0.4, 3.65);
+    const halo = new THREE.Mesh(
+      new THREE.TorusGeometry(0.26, 0.014, 8, 40),
+      glow(0xffd88b),
+    );
+    halo.rotation.x = Math.PI / 2;
+    mesh.add(halo);
+    root.add(mesh);
+    return { mesh, index, collected: false };
+  });
+  let boost = false,
+    toastTimer;
+  const boostButton = document.querySelector("#boost-toggle");
+  const toast = document.querySelector("#game-toast");
+  function announce(message) {
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 3600);
+  }
+  function updateRewards(message) {
+    const count = chips.filter((c) => c.collected).length;
+    const complete = count === 5 && visited.size === 3;
+    document.querySelector("#game-score").textContent =
+      visited.size * 100 + count * 20;
+    document.querySelector("#game-chips").textContent =
+      `데이터 칩 ${count} / 5`;
+    document.querySelector("#game-rank").textContent = complete
+      ? "SYSTEM ARCHITECT ★"
+      : visited.size === 3
+        ? "SYSTEM CONNECTOR"
+        : "EXPLORER";
+    document
+      .querySelector(".game-hud")
+      .classList.toggle("is-complete", complete);
+    document.querySelector("#game-hint").textContent = complete
+      ? "탐험 완료! 모든 시스템과 데이터를 연결했습니다."
+      : count === 5
+        ? "세 시스템을 연결하면 최종 배지를 획득합니다."
+        : "빛나는 칩을 모으고 세 시스템을 연결하세요.";
+    if (message)
+      announce(complete ? "★ SYSTEM ARCHITECT · 400 XP 달성!" : message);
+  }
+  function collectChips() {
+    if (!started) return;
+    chips.forEach((chip) => {
+      if (
+        !chip.collected &&
+        Math.hypot(
+          explorer.position.x - chip.mesh.position.x,
+          explorer.position.z - chip.mesh.position.z,
+        ) < 0.48
+      ) {
+        chip.collected = true;
+        chip.mesh.visible = false;
+        updateRewards("데이터 칩 획득 · +20 XP");
+      }
+    });
+  }
   const keys = new Set(),
     held = new Set(),
     visited = new Set();
@@ -410,6 +494,13 @@ function initializeScene() {
   function sizeScene() {
     const width = container.clientWidth,
       height = container.clientHeight;
+    const desiredRatio = highQuality
+      ? Math.min(Math.max(devicePixelRatio, 2), 2.5)
+      : Math.min(devicePixelRatio, 1.25);
+    // Bound framebuffer memory on very large screens while supersampling ordinary displays.
+    renderer.setPixelRatio(
+      Math.min(desiredRatio, Math.sqrt(8000000 / Math.max(1, width * height))),
+    );
     renderer.setSize(width, height, false);
     const aspect = width / height,
       vertical = innerWidth < 650 ? 4.2 : 4.6;
@@ -427,7 +518,7 @@ function initializeScene() {
       const marker = markers.find((m) => m.dataset.destination === id);
       marker.style.left = `${(p.x + 1) * 0.5 * container.clientWidth}px`;
       const projectedY = (1 - p.y) * 0.5 * container.clientHeight;
-      marker.style.top = `${innerWidth < 650 ? Math.max(195, projectedY) : projectedY}px`;
+      marker.style.top = `${innerWidth < 650 ? Math.max(265, projectedY) : projectedY}px`;
       marker.classList.add("positioned");
       marker.hidden = Math.abs(p.x) > 0.78 || p.y > 1 || p.y < -0.75;
     });
@@ -447,7 +538,11 @@ function initializeScene() {
       window.dispatchEvent(new Event("world-library"));
       return;
     }
+    const firstVisit = !visited.has(id);
     visited.add(id);
+    updateRewards(
+      firstVisit ? `${id.toUpperCase()} 시스템 연결 · +100 XP` : null,
+    );
     nearby = undefined;
     updateNearby();
     pads[id].children[0].material = highlightedPad;
@@ -499,6 +594,7 @@ function initializeScene() {
       explorer.position.copy(destinations[id]);
       cameraPose();
       updateNearby();
+      collectChips();
       selectZone(id);
       return;
     }
@@ -548,8 +644,12 @@ function initializeScene() {
       else if (Math.abs(direction.x) > 0.12) direction.z = 0;
     }
     if (direction.lengthSq() === 0) return false;
+    const remaining = autopilot ? direction.length() : Infinity;
     direction.normalize();
-    const step = 2.7 * delta;
+    const step = Math.min(
+      (boost || keys.has("shift") ? 4.5 : 2.7) * delta,
+      remaining,
+    );
     const x = explorer.position.x + direction.x * step,
       z = explorer.position.z + direction.z * step;
     let moved = false;
@@ -574,11 +674,17 @@ function initializeScene() {
       arms[0].rotation.x = Math.sin(walkTime) * 0.22;
       arms[1].rotation.x = -Math.sin(walkTime) * 0.22;
     }
+    collectChips();
     updateNearby();
     cameraPose();
     return true;
   }
   function pose() {
+    chips.forEach(({ mesh, index, collected }) => {
+      if (collected) return;
+      mesh.position.y = 0.4 + Math.sin(time * 2 + index) * 0.09;
+      mesh.rotation.y = time * 0.8 + index;
+    });
     robotArm.rotation.y = Math.sin(time * 0.85) * 0.38;
     server.position.y = Math.sin(time * 0.8 + 1) * 0.065;
     ai.position.y = 1.35 + Math.sin(time * 0.95) * 0.14;
@@ -645,6 +751,7 @@ function initializeScene() {
     const key = event.key.toLowerCase();
     if (
       [
+        "shift",
         "w",
         "a",
         "s",
@@ -709,6 +816,29 @@ function initializeScene() {
       -((event.clientY - r.top) / r.height) * 2 + 1,
     );
     raycaster.setFromCamera(pointer, camera);
+    const chip = chips.find(
+      (c) => !c.collected && raycaster.intersectObject(c.mesh, true).length,
+    );
+    if (chip) {
+      const point = new THREE.Vector3(
+        chip.mesh.position.x,
+        -0.1,
+        chip.mesh.position.z,
+      );
+      if (reducedMotion.matches) {
+        explorer.position.copy(point);
+        collectChips();
+        cameraPose();
+        updateNearby();
+        render();
+      } else {
+        autopilot = { point, zone: null };
+        targetRing.position.copy(point);
+        targetRing.visible = true;
+        wake();
+      }
+      return;
+    }
     for (const [id, pad] of Object.entries(pads)) {
       if (raycaster.intersectObject(pad, true).length) {
         travel(id);
@@ -721,6 +851,7 @@ function initializeScene() {
         explorer.position.copy(destinationPoint);
         cameraPose();
         updateNearby();
+        collectChips();
         render();
       } else {
         autopilot = { point: destinationPoint.clone(), zone: null };
@@ -735,6 +866,15 @@ function initializeScene() {
     clearInput();
     autopilot = null;
     visited.clear();
+    chips.forEach((chip) => {
+      chip.collected = false;
+      chip.mesh.visible = true;
+    });
+    boost = false;
+    boostButton.setAttribute("aria-pressed", "false");
+    clearTimeout(toastTimer);
+    toast.classList.remove("is-visible");
+    updateRewards();
     targetRing.visible = false;
     explorer.position.set(0, -0.1, 3.5);
     explorer.rotation.y = 0;
@@ -750,6 +890,25 @@ function initializeScene() {
     cameraPose();
     render();
   });
+  boostButton.addEventListener("click", () => {
+    boost = !boost;
+    boostButton.setAttribute("aria-pressed", String(boost));
+    canvas.focus({ preventScroll: true });
+  });
+  document
+    .querySelector("#quality-toggle")
+    .addEventListener("click", (event) => {
+      highQuality = !highQuality;
+      renderer.shadowMap.enabled = highQuality;
+      scene.traverse((object) => {
+        if (object.material) object.material.needsUpdate = true;
+      });
+      event.currentTarget.setAttribute("aria-pressed", String(highQuality));
+      event.currentTarget.textContent = highQuality
+        ? "화질 · High"
+        : "화질 · Standard";
+      sizeScene();
+    });
   motionButton.addEventListener("click", () => {
     paused = !paused;
     sync();

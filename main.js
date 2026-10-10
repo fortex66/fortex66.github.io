@@ -309,3 +309,9 @@ function followSectionHash() {
 }
 window.addEventListener("hashchange", followSectionHash);
 followSectionHash();
+
+window.addEventListener("identity-scene-unavailable", () => {
+  document
+    .querySelectorAll(".game-hud, #boost-toggle, #quality-toggle")
+    .forEach((el) => (el.hidden = true));
+});
