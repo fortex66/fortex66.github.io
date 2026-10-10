@@ -1406,3 +1406,551 @@ dialog::backdrop {
     transform: none;
   }
 }
+
+/* Playable Engineering Island */
+.hero-world .hero-grid {
+  display: block;
+  min-height: 0;
+  padding-block: 36px 20px;
+}
+.world-intro {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  align-items: flex-end;
+  margin-bottom: 28px;
+}
+.hero-world h1 {
+  font-size: 36px;
+  line-height: 1.4;
+  margin: 16px 0 14px;
+}
+.hero-world .hero-description {
+  font-size: 12px;
+}
+.world-intro-side {
+  text-align: right;
+  padding-bottom: 5px;
+}
+.world-intro-side .hero-current {
+  margin: 0 0 15px;
+  color: #c8dfd5;
+  font-size: 12px;
+}
+.world-intro-side .text-link {
+  color: #b0c4bc;
+  font-size: 11px;
+}
+.world-experience {
+  border: 1px solid #344843;
+  background: #101e21;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.world-experience .scene-topline {
+  padding: 11px 18px;
+  border-bottom: 1px solid #283a36;
+}
+.world-experience .scene-viewport {
+  height: 510px;
+  background: radial-gradient(ellipse at 50% 40%, #24473b66, transparent 70%);
+}
+.world-experience #identity-canvas {
+  touch-action: none;
+}
+.world-experience #identity-canvas:focus-visible {
+  outline: 2px solid #b0e4d2;
+  outline-offset: -3px;
+}
+.world-quest {
+  position: absolute;
+  top: 23px;
+  left: 24px;
+  z-index: 3;
+  pointer-events: none;
+}
+.world-quest .eyebrow {
+  color: #7ea995;
+  font-size: 8px;
+}
+.world-quest strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+  color: #d9eae1;
+}
+.quest-track {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+.quest-track span {
+  border: 1px solid #507067;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  font: 8px var(--mono);
+  color: #7f9e93;
+  background: #122323;
+}
+.quest-track span.connected {
+  color: #14312a;
+  background: #b0e4d2;
+  border-color: #b0e4d2;
+}
+.quest-track i {
+  width: 24px;
+  height: 1px;
+  background: #3c5b50;
+}
+.world-quest p {
+  font: 9px var(--mono);
+  color: #6f9987;
+  margin-top: 10px;
+}
+.world-quest p > span {
+  color: #b8dcc7;
+}
+.world-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  text-align: left;
+  background: #18302bde;
+  border: 1px solid #5e867567;
+  backdrop-filter: blur(6px);
+  border-radius: 4px;
+  padding: 9px 13px;
+  min-width: 112px;
+  transform: translate(-50%, -100%);
+  font-size: 12px;
+  color: #d5ebe0;
+  white-space: nowrap;
+}
+.world-marker small {
+  display: block;
+  font: 7px var(--mono);
+  color: #90b8a8;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+.world-marker span {
+  color: #86bca7;
+  margin-left: 10px;
+}
+.world-marker.visited {
+  border-color: #b0e4d2;
+}
+.world-marker.visited small::after {
+  content: " / CONNECTED";
+  color: #b0e4d2;
+}
+.world-marker:not(.positioned) {
+  visibility: hidden;
+}
+.world-start {
+  position: absolute;
+  left: 24px;
+  bottom: 25px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.world-start > span {
+  font-size: 10px;
+  color: #729488;
+}
+.world-start.is-started {
+  display: none;
+}
+.world-card {
+  position: absolute;
+  right: 22px;
+  top: 22px;
+  z-index: 5;
+  background: #f4f6ef;
+  color: #203b2e;
+  border: 1px solid #8da995;
+  border-radius: 6px;
+  width: 320px;
+  padding: 22px;
+  box-shadow: 0 12px 36px #05161066;
+  max-height: calc(100% - 100px);
+  overflow: auto;
+}
+.world-card[hidden] {
+  display: none;
+}
+.world-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.world-card-top .eyebrow {
+  color: #749482 !important;
+  font-size: 8px !important;
+}
+.world-card-top button {
+  background: none;
+  font-size: 20px;
+  padding: 0 3px;
+  color: #637e6b;
+}
+.world-card h3 {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 550;
+}
+.world-card p {
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 14px;
+  color: #5d7566;
+}
+.world-card .world-career {
+  font-family: var(--mono);
+  font-size: 9px;
+  border-block: 1px solid #d2ded0;
+  padding: 13px 0;
+  line-height: 1.9;
+  margin: 18px 0;
+}
+.world-card-projects {
+  display: flex;
+  flex-direction: column;
+}
+.world-card [data-world-project] {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: none;
+  text-align: left;
+  font-size: 11px;
+  padding: 10px 0;
+  border-bottom: 1px solid #d6e0d1;
+  color: #314d3c;
+}
+.world-card [data-world-project]:last-child {
+  border-bottom: 0;
+}
+.world-card [data-world-project]:hover {
+  color: #16705a;
+}
+.world-interact {
+  position: absolute;
+  right: 24px;
+  bottom: 25px;
+  z-index: 4;
+  background: #b0e4d2;
+  color: #15382b;
+  border: 1px solid #c7eddd;
+  border-radius: 4px;
+  font-size: 11px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 0 #32654e;
+}
+.world-interact:disabled {
+  background: #18312b;
+  color: #648779;
+  border-color: #39594a;
+  box-shadow: none;
+}
+.world-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 15px 20px;
+  border-top: 1px solid #2b4038;
+  color: #95b4a6;
+  align-items: center;
+  background: #10211f;
+}
+.world-toolbar p {
+  font-size: 10px;
+}
+.world-toolbar kbd {
+  font: 9px var(--mono);
+  border: 1px solid #365546;
+  border-radius: 3px;
+  padding: 3px 5px;
+  background: #172d24;
+  color: #bad3c3;
+}
+.world-toolbar p > span {
+  margin-inline: 8px;
+}
+.world-toolbar button {
+  background: none;
+  color: #abc9b7;
+  font: 10px var(--mono);
+}
+.world-experience .scene-tabs {
+  margin-inline: 20px;
+  border-color: #355646;
+}
+.world-experience .scene-caption {
+  margin: 10px 28px;
+  color: #84ac98;
+  min-height: 0;
+  font-size: 11px;
+}
+.world-experience .scene-footnote {
+  margin: 16px 28px;
+  color: #5d8570;
+}
+.touch-controls {
+  display: none;
+}
+.hero-world.world-complete .quest-track i {
+  background: #b0e4d2;
+}
+.world-complete .world-quest strong {
+  color: #b0e4d2;
+}
+.world-experience:not(:has(.webgl-ready)) .world-start,
+.world-experience:not(:has(.webgl-ready)) .world-interact,
+.world-experience:not(:has(.webgl-ready)) .touch-controls {
+  display: none;
+}
+@media (max-width: 800px) {
+  .world-intro {
+    align-items: flex-start;
+  }
+  .hero-world h1 {
+    font-size: 30px;
+  }
+  .world-intro-side {
+    display: none;
+  }
+  .world-experience .scene-viewport {
+    height: 520px;
+  }
+  .world-quest {
+    top: 18px;
+    left: 18px;
+  }
+  .world-card {
+    width: 285px;
+  }
+  .world-start > span {
+    display: none;
+  }
+  .touch-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    left: 18px;
+    bottom: 22px;
+    gap: 4px;
+    z-index: 4;
+    touch-action: none;
+  }
+  .touch-controls > div {
+    display: flex;
+    gap: 4px;
+  }
+  .touch-controls button {
+    width: 38px;
+    height: 38px;
+    background: #17332bd9;
+    border: 1px solid #5f8a77;
+    border-radius: 4px;
+    color: #c1e5d3;
+    font-size: 17px;
+    touch-action: none;
+    user-select: none;
+  }
+  .touch-controls button:active,
+  .touch-controls button.is-held {
+    background: #b0e4d2;
+    color: #15382b;
+  }
+  .world-start {
+    bottom: 135px;
+    left: 18px;
+  }
+  .world-toolbar p {
+    font-size: 9px;
+  }
+  .world-experience .scene-footnote span {
+    display: none;
+  }
+  .world-interact {
+    right: 18px;
+    bottom: 22px;
+    max-width: 190px;
+    padding: 12px;
+  }
+  .world-marker {
+    min-width: 90px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+  .world-marker small {
+    font-size: 6px;
+  }
+  .world-marker.visited small::after {
+    content: " ✓";
+  }
+}
+@media (max-width: 520px) {
+  .hero-world .hero-grid {
+    padding-top: 28px;
+  }
+  .hero-world h1 {
+    font-size: 29px;
+    white-space: normal;
+  }
+  .hero-world .hero-description {
+    font-size: 11px;
+    max-width: 300px;
+    line-height: 1.8;
+  }
+  .hero-world .eyebrow {
+    font-size: 7px;
+  }
+  .world-intro {
+    margin-bottom: 22px;
+  }
+  .world-experience .scene-topline {
+    padding: 8px 12px;
+  }
+  .world-experience .scene-topline .mono {
+    font-size: 6px;
+    letter-spacing: 0.05em;
+  }
+  .world-experience .scene-topline button {
+    font-size: 7px;
+  }
+  .world-experience .scene-viewport {
+    height: 515px;
+  }
+  .world-quest strong {
+    font-size: 11px;
+  }
+  .world-quest .eyebrow {
+    font-size: 7px;
+  }
+  .world-card {
+    right: 12px;
+    top: 130px;
+    width: calc(100% - 24px);
+    max-height: calc(100% - 220px);
+    padding: 18px;
+  }
+  .world-card h3 {
+    font-size: 20px;
+  }
+  .world-card p {
+    font-size: 11px;
+    margin-top: 10px;
+  }
+  .world-card .world-career {
+    font-size: 8px;
+    margin: 12px 0;
+    padding: 8px 0;
+  }
+  .world-card [data-world-project] {
+    font-size: 10px;
+    padding: 8px 0;
+  }
+  .world-toolbar {
+    padding: 13px 12px;
+    gap: 8px;
+  }
+  .world-toolbar p {
+    font-size: 8px;
+    line-height: 1.8;
+  }
+  .world-toolbar kbd {
+    font-size: 7px;
+    padding: 2px;
+  }
+  .world-toolbar p > span {
+    margin-inline: 3px;
+  }
+  .world-toolbar button {
+    font-size: 9px;
+  }
+  .world-experience .scene-tabs {
+    margin-inline: 12px;
+  }
+  .world-experience .scene-tabs button {
+    padding-inline: 6px;
+    font-size: 11px;
+  }
+  .world-experience .scene-tabs button > span {
+    font-size: 6px;
+    letter-spacing: 0;
+  }
+  .world-experience .scene-caption {
+    font-size: 10px;
+    margin-inline: 18px;
+    line-height: 1.8;
+  }
+  .world-experience .scene-footnote {
+    font-size: 6px;
+    margin: 12px 18px;
+  }
+  .world-interact {
+    max-width: 165px;
+    font-size: 10px;
+  }
+  .hero-world .hero-bottom {
+    font-size: 9px;
+  }
+  .world-marker {
+    min-width: 84px;
+    padding: 6px 8px;
+  }
+  .world-marker span {
+    margin-left: 5px;
+  }
+}
+@media (max-width: 650px) {
+  .world-quest {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 117px;
+    padding: 15px 16px;
+    background: linear-gradient(#102120f5, #102120c9, transparent);
+  }
+  .world-quest p {
+    position: absolute;
+    right: 16px;
+    top: 20px;
+    margin: 0;
+    font-size: 8px;
+    max-width: 90px;
+    text-align: right;
+    line-height: 1.8;
+  }
+  .world-quest strong {
+    font-size: 11px;
+  }
+  .quest-track {
+    margin-top: 11px;
+  }
+  .quest-track span {
+    width: 22px;
+    height: 22px;
+  }
+  .quest-track i {
+    width: 20px;
+  }
+  .world-card .world-career {
+    white-space: pre-line;
+  }
+}

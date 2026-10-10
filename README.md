@@ -1,6 +1,18 @@
 # Eonsang Son — Portfolio
 
-A GitHub Pages portfolio connecting industrial control, software, and manufacturing AI. The first screen uses a local Three.js scene with a robot, data server, and AI core. The scene is a conceptual identity map; it does not display live equipment data.
+A GitHub Pages portfolio connecting industrial control, software, and manufacturing AI. The first screen is a playable Three.js **Engineering Island**: move a small explorer between Equipment, Data, and Intelligence to discover career context and related projects. Connecting all three stations lights up the island's engineering circuit. This is a conceptual identity map; it does not display live equipment data.
+
+## Explore the island
+
+- Start exploring, then use WASD or arrow keys while the canvas is focused.
+- Approach a station and press E, Enter, or the connect button to discover it.
+- Click a station, its label, or a section shortcut to walk there automatically.
+- Click a reachable floor position to move; station bases and island edges block movement.
+- Mobile visitors can hold the directional buttons. The camera follows the explorer.
+- Project buttons open the same accessible dialogs as the regular project archive.
+- Reset restarts the three-station discovery. Progress is session-only and no account is needed.
+
+Reduced motion pauses ambient animation and makes section shortcuts jump directly to their destination; intentional keyboard/touch movement remains available. Without WebGL, section buttons still reveal the zone descriptions and projects alongside a static illustration.
 
 ## Work locally
 
@@ -15,8 +27,8 @@ Open http://localhost:4173. GitHub Pages can serve the root files directly; `dis
 
 - `index.html`: identity, experience, education, and contact
 - `data.js`: all 11 projects, roles, tools, sources, and optional demos
-- `main.js`: archive filters and keyboard-accessible project dialogs
-- `scene.js`: actual WebGL 3D, pause/resume, reduced motion, and SVG fallback
+- `main.js`: zone descriptions, discovery progress, archive filters, project dialogs
+- `scene.js`: 3D island, explorer movement/collisions, click navigation, camera, ambient animation
 - `main.css`: responsive layout and visual design
 
 After editing CSS or JavaScript, run `npm run prepare-assets` (also included in

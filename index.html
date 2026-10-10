@@ -21,10 +21,10 @@
     <meta property="og:url" content="https://fortex66.github.io/" />
     <title>Eonsang Son — Manufacturing Software Engineer</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./main-171f32954a11.css" />
+    <link rel="stylesheet" href="./main-5cda8cbbc822.css" />
     <script defer src="./data-16697dca69e7.js"></script>
-    <script defer src="./main-d9df737c725b.js"></script>
-    <script type="module" src="./scene-0e69c9551da2.js"></script>
+    <script defer src="./main-d387a89daf92.js"></script>
+    <script type="module" src="./scene-98edbd35cad6.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#projects">프로젝트로 바로 가기</a>
@@ -41,80 +41,181 @@
       </nav>
     </header>
     <main>
-      <section class="hero" id="home" aria-labelledby="hero-title">
+      <section class="hero hero-world" id="home" aria-labelledby="hero-title">
         <div class="shell hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow">
-              <span class="status-dot"></span> MANUFACTURING SOFTWARE ENGINEER
-            </p>
-            <h1 id="hero-title">
-              현장을 연결하고,<br /><span>지능을 만듭니다.</span>
-            </h1>
-            <p class="hero-intro">
-              손언상 <span class="subtle">/ Eonsang Son</span>
-            </p>
-            <p class="hero-description">
-              산업 제어의 언어를 소프트웨어로,<br />현장의 데이터를 AI 의사결정
-              지원으로.
-            </p>
-            <div class="hero-actions">
-              <a class="button button-light" href="#projects"
-                >프로젝트 살펴보기 <span aria-hidden="true">↗</span></a
-              ><a
-                class="text-link"
-                href="https://github.com/fortex66"
-                target="_blank"
-                rel="noopener noreferrer"
-                >GitHub <span aria-hidden="true">↗</span></a
+          <div class="world-intro">
+            <div>
+              <p class="eyebrow">
+                <span class="status-dot"></span> EONSANG SON / MANUFACTURING
+                SOFTWARE ENGINEER
+              </p>
+              <h1 id="hero-title">
+                현장과 소프트웨어 사이,<br /><span>나의 엔지니어링 월드.</span>
+              </h1>
+              <p class="hero-description">
+                손언상 · OT × IT × AI — 세 시스템을 탐험하며 제가 만드는 연결을
+                발견해 보세요.
+              </p>
+            </div>
+            <div class="world-intro-side">
+              <p class="hero-current">
+                SL Corporation<br /><span
+                  >Production Engineering Center · Since Jul. 2025</span
+                >
+              </p>
+              <a class="text-link" href="#projects"
+                >프로젝트 목록으로 바로 보기 ↗</a
               >
             </div>
-            <p class="hero-current">
-              CURRENTLY AT <strong>SL Corporation</strong><br /><span
-                >Production Engineering Center · Since Jul. 2025</span
-              >
-            </p>
           </div>
-          <div class="scene-panel">
+          <div class="world-experience">
             <div class="scene-topline">
-              <span class="mono">THE CONNECTED SYSTEM / 01</span
+              <span class="mono"
+                >ENGINEERING ISLAND / INTERACTIVE PORTFOLIO</span
               ><button
                 id="motion-toggle"
                 type="button"
                 aria-pressed="false"
-                aria-label="3D 움직임 정지"
+                aria-label="배경 움직임 정지"
               >
-                Pause motion <span aria-hidden="true">Ⅱ</span>
+                Pause ambience Ⅱ
               </button>
             </div>
             <div class="scene-viewport" id="scene-viewport">
               <img
                 class="scene-fallback"
                 src="./assets/scene-fallback.svg"
-                alt="산업용 로봇, 데이터 서버, AI 코어가 연결된 입체 구조도"
+                alt="Equipment, Data, Intelligence를 연결하는 엔지니어링 구조도"
               />
               <canvas
                 id="identity-canvas"
-                aria-label="산업용 로봇에서 데이터 서버와 AI 코어로 이어지는 3D 장면"
+                tabindex="0"
+                aria-label="엔지니어링 섬 탐험. WASD 또는 방향키로 이동하고 E 또는 Enter로 구역을 연결하세요."
+                aria-describedby="world-controls"
               ></canvas>
+              <div class="world-quest">
+                <span class="eyebrow">YOUR MISSION</span
+                ><strong>세 시스템을 하나로 연결하기</strong>
+                <div class="quest-track">
+                  <span data-objective="ot">OT</span><i></i
+                  ><span data-objective="it">IT</span><i></i
+                  ><span data-objective="ai">AI</span>
+                </div>
+                <p><span id="world-progress">0 / 3</span> systems connected</p>
+              </div>
+              <button
+                class="world-marker"
+                data-destination="ot"
+                type="button"
+                aria-label="Equipment 구역으로 이동"
+              >
+                <small>01 / OT</small>Equipment <span>↗</span>
+              </button>
+              <button
+                class="world-marker"
+                data-destination="it"
+                type="button"
+                aria-label="Data 구역으로 이동"
+              >
+                <small>02 / IT</small>Data <span>↗</span>
+              </button>
+              <button
+                class="world-marker"
+                data-destination="ai"
+                type="button"
+                aria-label="Intelligence 구역으로 이동"
+              >
+                <small>03 / AI</small>Intelligence <span>↗</span>
+              </button>
+              <div class="world-start">
+                <button
+                  class="button button-light"
+                  id="world-start"
+                  type="button"
+                >
+                  탐험 시작 <span>▷</span></button
+                ><span>바닥을 클릭해 이동하거나 구역을 선택하세요.</span>
+              </div>
+              <aside
+                class="world-card"
+                id="world-card"
+                aria-labelledby="world-card-title"
+                hidden
+              >
+                <div class="world-card-top">
+                  <span id="world-card-label" class="eyebrow"></span
+                  ><button
+                    id="world-card-close"
+                    type="button"
+                    aria-label="구역 소개 닫기"
+                  >
+                    ×
+                  </button>
+                </div>
+                <h3 id="world-card-title"></h3>
+                <p id="world-card-description"></p>
+                <p class="world-career" id="world-card-career"></p>
+                <div id="world-card-projects"></div>
+              </aside>
+              <div class="touch-controls" role="group" aria-label="캐릭터 이동">
+                <button type="button" data-move="up" aria-label="앞으로 이동">
+                  ↑
+                </button>
+                <div>
+                  <button
+                    type="button"
+                    data-move="left"
+                    aria-label="왼쪽으로 이동"
+                  >
+                    ←</button
+                  ><button
+                    type="button"
+                    data-move="down"
+                    aria-label="뒤로 이동"
+                  >
+                    ↓</button
+                  ><button
+                    type="button"
+                    data-move="right"
+                    aria-label="오른쪽으로 이동"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                id="world-interact"
+                class="world-interact"
+                disabled
+              >
+                구역 가까이 이동하세요
+              </button>
             </div>
-            <div class="scene-tabs" role="group" aria-label="정체성의 세 영역">
+            <div class="world-toolbar">
+              <p id="world-controls">
+                <kbd>W A S D</kbd> / <kbd>↑ ↓ ← →</kbd> 이동 <span>·</span>
+                <kbd>E</kbd> / <kbd>Enter</kbd> 연결
+              </p>
+              <button id="world-reset" type="button">Reset ↺</button>
+            </div>
+            <div class="scene-tabs" role="group" aria-label="구역 바로 탐험">
               <button type="button" data-layer="ot" aria-pressed="true">
-                <span>01 / OT</span>Equipment
-              </button>
-              <button type="button" data-layer="it" aria-pressed="false">
-                <span>02 / IT</span>Data
-              </button>
-              <button type="button" data-layer="ai" aria-pressed="false">
-                <span>03 / AI</span>Intelligence
+                <span>CONTROL / ROBOTICS</span>Equipment</button
+              ><button type="button" data-layer="it" aria-pressed="false">
+                <span>SOFTWARE / DATA</span>Data</button
+              ><button type="button" data-layer="ai" aria-pressed="false">
+                <span>AI / ENGINEERING KNOWLEDGE</span>Intelligence
               </button>
             </div>
             <p id="scene-caption" class="scene-caption" aria-live="polite">
-              설비와 제어 시스템을 이해하고, 현장에서 동작하는 소프트웨어를
-              만듭니다.
+              로봇·데이터·AI 구역에서 엔지니어링 기술과 관련 프로젝트를
+              만나보세요.
             </p>
+            <p id="world-status" class="sr-only" aria-live="polite"></p>
             <p class="scene-footnote mono">
-              CONCEPTUAL ENGINEERING MAP
-              <span>MOVE YOUR POINTER TO EXPLORE</span>
+              A PLAYABLE MAP OF MY ENGINEERING IDENTITY
+              <span>EXPLORE → CONNECT → DISCOVER</span>
             </p>
           </div>
         </div>
