@@ -93,32 +93,6 @@ dialog.addEventListener("close", () => {
   previousFocus?.focus();
   window.dispatchEvent(new Event("world-overlay-close"));
 });
-const captions = {
-  ot: "설비와 제어 시스템을 이해하고, 현장에서 동작하는 소프트웨어를 만듭니다.",
-  it: "장비의 신호를 연결하고 구조화해, 모니터링과 데이터 시스템으로 확장합니다.",
-  ai: "공정 지식과 AI를 결합해, 엔지니어의 해석과 의사결정을 지원합니다.",
-};
-document.querySelectorAll("[data-layer]").forEach((button) =>
-  button.addEventListener("click", () => {
-    document
-      .querySelectorAll("[data-layer]")
-      .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
-    document.querySelector("#scene-caption").textContent =
-      captions[button.dataset.layer];
-    window.dispatchEvent(
-      new CustomEvent("identity-layer", { detail: button.dataset.layer }),
-    );
-  }),
-);
-// The readable SVG remains available if a browser cannot run the 3D scene.
-window.addEventListener("identity-scene-unavailable", () => {
-  const motion = document.querySelector("#motion-toggle");
-  motion.hidden = true;
-  document.querySelector(".scene-footnote span").textContent =
-    "EQUIPMENT → DATA → INTELLIGENCE";
-});
-
-// Content is discoverable through the world as well as the regular archive.
 const worldZones = {
   ot: {
     label: "01 / EQUIPMENT — OT",
@@ -145,7 +119,6 @@ const worldZones = {
     projects: ["plc-ai", "local-llm"],
   },
 };
-let worldAvailable = false;
 const worldCard = document.querySelector("#world-card");
 function showWorldZone(id) {
   const zone = worldZones[id];
@@ -167,12 +140,12 @@ function showWorldZone(id) {
       "beforeend",
       '<div class="zone-library-links"><button type="button" data-open-library="projects">전체 프로젝트 ↗</button><button type="button" data-open-library="experience">경력·학력 ↗</button><button type="button" data-open-library="identity">소개 ↗</button><button type="button" data-open-library="contact">연락처 ↗</button></div>',
     );
-  worldCard.hidden = false;
-  document.querySelector("#world-status").textContent =
-    `${zone.title}. ${zone.description}`;
+  worldCard.showModal();
+  window.dispatchEvent(new Event("world-overlay-open"));
+  document.querySelector("#world-card-close").focus();
 }
 function closeWorldCard() {
-  worldCard.hidden = true;
+  worldCard.close();
   document.querySelector("#identity-canvas").focus({ preventScroll: true });
 }
 document
@@ -188,64 +161,14 @@ worldCard.addEventListener("click", (event) => {
   const b = event.target.closest("[data-world-project]");
   if (b) openProject(b.dataset.worldProject);
 });
-window.addEventListener("world-ready", () => {
-  worldAvailable = true;
-});
-window.addEventListener("world-zone", (event) => {
-  const { id, visited } = event.detail;
-  showWorldZone(id);
-  document.querySelector("#world-progress").textContent =
-    `${visited.length} / 3`;
-  document
-    .querySelectorAll("[data-objective]")
-    .forEach((el) =>
-      el.classList.toggle("connected", visited.includes(el.dataset.objective)),
-    );
-  document
-    .querySelectorAll("[data-destination]")
-    .forEach((el) =>
-      el.classList.toggle("visited", visited.includes(el.dataset.destination)),
-    );
-  document
-    .querySelector(".hero-world")
-    .classList.toggle("world-complete", visited.length === 3);
-  document.querySelector(".world-quest strong").textContent =
-    visited.length === 3
-      ? "Equipment → Data → Intelligence 연결 완료"
-      : "세 시스템을 하나로 연결하기";
-});
-window.addEventListener("identity-layer", (event) => {
-  worldCard.hidden = true;
-  if (!worldAvailable) showWorldZone(event.detail);
-});
-document
-  .querySelectorAll("[data-destination]")
-  .forEach((b) =>
-    b.addEventListener("click", () =>
-      document.querySelector(`[data-layer="${b.dataset.destination}"]`).click(),
-    ),
-  );
-document.querySelector("#world-reset").addEventListener("click", () => {
-  worldCard.hidden = true;
-  document.querySelector("#world-progress").textContent = "0 / 3";
-  document
-    .querySelectorAll(".connected,.visited")
-    .forEach((el) => el.classList.remove("connected", "visited"));
-  document.querySelector(".hero-world").classList.remove("world-complete");
-  document.querySelector(".world-quest strong").textContent =
-    "세 시스템을 하나로 연결하기";
-  document.querySelector("#world-status").textContent =
-    "탐험을 처음부터 시작합니다.";
-  window.dispatchEvent(new Event("world-reset"));
-});
-window.addEventListener("identity-scene-unavailable", () => {
-  worldAvailable = false;
-  document.querySelector(".world-quest").hidden = true;
-  document.querySelector("#world-controls").textContent =
-    "아래 구역 버튼으로 기술과 프로젝트를 탐색하세요.";
-});
 
-// The world is the main page; all portfolio sections live in its terminal.
+worldCard.addEventListener("close", () => {
+  window.dispatchEvent(new Event("world-overlay-close"));
+  document.querySelector("#identity-canvas").focus({ preventScroll: true });
+});
+window.addEventListener("factory-inspect", (event) =>
+  showWorldZone(event.detail),
+);
 const library = document.querySelector("#library-dialog");
 let libraryReturnFocus = null;
 function selectLibrarySection(id) {
@@ -284,22 +207,27 @@ library.addEventListener("close", () => {
     document.querySelector("#identity-canvas").focus({ preventScroll: true });
   window.dispatchEvent(new Event("world-overlay-close"));
 });
-window.addEventListener("world-library", () => openLibrary());
-document.querySelector("#world-terminal").addEventListener("click", () => {
-  if (worldAvailable)
-    window.dispatchEvent(
-      new CustomEvent("identity-layer", { detail: "terminal" }),
-    );
-  else openLibrary();
-});
+
 document
-  .querySelector("#terminal-marker")
-  .addEventListener("click", () =>
-    document.querySelector("#world-terminal").click(),
-  );
-worldCard.addEventListener("click", (event) => {
+  .querySelector("#world-terminal")
+  .addEventListener("click", () => openLibrary());
+document.addEventListener("click", (event) => {
   const button = event.target.closest("[data-open-library]");
   if (button) openLibrary(button.dataset.openLibrary);
+});
+window.addEventListener("identity-scene-unavailable", () => {
+  document.querySelector("#factory-hint").textContent =
+    "이 환경에서는 3D를 표시할 수 없습니다. 장치를 선택하면 관련 프로젝트를 볼 수 있습니다.";
+  document
+    .querySelectorAll("[data-add]")
+    .forEach((button) =>
+      button.addEventListener("click", () => showWorldZone(button.dataset.add)),
+    );
+  document
+    .querySelectorAll(
+      ".factory-tools, .factory-secondary, .factory-bottom, .factory-camera, .factory-metrics, #factory-run, #quality-toggle, #motion-toggle",
+    )
+    .forEach((el) => (el.hidden = true));
 });
 // Legacy section URLs also open the requested terminal page.
 function followSectionHash() {
@@ -309,9 +237,3 @@ function followSectionHash() {
 }
 window.addEventListener("hashchange", followSectionHash);
 followSectionHash();
-
-window.addEventListener("identity-scene-unavailable", () => {
-  document
-    .querySelectorAll(".game-hud, #boost-toggle, #quality-toggle")
-    .forEach((el) => (el.hidden = true));
-});
