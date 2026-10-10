@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" role="img" aria-labelledby="title desc">
+<title id="title">Eonsang Son — OT × IT × AI</title>
+<desc id="desc">An isometric industrial robot, data server, and floating neural cube connect equipment, software, and manufacturing intelligence. This is a conceptual identity diagram.</desc>
+<defs>
+<linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101a29"/><stop offset="1" stop-color="#090e18"/></linearGradient>
+<radialGradient id="aura"><stop stop-color="#26486a" stop-opacity=".45"/><stop offset="1" stop-color="#14243a" stop-opacity="0"/></radialGradient>
+<linearGradient id="top" x2="1" y2="1"><stop stop-color="#34465e"/><stop offset="1" stop-color="#18273b"/></linearGradient>
+<linearGradient id="left" x2="0" y2="1"><stop stop-color="#25374d"/><stop offset="1" stop-color="#111d2e"/></linearGradient>
+<linearGradient id="right" x2="0" y2="1"><stop stop-color="#16243a"/><stop offset="1" stop-color="#0c1422"/></linearGradient>
+<linearGradient id="metal" x2="1" y2="1"><stop stop-color="#e1b984"/><stop offset=".5" stop-color="#c18b57"/><stop offset="1" stop-color="#855630"/></linearGradient>
+<linearGradient id="glass" x2="1" y2="1"><stop stop-color="#8e98ff" stop-opacity=".55"/><stop offset="1" stop-color="#6b64de" stop-opacity=".12"/></linearGradient>
+<linearGradient id="glassSide" x2="1" y2="1"><stop stop-color="#8d83ff" stop-opacity=".3"/><stop offset="1" stop-color="#4943a8" stop-opacity=".12"/></linearGradient>
+<linearGradient id="accent"><stop stop-color="#6ee7dc"/><stop offset="1" stop-color="#ae9bff"/></linearGradient>
+<pattern id="grid" width="48" height="28" patternUnits="userSpaceOnUse" patternTransform="matrix(1 .5 -1 .5 860 0)"><path d="M48 0H0V28" fill="none" stroke="#7893b8" stroke-opacity=".09"/></pattern>
+<filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5"/></filter>
+<filter id="shadow" x="-50%" y="-50%" width="200%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+<style>
+text{font-family:Arial,Helvetica,sans-serif}.mono{font-family:'Courier New',monospace}
+.flow{stroke-dasharray:4 34}.core{}.signal{}
+
+
+</style></defs>
+<rect x="1" y="1" width="1198" height="458" rx="24" fill="url(#bg)" stroke="#283448"/>
+<ellipse cx="850" cy="220" rx="380" ry="240" fill="url(#aura)"/>
+<path d="M510 36H1176V390H510Z" fill="url(#grid)"/>
+<rect x="48" y="46" width="28" height="3" rx="1.5" fill="#6ee7dc"/>
+
+<text x="88" y="53" font-size="14" fill="#9db1c9" class="mono" letter-spacing="2.5">FORTEX66 / ENGINEER</text>
+<text x="48" y="133" font-size="55" fill="#f0f4fa" font-weight="700" letter-spacing="-2">Eonsang Son.</text>
+<text x="50" y="189" font-size="30" fill="#d5e1ef" font-weight="600" letter-spacing="-.6">From industrial control</text>
+<text x="50" y="230" font-size="30" fill="#d5e1ef" font-weight="600" letter-spacing="-.6">to manufacturing</text>
+<text x="50" y="271" font-size="30" fill="url(#accent)" font-weight="600" letter-spacing="-.6">intelligence.</text>
+<text x="50" y="326" font-size="18" fill="#93b7bc" class="mono" letter-spacing="2">OT × IT × AI</text>
+<g fill="#000" opacity=".38" filter="url(#shadow)"><ellipse cx="645" cy="319" rx="97" ry="28"/><ellipse cx="838" cy="263" rx="92" ry="27"/><ellipse cx="1032" cy="207" rx="87" ry="26"/></g>
+<path d="M652 301L742 255L840 255L931 209L1030 209" fill="none" stroke="#40516c" stroke-width="2"/>
+<path d="M652 301L742 255L840 255L931 209L1030 209" fill="none" stroke="#76e5df" stroke-width="3" class="flow"/>
+<g stroke="#43536d" stroke-width="1" stroke-linejoin="round">
+<path d="M551 272L645 225L739 272L645 319Z" fill="url(#top)" stroke="#43536d" />
+<path d="M551 272V290L645 337V319Z" fill="url(#left)" stroke="#43536d" />
+<path d="M645 319L739 272V290L645 337Z" fill="url(#right)" stroke="#43536d" />
+</g>
+<path d="M558 280L645 324L732 280" fill="none" stroke="#d5a16d" stroke-width="2" opacity=".7"/>
+<g stroke="#43536d" stroke-width="1" stroke-linejoin="round">
+<path d="M744 218L838 171L932 218L838 265Z" fill="url(#top)" stroke="#43536d" />
+<path d="M744 218V236L838 283V265Z" fill="url(#left)" stroke="#43536d" />
+<path d="M838 265L932 218V236L838 283Z" fill="url(#right)" stroke="#43536d" />
+</g>
+<path d="M751 226L838 270L925 226" fill="none" stroke="#6ee7dc" stroke-width="2" opacity=".7"/>
+<g stroke="#43536d" stroke-width="1" stroke-linejoin="round">
+<path d="M938 164L1032 117L1126 164L1032 211Z" fill="url(#top)" stroke="#43536d" />
+<path d="M938 164V182L1032 229V211Z" fill="url(#left)" stroke="#43536d" />
+<path d="M1032 211L1126 164V182L1032 229Z" fill="url(#right)" stroke="#43536d" />
+</g>
+<path d="M945 172L1032 216L1119 172" fill="none" stroke="#a399ff" stroke-width="2" opacity=".7"/>
+<g stroke-linejoin="round">
+<path d="M604 273L642 254L680 273L642 292Z" fill="#bd8e5e" stroke="#e5c392" />
+<path d="M604 273V282L642 301V292Z" fill="#815937" stroke="none" />
+<path d="M642 292L680 273V282L642 301Z" fill="#513822" stroke="none" />
+<path d="M624 243L642 234L660 243V270L642 279L624 270Z" fill="url(#metal)" stroke="#e0b382" />
+<path d="M642 252L660 243V270L642 279Z" fill="#85582e" stroke="none" />
+<path d="M642 243L618 203L657 167" fill="none" stroke="#60422d" stroke-width="23" stroke-linecap="round"/>
+<path d="M637 239L613 199L652 163" fill="none" stroke="url(#metal)" stroke-width="19" stroke-linecap="round"/>
+<path d="M652 163L687 186" fill="none" stroke="#a77448" stroke-width="17" stroke-linecap="round"/>
+<path d="M649 158L686 180" fill="none" stroke="#e4bb87" stroke-width="10" stroke-linecap="round"/>
+<circle cx="637" cy="239" r="13" fill="#d4a36e" stroke="#f1cda0"/>
+<circle cx="637" cy="239" r="5" fill="#5c4939" />
+<circle cx="613" cy="199" r="13" fill="#d4a36e" stroke="#f1cda0"/>
+<circle cx="613" cy="199" r="5" fill="#5c4939" />
+<circle cx="652" cy="163" r="11" fill="#d4a36e" stroke="#f1cda0"/>
+<circle cx="652" cy="163" r="5" fill="#5c4939" />
+<path d="M686 180L698 187L700 201M698 187L711 184L715 196" fill="none" stroke="#b9c8d8" stroke-width="5" stroke-linecap="round"/>
+<path d="M700 206L710 201L720 206L710 211Z" fill="#64d9cb" stroke="none" />
+<path d="M700 206V218L710 223V211Z" fill="#327d79" stroke="none" />
+<path d="M710 211L720 206V218L710 223Z" fill="#235955" stroke="none" />
+</g>
+<g stroke-linejoin="round">
+<path d="M794 141L828 124L873 147L839 164Z" fill="#58718a" stroke="#5a7189" />
+<path d="M794 141V213L839 236V164Z" fill="url(#left)" stroke="#5a7189" />
+<path d="M839 164L873 147V219L839 236Z" fill="url(#right)" stroke="#5a7189" />
+<path d="M803 160L830 174M803 178L830 192M803 196L830 210" fill="none" stroke="#70869d" stroke-width="2"/>
+<g class="signal">
+<circle cx="806" cy="159" r="2.3" fill="#6ee7dc" />
+<circle cx="806" cy="177" r="2.3" fill="#6ee7dc" />
+<circle cx="806" cy="195" r="2.3" fill="#6ee7dc" />
+</g>
+<path d="M853 166L922 131V189L853 224Z" fill="#102739" stroke="#54acb1" />
+<path d="M861 175L913 149M861 207L873 190L884 193L898 168L913 170" fill="none" stroke="#6ee7dc" stroke-width="2"/>
+<path d="M861 189L913 163M861 202L913 176" fill="none" stroke="#64a5af" stroke-opacity=".25"/>
+</g><ellipse cx="1032" cy="168" rx="44" ry="18" fill="#8f82ff" opacity=".16" filter="url(#glow)"/><g class="core" stroke-linejoin="round">
+<path d="M986 85L1032 62L1078 85L1032 108Z" fill="url(#glass)" stroke="#c6bcff" />
+<path d="M986 85V139L1032 162V108Z" fill="url(#glass)" stroke="#968cf0" />
+<path d="M1032 108L1078 85V139L1032 162Z" fill="url(#glassSide)" stroke="#968cf0" />
+<path d="M986 139L1032 116L1078 139M1032 62V116" fill="none" stroke="#aaa1ff" stroke-dasharray="3 5" stroke-opacity=".4"/>
+<circle cx="1032" cy="112" r="16" fill="#a69bff" opacity=".3" filter="url(#glow)"/>
+<path d="M1011 104L1032 90L1053 104L1050 126L1032 137L1014 124Z M1011 104L1050 126L1032 90L1014 124L1053 104L1032 137Z" fill="none" stroke="#cec4ff" stroke-width="1.4"/>
+<circle cx="1011" cy="104" r="3" fill="#e1daff" />
+<circle cx="1032" cy="90" r="3" fill="#e1daff" />
+<circle cx="1053" cy="104" r="3" fill="#e1daff" />
+<circle cx="1050" cy="126" r="3" fill="#e1daff" />
+<circle cx="1032" cy="137" r="3" fill="#e1daff" />
+<circle cx="1014" cy="124" r="3" fill="#e1daff" />
+</g>
+<text x="645" y="367" font-size="14" fill="#e0b382" class="mono" text-anchor="middle" letter-spacing="1.5">01 / EQUIPMENT</text>
+<text x="838" y="313" font-size="14" fill="#7de2d8" class="mono" text-anchor="middle" letter-spacing="1.5">02 / SOFTWARE</text>
+<text x="1032" y="259" font-size="14" fill="#bcb0ff" class="mono" text-anchor="middle" letter-spacing="1.5">03 / INTELLIGENCE</text>
+<path d="M48 398H1152" fill="none" stroke="#29364b" />
+<text x="50" y="431" font-size="14" fill="#9aadc4" letter-spacing="1">EQUIPMENT → DATA → DECISION SUPPORT</text>
+<text x="1150" y="431" font-size="14" fill="#8eaaa9" class="mono" text-anchor="end" letter-spacing="1">HUMAN IN THE LOOP</text>
+</svg>
