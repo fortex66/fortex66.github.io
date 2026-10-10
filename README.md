@@ -1,24 +1,18 @@
-# Eonsang Son — Portfolio
+# Eonsang Son — Factory Playground
 
-A GitHub Pages portfolio connecting industrial control, software, and manufacturing AI. The main page is a fixed, fullscreen playable Three.js **Engineering Island**: move a small explorer between Equipment, Data, and Intelligence to discover career context and related projects. Connecting all three stations lights up the island's engineering circuit. This is a conceptual identity map; it does not display live equipment data.
+A fullscreen Three.js portfolio connecting industrial control, software, and manufacturing AI. Visitors arrange a small factory, connect robot cells to SCADA and AI, and start a simulated production line. Every module links to the related real projects; all 11 projects, experience, education, and contact remain available in the portfolio terminal.
 
-## Explore the island
+## Build a factory
 
-- Start exploring, then use WASD or arrow keys while the canvas is focused.
-- Approach a station and press E, Enter, or the connect button to discover it.
-- Click a station, its label, or a section shortcut to walk there automatically.
-- Click a reachable floor position to move; station bases and island edges block movement.
-- Mobile visitors can hold the directional buttons. The camera follows the explorer.
-- Walk to the information terminal (or select its shortcut) to open Identity, Projects, Experience, and Contact without leaving the island.
-- Station cards also link to these terminal sections. Project details open in a second dialog; Escape returns one level at a time.
-- The background world pauses while a terminal or project dialog is open. Closing it resumes exploration.
-- Collect five golden data chips by walking into them or clicking them to navigate. Each chip grants 20 XP; each first-time station connection grants 100 XP. All five chips and three stations earn the **System Architect** badge at 400 XP. Rewards are optional and never lock portfolio content.
-- Hold Shift while moving, or toggle the boost button on desktop/mobile, for faster travel.
-- Reset clears discovery, chips, XP, and boost. Progress is session-only and no account is needed.
+- Add up to eight robot, SCADA, and AI modules. Select a module, then click an empty floor position to move it. The grid snaps to half-unit increments and rejects overlapping or out-of-bounds placement.
+- Use **Connect** mode to select a source and destination: robot → SCADA, then SCADA → AI. **Auto connect** creates a valid example line. Multiple robots can share SCADA and AI.
+- Start production once at least one complete chain exists. The robot arms and data packets animate; the demo counter increments for complete robot lines. The desktop speed slider changes the simulation rate. This is a conceptual simulation, not real equipment telemetry or an AI service.
+- Rotate, disconnect, remove, or inspect the selected device. Arrow keys move the selected module while the canvas has focus; Q/E rotate. Escape or **Done** clears selection.
+- Drag empty floor to orbit, use the wheel or camera buttons to zoom, or restore the initial viewpoint. Touch visitors use drag and the same camera buttons.
+- Undo restores up to 30 layout edits. **Example layout** restores the initial three devices; **Empty factory** starts from a clean floor. Layout and production are session-only.
+- Open **Real projects** for a selected device, or the top-right **Portfolio** terminal for all content. Nested project dialogs return one level at a time with Escape. Dialogs and hidden browser tabs pause simulation.
 
-Reduced motion pauses ambient animation and makes section shortcuts jump directly to their destination; intentional keyboard/touch movement remains available. Without WebGL, section buttons still reveal the zone descriptions and projects alongside a static illustration, and the terminal shortcut opens the portfolio directly. Legacy section URLs open the matching terminal tab.
-
-High quality uses 2× supersampling on ordinary displays (up to 2.5× on high-density screens, capped at an 8-million-pixel framebuffer), antialiasing, smoother curved geometry, and 2048px soft shadows. The **High / Standard** toggle reduces resolution and disables shadows for slower devices.
+The interface uses 17–18px primary descriptions and 16–18px desktop controls, with 14–16px mobile controls instead of tiny captions. High quality uses 2× supersampling on ordinary displays (up to 2.5×, capped at an 8-million-pixel framebuffer), antialiasing, smooth curves, and 2048px soft shadows. The quality toggle reduces resolution and disables shadows for slower devices. Reduced motion stops ambient/device animation while keeping intentional edits and the production counter available. Without WebGL, the model palette opens related project details and the terminal remains usable.
 
 ## Work locally
 
@@ -31,10 +25,10 @@ npm run preview
 
 Open http://localhost:4173. GitHub Pages can serve the root files directly; `dist/` is an optional static deployment artifact. Keep the existing GitHub Pages publishing configuration when merging.
 
-- `index.html`: fullscreen world and terminal dialog with identity, experience, education, and contact
+- `index.html`: factory controls and portfolio dialogs
 - `data.js`: all 11 projects, roles, tools, sources, and optional demos
-- `main.js`: zone descriptions, discovery progress, archive filters, project dialogs
-- `scene.js`: 3D island, explorer movement/collisions, click navigation, camera, ambient animation
+- `main.js`: device identity descriptions, archive filters, and nested portfolio dialogs
+- `scene.js`: procedural models, layout/connection editing, undo, production simulation, and camera
 - `main.css`: responsive layout and visual design
 
 After editing CSS or JavaScript, run `npm run prepare-assets` (also included in
@@ -43,6 +37,19 @@ derived from the file contents, preventing new HTML from loading older cached
 styles or scripts. Commit the generated versioned files with the source files.
 Previous versions remain available for visitors who still have older HTML.
 
-The scene stops rendering outside the viewport or when the browser tab is hidden. Reduced motion starts paused, and WebGL failure retains a static SVG. Large legacy project GIFs load only after a visitor requests a demo.
+The scene stops rendering when a dialog is open or the browser tab is hidden. Reduced motion starts paused, and WebGL failure retains a static SVG. Large legacy project GIFs load only after a visitor requests a demo.
 
 Three.js **0.180.0** is vendored from its npm release (`three.module.min.js`, `three.core.min.js`) with the MIT license in `vendor/THREE-LICENSE.txt`. No CDN is required at runtime. The water-treatment project credits its collaborator and original project via the project dialog and repository README.
+
+## Browser checks
+
+Serve the site with `npm run preview` in one terminal, then run the browser checks in another:
+
+```sh
+python3 -m pip install playwright
+python3 -m playwright install chromium
+python3 tests/factory_interactions.py
+python3 tests/factory_rendering.py
+```
+
+Set `CHROMIUM_PATH` to use a system Chromium executable, `PORTFOLIO_URL` to test a different server, or `SCREENSHOT_DIR` to keep the screenshots in a chosen directory. Tests cover manual/automatic connections, production, collision rejection, editing/undo, raycasts, camera controls, eight-module limits, nested dialogs, responsive layout, reduced motion, quality, and WebGL fallback.

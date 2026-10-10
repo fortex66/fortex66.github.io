@@ -134,6 +134,7 @@ function initializeScene() {
   cylinder(robot, 0.23, 0.48, bronze, 0, 0.65, 0);
   cylinder(robot, 0.25, 0.1, metal, 0, 0.88, 0);
   const robotArm = new THREE.Group();
+  robotArm.name = "robotArm";
   robotArm.position.y = 0.91;
   robot.add(robotArm);
   const joint = (x, y, z, r = 0.19) => {
@@ -200,6 +201,7 @@ function initializeScene() {
   );
   // Transparent AI core with a wireframe lattice of connected nodes.
   const ai = new THREE.Group();
+  ai.name = "aiCore";
   ai.position.y = 1.35;
   pads.ai.add(ai);
   const coreMat = new THREE.MeshPhysicalMaterial({
@@ -237,715 +239,739 @@ function initializeScene() {
     glow(0x8c7ab7),
   );
   halo.rotation.x = Math.PI / 2;
-  halo.position.y = -0.92;
+  halo.position.y = 0.2;
   pads.ai.add(halo);
-  // Flow between equipment, software and intelligence, not a live telemetry view.
-  const paths = [
-    new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-2, 0.25, 1.5),
-      new THREE.Vector3(-1.5, 0.45, 1.5),
-      new THREE.Vector3(-1.35, 0.45, 0.8),
-      new THREE.Vector3(-1.2, 0.55, 0.5),
-    ]),
-    new THREE.CatmullRomCurve3([
-      new THREE.Vector3(1.2, 0.65, 0.6),
-      new THREE.Vector3(1.7, 0.8, 0.6),
-      new THREE.Vector3(1.9, 0.85, -0.1),
-      new THREE.Vector3(2, 0.85, -0.3),
-    ]),
-  ];
-  const particles = [];
-  paths.forEach((path) => {
-    const geometry = new THREE.BufferGeometry().setFromPoints(
-      path.getPoints(45),
-    );
-    root.add(
-      new THREE.Line(
-        geometry,
-        new THREE.LineBasicMaterial({
-          color: 0x547f7a,
-          transparent: true,
-          opacity: 0.7,
-        }),
-      ),
-    );
-    for (let i = 0; i < 3; i++) {
-      const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.04, 8, 6),
-        glow(colors.it),
-      );
-      root.add(dot);
-      particles.push({ dot, path, offset: i / 3 });
-    }
+  // Reuse the identity models as movable factory modules.
+  Object.values(pads).forEach((p) => {
+    p.visible = false;
+    p.position.set(0, 0, 0);
   });
-  // A playable island: the explorer connects the three engineering stations.
-  const deck = box(root, 12, 0.32, 8.5, mat(0x162c2c, 0.4), 0, -0.32, 0.5);
-  // The in-world information terminal opens the rest of the portfolio.
-  const terminal = new THREE.Group();
-  terminal.position.set(4.45, 0, 2);
-  root.add(terminal);
-  const terminalBase = box(terminal, 0.85, 0.14, 0.8, dark, 0, -0.02, 0);
-  edge(terminalBase, 0xb0e4d2);
-  box(terminal, 0.22, 0.65, 0.22, metal, 0, 0.32, 0);
-  const terminalScreen = box(
-    terminal,
-    0.78,
-    0.52,
-    0.1,
-    mat(0x173b36),
-    0,
-    0.84,
-    0,
-  );
-  terminalScreen.rotation.x = -0.2;
-  edge(terminalScreen, 0xb0e4d2);
-  for (let i = 0; i < 3; i++)
-    box(
-      terminal,
-      0.46 - i * 0.08,
-      0.025,
-      0.02,
-      glow(0xb0e4d2),
-      -0.06,
-      0.97 - i * 0.1,
-      0.1,
-    );
-  pads.terminal = terminal;
+  const deck = box(root, 14, 0.32, 10, mat(0x162c2c, 0.4), 0, -0.32, 0);
   deck.castShadow = false;
-  edge(deck, 0x4b8171, 0.8);
-  const floor = new THREE.GridHelper(12, 24, 0x3b6759, 0x28473e);
-  floor.position.set(0, -0.15, 0.5);
-  floor.material.transparent = true;
-  floor.material.opacity = 0.55;
-  root.add(floor);
-  const routeMaterial = glow(0x426e5c);
-  // Illuminated corridor: the front of each station is a clear walking route.
-  for (let x = -4.3; x <= 4.3; x += 0.32)
-    box(root, 0.1, 0.025, 0.08, routeMaterial, x, -0.13, 2.7);
-  Object.values(positions).forEach((pos) => {
-    for (let z = pos.z + 1.5; z < 2.7; z += 0.3)
-      box(root, 0.08, 0.025, 0.1, routeMaterial, pos.x, -0.13, z);
+  edge(deck, 0x517c6c, 0.9);
+  const grid = new THREE.GridHelper(14, 28, 0x496d5c, 0x29463f);
+  grid.position.y = -0.15;
+  grid.scale.z = 10 / 14;
+  root.add(grid);
+  const names = { ot: "로봇 셀", it: "관제 시스템", ai: "AI 스튜디오" };
+  const descriptions = {
+    ot: "OT / 현장 제어",
+    it: "IT / 소프트웨어",
+    ai: "AI / 엔지니어링 지식",
+  };
+  const fresh = () => ({
+    nodes: [
+      { id: 1, type: "ot", x: -3.5, z: 0, r: 0 },
+      { id: 2, type: "it", x: 0, z: 0, r: 0 },
+      { id: 3, type: "ai", x: 3.5, z: 0, r: 0 },
+    ],
+    links: [],
+    next: 4,
   });
-  const beacons = {};
-  Object.entries(positions).forEach(([id, p]) => {
-    const beacon = new THREE.Mesh(
-      new THREE.TorusGeometry(0.3, 0.028, 8, 40),
-      glow(colors[id]),
-    );
-    beacon.rotation.x = Math.PI / 2;
-    beacon.position.set(p.x, -0.08, p.z + 1.65);
-    root.add(beacon);
-    beacons[id] = beacon;
-  });
-  // Small software explorer; the visitor, not a claimed real-world machine.
-  const explorer = new THREE.Group();
-  explorer.position.set(0, -0.1, 3.5);
-  root.add(explorer);
-  const suit = mat(0xb0ded0, 0.3),
-    visor = mat(0x142c35, 0.5),
-    boot = mat(0x52776a, 0.6);
-  const body = box(explorer, 0.38, 0.42, 0.28, suit, 0, 0.49, 0);
-  edge(body, 0xd4f0db, 0.7);
-  const head = box(explorer, 0.44, 0.32, 0.35, suit, 0, 0.91, 0);
-  edge(head, 0xbde9d3, 0.5);
-  box(explorer, 0.35, 0.14, 0.025, visor, 0, 0.94, 0.19);
-  box(explorer, 0.075, 0.045, 0.02, glow(0x87e3d4), -0.1, 0.95, 0.21);
-  box(explorer, 0.075, 0.045, 0.02, glow(0x87e3d4), 0.1, 0.95, 0.21);
-  cylinder(explorer, 0.016, 0.17, metal, 0, 1.16, 0);
-  const antenna = new THREE.Mesh(
-    new THREE.SphereGeometry(0.046, 12, 8),
-    glow(0xc9ecb7),
+  let state = fresh(),
+    selected = null,
+    mode = "move",
+    source = null,
+    running = false,
+    produced = 0,
+    cycle = 0,
+    speed = 1;
+  let paused = reducedMotion.matches,
+    yaw = 0.6,
+    zoom = 1,
+    time = 0,
+    raf = 0,
+    previous = 0,
+    toastTimer;
+  const history = [],
+    objects = new Map(),
+    connections = [],
+    labels = document.querySelector("#factory-labels");
+  const $ = (s) => document.querySelector(s);
+  const node = (id) => state.nodes.find((n) => n.id === id);
+  const isOverlay = () => !!document.querySelector("dialog[open]");
+  const raycaster = new THREE.Raycaster(),
+    pointer = new THREE.Vector2(),
+    hit = new THREE.Vector3();
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.12);
+  const selectionRing = new THREE.Mesh(
+    new THREE.TorusGeometry(1.4, 0.025, 8, 70),
+    glow(0xf5d59c),
   );
-  antenna.position.set(0, 1.25, 0);
-  explorer.add(antenna);
-  const feet = [
-    box(explorer, 0.14, 0.2, 0.22, boot, -0.12, 0.16, 0.015),
-    box(explorer, 0.14, 0.2, 0.22, boot, 0.12, 0.16, 0.015),
-  ];
-  const arms = [
-    box(explorer, 0.1, 0.34, 0.12, suit, -0.26, 0.5, 0),
-    box(explorer, 0.1, 0.34, 0.12, suit, 0.26, 0.5, 0),
-  ];
-  const shadow = new THREE.Mesh(
-    new THREE.CircleGeometry(0.32, 24),
+  selectionRing.rotation.x = -Math.PI / 2;
+  selectionRing.visible = false;
+  root.add(selectionRing);
+  const preview = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.5, 2.5),
     new THREE.MeshBasicMaterial({
-      color: 0x050e10,
+      color: 0xb0e4d2,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.2,
+      depthWrite: false,
     }),
   );
-  shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = 0.015;
-  explorer.add(shadow);
-  const targetRing = new THREE.Mesh(
-    new THREE.TorusGeometry(0.23, 0.012, 8, 36),
-    glow(0xb0e4d2),
-  );
-  targetRing.rotation.x = Math.PI / 2;
-  targetRing.position.y = -0.1;
-  targetRing.visible = false;
-  root.add(targetRing);
-  // Optional exploration rewards never lock portfolio content.
-  const chips = [-4.8, -2.4, 0, 2.4, 4.8].map((x, index) => {
-    const mesh = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.16),
-      glow(0xffd88b),
-    );
-    mesh.position.set(x, 0.4, 3.65);
-    const halo = new THREE.Mesh(
-      new THREE.TorusGeometry(0.26, 0.014, 8, 40),
-      glow(0xffd88b),
-    );
-    halo.rotation.x = Math.PI / 2;
-    mesh.add(halo);
-    root.add(mesh);
-    return { mesh, index, collected: false };
-  });
-  let boost = false,
-    toastTimer;
-  const boostButton = document.querySelector("#boost-toggle");
-  const toast = document.querySelector("#game-toast");
+  preview.rotation.x = -Math.PI / 2;
+  preview.visible = false;
+  root.add(preview);
   function announce(message) {
     clearTimeout(toastTimer);
-    toast.textContent = message;
-    toast.classList.add("is-visible");
-    toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 3600);
+    $("#factory-toast").textContent = message;
+    $("#factory-toast").classList.add("visible");
+    toastTimer = setTimeout(
+      () => $("#factory-toast").classList.remove("visible"),
+      3500,
+    );
   }
-  function updateRewards(message) {
-    const count = chips.filter((c) => c.collected).length;
-    const complete = count === 5 && visited.size === 3;
-    document.querySelector("#game-score").textContent =
-      visited.size * 100 + count * 20;
-    document.querySelector("#game-chips").textContent =
-      `데이터 칩 ${count} / 5`;
-    document.querySelector("#game-rank").textContent = complete
-      ? "SYSTEM ARCHITECT ★"
-      : visited.size === 3
-        ? "SYSTEM CONNECTOR"
-        : "EXPLORER";
-    document
-      .querySelector(".game-hud")
-      .classList.toggle("is-complete", complete);
-    document.querySelector("#game-hint").textContent = complete
-      ? "탐험 완료! 모든 시스템과 데이터를 연결했습니다."
-      : count === 5
-        ? "세 시스템을 연결하면 최종 배지를 획득합니다."
-        : "빛나는 칩을 모으고 세 시스템을 연결하세요.";
-    if (message)
-      announce(complete ? "★ SYSTEM ARCHITECT · 400 XP 달성!" : message);
+  function checkpoint() {
+    history.push(JSON.stringify(state));
+    if (history.length > 30) history.shift();
+    running = false;
+    cycle = 0;
   }
-  function collectChips() {
-    if (!started) return;
-    chips.forEach((chip) => {
-      if (
-        !chip.collected &&
-        Math.hypot(
-          explorer.position.x - chip.mesh.position.x,
-          explorer.position.z - chip.mesh.position.z,
-        ) < 0.48
-      ) {
-        chip.collected = true;
-        chip.mesh.visible = false;
-        updateRewards("데이터 칩 획득 · +20 XP");
-      }
-    });
+  function completeLines() {
+    return state.nodes.filter(
+      (n) =>
+        n.type === "ot" &&
+        state.links.some(
+          ([a, b]) =>
+            a === n.id &&
+            state.links.some(([c, d]) => c === b && node(d)?.type === "ai"),
+        ),
+    ).length;
   }
-  const keys = new Set(),
-    held = new Set(),
-    visited = new Set();
-  const markers = [...document.querySelectorAll("[data-destination]")];
-  const interact = document.querySelector("#world-interact");
-  const startUI = document.querySelector(".world-start");
-  const destinations = Object.fromEntries(
-    Object.entries(positions).map(([id, p]) => [
-      id,
-      new THREE.Vector3(p.x, -0.1, p.z + 1.75),
-    ]),
-  );
-  destinations.terminal = new THREE.Vector3(4.45, -0.1, 3.6);
-  const viewCenter = new THREE.Vector3(0, 0.4, 0.5);
-  let paused = reducedMotion.matches,
-    inViewport = true,
-    raf = 0,
-    time = 0,
-    previous = 0,
-    autopilot = null,
-    nearby = null,
-    started = false,
-    walkTime = 0;
-  const raycaster = new THREE.Raycaster(),
-    pointer = new THREE.Vector2();
-  const walkPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.1);
-  const direction = new THREE.Vector3(),
-    destinationPoint = new THREE.Vector3();
-  const focusable = () =>
-    !document.querySelector("dialog[open]") && !document.hidden && inViewport;
-  function cameraPose() {
-    if (innerWidth < 650) {
-      viewCenter.x = explorer.position.x;
-      viewCenter.z = explorer.position.z - 0.9;
-    } else {
-      viewCenter.set(0, 0.4, 0.5);
+  function validSpot(x, z, id) {
+    return (
+      Math.abs(x) <= 5.5 &&
+      Math.abs(z) <= 3.5 &&
+      !state.nodes.some(
+        (n) => n.id !== id && Math.hypot(n.x - x, n.z - z) < 2.6,
+      )
+    );
+  }
+  function refreshUI() {
+    const chosen = node(selected),
+      complete = completeLines();
+    container.classList.toggle("is-running", running);
+    $("#factory-run").disabled = complete === 0;
+    $("#factory-run").textContent = running ? "Ⅱ 가동 멈추기" : "▶ 공장 가동";
+    $("#factory-run").setAttribute("aria-pressed", String(running));
+    $("#factory-undo").disabled = history.length === 0;
+    $("#factory-lines").innerHTML = `${complete}<small>개</small>`;
+    $("#factory-output").innerHTML = `${produced}<small>개</small>`;
+    $("#factory-state").textContent = running
+      ? "FACTORY RUNNING"
+      : mode === "connect"
+        ? "CONNECT MODE"
+        : "BUILD MODE";
+    $("#step-place").classList.toggle("done", state.nodes.length > 0);
+    $("#step-link").classList.toggle("done", complete > 0);
+    $("#step-run").classList.toggle("done", running);
+    $("#move-mode").setAttribute("aria-pressed", String(mode === "move"));
+    $("#connect-mode").setAttribute("aria-pressed", String(mode === "connect"));
+    $("#factory-selection").hidden = !chosen;
+    $("#factory-hint").textContent = running
+      ? "로봇의 작업이 데이터로, 데이터가 AI로 이어집니다."
+      : source
+        ? `${names[node(source).type]}에서 연결할 다음 장치를 선택하세요.`
+        : mode === "connect"
+          ? "로봇 → 관제 → AI 순서로 두 장치씩 선택하세요."
+          : chosen
+            ? `${names[chosen.type]} 선택됨 · 바닥을 클릭해 이동하세요. 방향키로도 옮길 수 있습니다.`
+            : "설비를 추가하고 자유롭게 배치하세요. 연결하면 공장을 가동할 수 있습니다.";
+    if (chosen) {
+      $("#selection-kind").textContent = descriptions[chosen.type];
+      $("#selection-name").textContent = `${names[chosen.type]} ${chosen.id}`;
+      selectionRing.position.set(chosen.x, -0.1, chosen.z);
     }
-    camera.position.set(viewCenter.x + 10, 10, viewCenter.z + 14);
-    camera.lookAt(viewCenter);
+    selectionRing.visible = !!chosen;
+    document
+      .querySelectorAll("[data-node]")
+      .forEach((b) =>
+        b.setAttribute(
+          "aria-pressed",
+          String(Number(b.dataset.node) === selected),
+        ),
+      );
+  }
+  function rebuild() {
+    objects.forEach((o) => root.remove(o));
+    objects.clear();
+    connections.forEach((c) => {
+      root.remove(c.group);
+      c.group.traverse((o) => {
+        o.geometry?.dispose();
+        if (o.material) o.material.dispose();
+      });
+    });
+    connections.length = 0;
+    labels.replaceChildren();
+    state.nodes.forEach((n) => {
+      const object = pads[n.type].clone(true);
+      object.visible = true;
+      object.position.set(n.x, 0, n.z);
+      object.rotation.y = n.r;
+      object.scale.setScalar(0.85);
+      root.add(object);
+      objects.set(n.id, object);
+      const label = document.createElement("button");
+      label.type = "button";
+      label.dataset.node = n.id;
+      label.innerHTML = `<span>${names[n.type]}</span><small>${n.type.toUpperCase()} / ${String(n.id).padStart(2, "0")}</small>`;
+      label.setAttribute("aria-label", `${names[n.type]} ${n.id} 선택`);
+      labels.append(label);
+    });
+    state.links.forEach(([a, b]) => {
+      const start = node(a),
+        end = node(b),
+        group = new THREE.Group();
+      root.add(group);
+      const path = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(start.x, 0.2, start.z + 0.8),
+        new THREE.Vector3(start.x, 0.25, start.z + 1.35),
+        new THREE.Vector3(end.x, 0.25, end.z + 1.35),
+        new THREE.Vector3(end.x, 0.2, end.z + 0.8),
+      ]);
+      group.add(
+        new THREE.Mesh(
+          new THREE.TubeGeometry(path, 48, 0.035, 6, false),
+          glow(colors[start.type]),
+        ),
+      );
+      const packets = [];
+      for (let i = 0; i < 3; i++) {
+        const dot = new THREE.Mesh(
+          new THREE.BoxGeometry(0.14, 0.14, 0.14),
+          glow(0xffe2a8),
+        );
+        group.add(dot);
+        packets.push(dot);
+      }
+      connections.push({ group, path, packets });
+    });
+    refreshUI();
+    pose();
+    render();
+    wake();
+  }
+  function select(id) {
+    if (!node(id)) return;
+    preview.visible = false;
+    if (mode === "connect") {
+      if (!source) {
+        source = id;
+        selected = id;
+      } else {
+        const a = node(source),
+          b = node(id);
+        if (source === id) source = null;
+        else if (!(
+          (a.type === "ot" && b.type === "it") ||
+          (a.type === "it" && b.type === "ai")
+        ))
+          announce("로봇 → 관제 또는 관제 → AI 순서로 연결하세요.");
+        else if (state.links.some(([x, y]) => x === source && y === id))
+          announce("이미 연결된 장치입니다.");
+        else {
+          checkpoint();
+          state.links.push([source, id]);
+          source = null;
+          selected = id;
+          rebuild();
+          announce(
+            completeLines()
+              ? "생산 라인 완성! 공장을 가동해 보세요."
+              : "연결 완료 · 다음 장치를 이어 보세요.",
+          );
+        }
+      }
+    } else {
+      selected = id;
+      source = null;
+    }
+    refreshUI();
+    render();
+  }
+  function moveNode(x, z) {
+    if (!node(selected)) return;
+    x = Math.round(x * 2) / 2;
+    z = Math.round(z * 2) / 2;
+    if (!validSpot(x, z, selected)) {
+      announce("바닥 안의 빈 공간에 배치해 주세요.");
+      return;
+    }
+    if (node(selected).x === x && node(selected).z === z) return;
+    checkpoint();
+    Object.assign(node(selected), { x, z });
+    rebuild();
+  }
+  function add(type) {
+    if (state.nodes.length >= 8) {
+      announce("이 공장에는 최대 8개 장치를 배치할 수 있습니다.");
+      return;
+    }
+    let spot;
+    for (const z of [0, 3, -3])
+      for (const x of [0, -3.5, 3.5])
+        if (!spot && validSpot(x, z)) spot = { x, z };
+    if (!spot) {
+      announce("빈 공간이 부족합니다. 장치를 옮기거나 삭제해 주세요.");
+      return;
+    }
+    checkpoint();
+    selected = state.next++;
+    state.nodes.push({ id: selected, type, ...spot, r: 0 });
+    mode = "move";
+    source = null;
+    rebuild();
+    announce("장치 추가 완료 · 빈 바닥을 클릭하면 옮길 수 있습니다.");
+  }
+  function rotateNode(direction = 1) {
+    if (!node(selected)) return;
+    checkpoint();
+    node(selected).r += (direction * Math.PI) / 2;
+    rebuild();
+  }
+  function cameraPose() {
+    const aspect = Math.max(
+        0.1,
+        container.clientWidth / container.clientHeight,
+      ),
+      vertical = Math.max(5.9, 7.9 / aspect) / zoom;
+    camera.left = -vertical * aspect;
+    camera.right = vertical * aspect;
+    camera.top = vertical;
+    camera.bottom = -vertical;
+    camera.position.set(Math.sin(yaw) * 15, 13, Math.cos(yaw) * 15);
+    camera.lookAt(0, 0.2, 0);
+    camera.updateProjectionMatrix();
     camera.updateMatrixWorld();
   }
   function sizeScene() {
     const width = container.clientWidth,
       height = container.clientHeight;
-    const desiredRatio = highQuality
+    const ratio = highQuality
       ? Math.min(Math.max(devicePixelRatio, 2), 2.5)
       : Math.min(devicePixelRatio, 1.25);
-    // Bound framebuffer memory on very large screens while supersampling ordinary displays.
     renderer.setPixelRatio(
-      Math.min(desiredRatio, Math.sqrt(8000000 / Math.max(1, width * height))),
+      Math.min(ratio, Math.sqrt(8000000 / Math.max(1, width * height))),
     );
     renderer.setSize(width, height, false);
-    const aspect = width / height,
-      vertical = innerWidth < 650 ? 4.2 : 4.6;
-    camera.left = -vertical * aspect;
-    camera.right = vertical * aspect;
-    camera.top = vertical;
-    camera.bottom = -vertical;
-    camera.updateProjectionMatrix();
     cameraPose();
     render();
-  }
-  function updateMarkers() {
-    Object.entries(positions).forEach(([id, pos]) => {
-      const p = new THREE.Vector3(pos.x, pos.y + 2.8, pos.z).project(camera);
-      const marker = markers.find((m) => m.dataset.destination === id);
-      marker.style.left = `${(p.x + 1) * 0.5 * container.clientWidth}px`;
-      const projectedY = (1 - p.y) * 0.5 * container.clientHeight;
-      marker.style.top = `${innerWidth < 650 ? Math.max(265, projectedY) : projectedY}px`;
-      marker.classList.add("positioned");
-      marker.hidden = Math.abs(p.x) > 0.78 || p.y > 1 || p.y < -0.75;
-    });
-    const label = document.querySelector("#terminal-marker");
-    const point = new THREE.Vector3(4.45, 1.8, 2).project(camera);
-    label.style.left = `${(point.x + 1) * 0.5 * container.clientWidth}px`;
-    label.style.top = `${(1 - point.y) * 0.5 * container.clientHeight}px`;
-    label.hidden = Math.abs(point.x) > 0.82 || Math.abs(point.y) > 0.85;
-    label.classList.add("positioned");
   }
   function render() {
     renderer.render(scene, camera);
-    updateMarkers();
-  }
-  function selectZone(id) {
-    if (id === "terminal") {
-      window.dispatchEvent(new Event("world-library"));
-      return;
-    }
-    const firstVisit = !visited.has(id);
-    visited.add(id);
-    updateRewards(
-      firstVisit ? `${id.toUpperCase()} 시스템 연결 · +100 XP` : null,
-    );
-    nearby = undefined;
-    updateNearby();
-    pads[id].children[0].material = highlightedPad;
-    beacons[id].material.emissiveIntensity = 1.8;
-    if (visited.size === 3) {
-      routeMaterial.color.setHex(0xb0e4d2);
-      routeMaterial.emissive.setHex(0x70c39e);
-      coreMat.opacity = 0.45;
-    }
-    document
-      .querySelectorAll("[data-layer]")
-      .forEach((b) =>
-        b.setAttribute("aria-pressed", String(b.dataset.layer === id)),
+    const placed = [];
+    state.nodes.forEach((n) => {
+      const p = new THREE.Vector3(n.x, 2.6, n.z).project(camera),
+        label = labels.querySelector(`[data-node="${n.id}"]`);
+      label.hidden = Math.abs(p.x) > 0.94 || Math.abs(p.y) > 0.85;
+      if (label.hidden) return;
+      const w = label.offsetWidth,
+        h = label.offsetHeight;
+      const x = THREE.MathUtils.clamp(
+        (p.x + 1) * 0.5 * container.clientWidth,
+        w / 2 + 8,
+        container.clientWidth - w / 2 - 8,
       );
-    window.dispatchEvent(
-      new CustomEvent("world-zone", { detail: { id, visited: [...visited] } }),
-    );
-    render();
-  }
-  function updateNearby() {
-    let next = null,
-      best = 1.55;
-    for (const [id, point] of Object.entries(destinations)) {
-      const d = point.distanceTo(explorer.position);
-      if (d < best) {
-        best = d;
-        next = id;
-      }
-    }
-    if (next !== nearby) {
-      nearby = next;
-      interact.disabled = !next;
-      interact.textContent = next
-        ? next === "terminal"
-          ? "안내 단말 열기 ↗"
-          : `${visited.has(next) ? "다시 보기" : "연결하기"} / ${next.toUpperCase()} ↗`
-        : "구역 가까이 이동하세요";
-    }
-  }
-  function begin() {
-    started = true;
-    startUI.classList.add("is-started");
-    canvas.focus({ preventScroll: true });
-    wake();
-  }
-  function travel(id) {
-    begin();
-    if (reducedMotion.matches) {
-      explorer.position.copy(destinations[id]);
-      cameraPose();
-      updateNearby();
-      collectChips();
-      selectZone(id);
-      return;
-    }
-    autopilot = { point: destinations[id].clone(), zone: id };
-    targetRing.position.copy(destinations[id]);
-    targetRing.visible = true;
-    wake();
-  }
-  function blocked(x, z) {
-    if (Math.abs(x) > 5.55 || z < -3.25 || z > 4.35) return true;
-    if (Math.abs(x - 4.45) < 0.6 && Math.abs(z - 2) < 0.55) return true;
-    return Object.values(positions).some(
-      (p) => Math.abs(x - p.x) < 1.48 && Math.abs(z - p.z) < 1.35,
-    );
-  }
-  function move(delta) {
-    if (!started || !focusable()) return false;
-    direction.set(0, 0, 0);
-    const right =
-      keys.has("d") || keys.has("arrowright") || held.has("right") ? 1 : 0;
-    const left =
-      keys.has("a") || keys.has("arrowleft") || held.has("left") ? 1 : 0;
-    const down =
-      keys.has("s") || keys.has("arrowdown") || held.has("down") ? 1 : 0;
-    const up = keys.has("w") || keys.has("arrowup") || held.has("up") ? 1 : 0;
-    if (right || left || down || up) {
-      autopilot = null;
-      direction.set(
-        (right - left) * 0.814 + (down - up) * 0.581,
-        0,
-        (down - up) * 0.814 - (right - left) * 0.581,
+      const preferredY = Math.max(
+        (1 - p.y) * 0.5 * container.clientHeight,
+        container.clientHeight < 350 ? 85 : 145,
       );
-    } else if (autopilot) {
-      direction.copy(autopilot.point).sub(explorer.position);
-      direction.y = 0;
-      if (direction.length() < 0.1) {
-        const id = autopilot.zone;
-        autopilot = null;
-        targetRing.visible = false;
-        updateNearby();
-        if (id) selectZone(id);
-        return false;
+      const candidates = [];
+      for (const dy of [0, -1, 1, -2, 2, -3, 3])
+        for (const dx of [0, -1, 1]) {
+          const cx = x + dx * (w + 8),
+            cy = preferredY + dy * (h + 8);
+          if (
+            cx - w / 2 < 8 ||
+            cx + w / 2 > container.clientWidth - 8 ||
+            cy - h < 45 ||
+            cy > container.clientHeight - 60
+          )
+            continue;
+          candidates.push({
+            x: cx,
+            y: cy,
+            d: Math.abs(dx) * w + Math.abs(dy) * h,
+          });
+        }
+      const choice = candidates
+        .sort((a, b) => a.d - b.d)
+        .find(
+          (c) =>
+            !placed.some(
+              (b) =>
+                Math.abs(c.x - b.x) < (w + b.w) / 2 + 5 &&
+                c.y - h < b.y + 5 &&
+                c.y > b.y - b.h - 5,
+            ),
+        );
+      if (!choice) {
+        label.hidden = true;
+        return;
       }
-      // Walk along the clear front corridor before approaching the station.
-      if (Math.abs(direction.x) > 0.12 && explorer.position.z < 2.7)
-        direction.set(0, 0, 1);
-      else if (Math.abs(direction.x) > 0.12) direction.z = 0;
-    }
-    if (direction.lengthSq() === 0) return false;
-    const remaining = autopilot ? direction.length() : Infinity;
-    direction.normalize();
-    const step = Math.min(
-      (boost || keys.has("shift") ? 4.5 : 2.7) * delta,
-      remaining,
-    );
-    const x = explorer.position.x + direction.x * step,
-      z = explorer.position.z + direction.z * step;
-    let moved = false;
-    if (!blocked(x, explorer.position.z)) {
-      explorer.position.x = x;
-      moved = true;
-    }
-    if (!blocked(explorer.position.x, z)) {
-      explorer.position.z = z;
-      moved = true;
-    }
-    if (!moved) {
-      autopilot = null;
-      targetRing.visible = false;
-      return false;
-    }
-    explorer.rotation.y = Math.atan2(direction.x, direction.z);
-    walkTime += delta * 11;
-    if (!reducedMotion.matches) {
-      feet[0].position.y = 0.16 + Math.max(0, Math.sin(walkTime)) * 0.08;
-      feet[1].position.y = 0.16 + Math.max(0, -Math.sin(walkTime)) * 0.08;
-      arms[0].rotation.x = Math.sin(walkTime) * 0.22;
-      arms[1].rotation.x = -Math.sin(walkTime) * 0.22;
-    }
-    collectChips();
-    updateNearby();
-    cameraPose();
-    return true;
+      label.style.left = `${choice.x}px`;
+      label.style.top = `${choice.y}px`;
+      placed.push({ ...choice, w, h });
+    });
   }
   function pose() {
-    chips.forEach(({ mesh, index, collected }) => {
-      if (collected) return;
-      mesh.position.y = 0.4 + Math.sin(time * 2 + index) * 0.09;
-      mesh.rotation.y = time * 0.8 + index;
+    state.nodes.forEach((n) => {
+      const o = objects.get(n.id);
+      // Animated children retain the procedural models' hierarchy.
+      if (n.type === "ot")
+        o.getObjectByName("robotArm").rotation.y =
+          running && !paused ? Math.sin(time * 1.8 * speed) * 0.6 : 0;
+      if (n.type === "ai") {
+        const core = o.getObjectByName("aiCore");
+        core.position.y = 1.35 + (paused ? 0 : Math.sin(time + n.id) * 0.1);
+        core.rotation.y = paused ? 0 : time * 0.15;
+      }
     });
-    robotArm.rotation.y = Math.sin(time * 0.85) * 0.38;
-    server.position.y = Math.sin(time * 0.8 + 1) * 0.065;
-    ai.position.y = 1.35 + Math.sin(time * 0.95) * 0.14;
-    ai.rotation.y = Math.sin(time * 0.4) * 0.18;
-    particles.forEach(({ dot, path, offset }) =>
-      dot.position.copy(path.getPointAt((time * 0.12 + offset) % 1)),
+    connections.forEach(({ packets, path }) =>
+      packets.forEach((dot, i) => {
+        dot.position.copy(
+          path.getPointAt(
+            (running && !paused ? time * speed * 0.15 : 0) +
+              i / 3 -
+              Math.floor(
+                (running && !paused ? time * speed * 0.15 : 0) + i / 3,
+              ),
+          ),
+        );
+        dot.visible = running;
+      }),
     );
-  }
-  function hasInput() {
-    return keys.size > 0 || held.size > 0 || autopilot !== null;
   }
   function frame(now) {
     raf = 0;
-    if (
-      document.hidden ||
-      !inViewport ||
-      document.querySelector("dialog[open]")
-    ) {
+    if (document.hidden || isOverlay()) {
       previous = 0;
       return;
     }
-    const dt = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
+    const elapsed = previous ? Math.min((now - previous) / 1000, 0.5) : 0,
+      dt = Math.min(elapsed, 0.05);
     previous = now;
-    const moved = move(dt);
-    if (!paused) {
-      time += dt;
+    if (!paused) time += dt;
+    if (running) {
+      cycle += elapsed * speed;
+      if (cycle >= 3) {
+        produced += completeLines() * Math.floor(cycle / 3);
+        cycle %= 3;
+        $("#factory-output").innerHTML = `${produced}<small>개</small>`;
+      }
+    }
+    if (!paused || dt === 0) {
       pose();
+      render();
     }
-    if (!moved) {
-      feet.forEach((f) => (f.position.y = 0.16));
-      arms.forEach((a) => (a.rotation.x = 0));
-    }
-    render();
-    if (!paused || hasInput()) raf = requestAnimationFrame(frame);
+    if (!paused || running) raf = requestAnimationFrame(frame);
     else previous = 0;
   }
   function wake() {
-    if (!raf && !document.hidden && inViewport) {
+    if (!raf && !document.hidden && !isOverlay()) {
       previous = 0;
       raf = requestAnimationFrame(frame);
     }
   }
-  function clearInput() {
-    keys.clear();
-    held.clear();
-    document
-      .querySelectorAll(".is-held")
-      .forEach((b) => b.classList.remove("is-held"));
-  }
-  function sync() {
-    cancelAnimationFrame(raf);
-    raf = 0;
-    previous = 0;
-    motionButton.setAttribute("aria-pressed", String(paused));
-    motionButton.setAttribute(
-      "aria-label",
-      paused ? "배경 움직임 재생" : "배경 움직임 정지",
-    );
-    motionButton.textContent = paused ? "Play ambience ▷" : "Pause ambience Ⅱ";
+  function setMode(value) {
+    mode = value;
+    source = null;
+    preview.visible = false;
+    refreshUI();
     render();
-    if (!paused || hasInput()) wake();
   }
-  canvas.addEventListener("keydown", (event) => {
-    const key = event.key.toLowerCase();
-    if (
-      [
-        "shift",
-        "w",
-        "a",
-        "s",
-        "d",
-        "arrowup",
-        "arrowdown",
-        "arrowleft",
-        "arrowright",
-      ].includes(key)
-    ) {
-      event.preventDefault();
-      if (!focusable()) return;
-      begin();
-      keys.add(key);
-      wake();
-    } else if (["e", "enter", " "].includes(key)) {
-      event.preventDefault();
-      if (nearby && !event.repeat) selectZone(nearby);
+  document
+    .querySelectorAll("[data-add]")
+    .forEach((b) => b.addEventListener("click", () => add(b.dataset.add)));
+  labels.addEventListener("click", (event) => {
+    const b = event.target.closest("[data-node]");
+    if (b) select(Number(b.dataset.node));
+  });
+  $("#move-mode").addEventListener("click", () => setMode("move"));
+  $("#connect-mode").addEventListener("click", () => setMode("connect"));
+  $("#selection-done").addEventListener("click", () => {
+    selected = null;
+    source = null;
+    preview.visible = false;
+    refreshUI();
+    render();
+  });
+  $("#selection-rotate").addEventListener("click", () => rotateNode());
+  $("#selection-disconnect").addEventListener("click", () => {
+    if (!node(selected)) return;
+    checkpoint();
+    state.links = state.links.filter((pair) => !pair.includes(selected));
+    source = null;
+    rebuild();
+    announce("선택한 장치의 연결을 해제했습니다.");
+  });
+  $("#selection-remove").addEventListener("click", () => {
+    if (!node(selected)) return;
+    checkpoint();
+    state.nodes = state.nodes.filter((n) => n.id !== selected);
+    state.links = state.links.filter((pair) => !pair.includes(selected));
+    source = null;
+    selected = null;
+    rebuild();
+  });
+  $("#selection-project").addEventListener("click", () => {
+    if (node(selected))
+      window.dispatchEvent(
+        new CustomEvent("factory-inspect", { detail: node(selected).type }),
+      );
+  });
+  $("#factory-undo").addEventListener("click", () => {
+    if (!history.length) return;
+    state = JSON.parse(history.pop());
+    running = false;
+    cycle = 0;
+    selected = null;
+    source = null;
+    rebuild();
+  });
+  $("#factory-sample").addEventListener("click", () => {
+    checkpoint();
+    state = fresh();
+    selected = null;
+    source = null;
+    produced = 0;
+    rebuild();
+    announce("세 장치를 연결해 공장을 가동해 보세요.");
+  });
+  $("#factory-clear").addEventListener("click", () => {
+    checkpoint();
+    state = { nodes: [], links: [], next: 1 };
+    selected = null;
+    source = null;
+    produced = 0;
+    rebuild();
+    announce("원하는 장치를 추가해 나만의 공장을 만들어 보세요.");
+  });
+  $("#quick-connect").addEventListener("click", () => {
+    const it = state.nodes.find((n) => n.type === "it"),
+      ai = state.nodes.find((n) => n.type === "ai"),
+      ots = state.nodes.filter((n) => n.type === "ot");
+    if (!it || !ai || !ots.length) {
+      announce("로봇, 관제, AI 장치를 하나씩 추가하세요.");
+      return;
     }
+    const pairs = [...ots.map((n) => [n.id, it.id]), [it.id, ai.id]].filter(
+      ([a, b]) => !state.links.some(([x, y]) => x === a && y === b),
+    );
+    if (!pairs.length) {
+      announce("이미 생산 라인이 연결되어 있습니다.");
+      return;
+    }
+    checkpoint();
+    state.links.push(...pairs);
+    source = null;
+    rebuild();
+    announce("연결 완료! 공장 가동 버튼을 눌러 보세요.");
   });
-  document.addEventListener("keyup", (event) =>
-    keys.delete(event.key.toLowerCase()),
-  );
-  canvas.addEventListener("blur", clearInput);
-  window.addEventListener("world-overlay-open", () => {
-    clearInput();
-    autopilot = null;
-    targetRing.visible = false;
-    cancelAnimationFrame(raf);
-    raf = 0;
-    previous = 0;
+  $("#factory-run").addEventListener("click", () => {
+    if (!completeLines()) return;
+    running = !running;
+    source = null;
+    refreshUI();
+    wake();
+    if (running)
+      announce("공장 가동 · 로봇 → 데이터 → AI의 흐름을 확인하세요.");
   });
-  window.addEventListener("world-overlay-close", sync);
-  window.addEventListener("blur", clearInput);
-  document.querySelectorAll("[data-move]").forEach((button) => {
-    button.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      begin();
-      held.add(button.dataset.move);
-      button.classList.add("is-held");
-      button.setPointerCapture(e.pointerId);
-      wake();
+  $("#factory-speed").addEventListener("input", (event) => {
+    speed = Number(event.target.value);
+    $("#speed-label").textContent = `${speed}×`;
+  });
+  for (const [id, action] of Object.entries({
+    "camera-left": () => (yaw -= 0.3),
+    "camera-right": () => (yaw += 0.3),
+    "camera-in": () => (zoom = Math.min(1.8, zoom + 0.15)),
+    "camera-out": () => (zoom = Math.max(0.7, zoom - 0.15)),
+    "camera-home": () => {
+      yaw = 0.6;
+      zoom = 1;
+    },
+  }))
+    $("#" + id).addEventListener("click", () => {
+      action();
+      cameraPose();
+      render();
     });
-    const release = () => {
-      held.delete(button.dataset.move);
-      button.classList.remove("is-held");
-    };
-    button.addEventListener("pointerup", release);
-    button.addEventListener("pointercancel", release);
-    button.addEventListener("lostpointercapture", release);
-  });
-  document.querySelector("#world-start").addEventListener("click", begin);
-  interact.addEventListener("click", () => {
-    if (nearby) selectZone(nearby);
-  });
-  container.addEventListener("pointerdown", (event) => {
-    if (event.target !== canvas) return;
-    begin();
+  let gesture = null;
+  function screenRay(event) {
     const r = canvas.getBoundingClientRect();
     pointer.set(
       ((event.clientX - r.left) / r.width) * 2 - 1,
       -((event.clientY - r.top) / r.height) * 2 + 1,
     );
     raycaster.setFromCamera(pointer, camera);
-    const chip = chips.find(
-      (c) => !c.collected && raycaster.intersectObject(c.mesh, true).length,
-    );
-    if (chip) {
-      const point = new THREE.Vector3(
-        chip.mesh.position.x,
-        -0.1,
-        chip.mesh.position.z,
-      );
-      if (reducedMotion.matches) {
-        explorer.position.copy(point);
-        collectChips();
+  }
+  canvas.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    canvas.focus({ preventScroll: true });
+    gesture = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+      yaw,
+      drag: false,
+    };
+    canvas.setPointerCapture(event.pointerId);
+  });
+  canvas.addEventListener("pointermove", (event) => {
+    if (gesture) {
+      if (Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 6)
+        gesture.drag = true;
+      if (gesture.drag) {
+        yaw = gesture.yaw - (event.clientX - gesture.x) * 0.007;
+        preview.visible = false;
         cameraPose();
-        updateNearby();
         render();
-      } else {
-        autopilot = { point, zone: null };
-        targetRing.position.copy(point);
-        targetRing.visible = true;
-        wake();
       }
       return;
     }
-    for (const [id, pad] of Object.entries(pads)) {
-      if (raycaster.intersectObject(pad, true).length) {
-        travel(id);
-        return;
-      }
-    }
-    if (raycaster.ray.intersectPlane(walkPlane, destinationPoint)) {
-      if (blocked(destinationPoint.x, destinationPoint.z)) return;
-      if (reducedMotion.matches) {
-        explorer.position.copy(destinationPoint);
-        cameraPose();
-        updateNearby();
-        collectChips();
+    if (mode === "move" && node(selected)) {
+      screenRay(event);
+      if (raycaster.ray.intersectPlane(plane, hit)) {
+        const x = Math.round(hit.x * 2) / 2,
+          z = Math.round(hit.z * 2) / 2;
+        preview.position.set(x, -0.1, z);
+        preview.visible = Math.abs(x) < 7 && Math.abs(z) < 5;
+        preview.material.color.setHex(
+          validSpot(x, z, selected) ? 0xb0e4d2 : 0xff9988,
+        );
         render();
-      } else {
-        autopilot = { point: destinationPoint.clone(), zone: null };
-        targetRing.position.copy(destinationPoint);
-        targetRing.visible = true;
-        wake();
       }
     }
   });
-  window.addEventListener("identity-layer", (event) => travel(event.detail));
-  window.addEventListener("world-reset", () => {
-    clearInput();
-    autopilot = null;
-    visited.clear();
-    chips.forEach((chip) => {
-      chip.collected = false;
-      chip.mesh.visible = true;
-    });
-    boost = false;
-    boostButton.setAttribute("aria-pressed", "false");
-    clearTimeout(toastTimer);
-    toast.classList.remove("is-visible");
-    updateRewards();
-    targetRing.visible = false;
-    explorer.position.set(0, -0.1, 3.5);
-    explorer.rotation.y = 0;
-    started = false;
-    startUI.classList.remove("is-started");
-    coreMat.opacity = 0.25;
-    routeMaterial.color.setHex(0x426e5c);
-    routeMaterial.emissive.setHex(0x426e5c);
-    Object.values(pads).forEach((p) => (p.children[0].material = dark));
-    Object.values(beacons).forEach((b) => (b.material.emissiveIntensity = 0.6));
-    nearby = undefined;
-    updateNearby();
-    cameraPose();
+  canvas.addEventListener("pointerup", (event) => {
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const drag = gesture.drag;
+    gesture = null;
+    if (drag) return;
+    screenRay(event);
+    const hits = state.nodes
+      .map((n) => ({
+        id: n.id,
+        hit: raycaster.intersectObject(objects.get(n.id), true)[0],
+      }))
+      .filter((n) => n.hit)
+      .sort((a, b) => a.hit.distance - b.hit.distance);
+    if (hits.length) select(hits[0].id);
+    else if (
+      mode === "move" &&
+      selected &&
+      raycaster.ray.intersectPlane(plane, hit)
+    ) {
+      moveNode(hit.x, hit.z);
+      preview.visible = false;
+    } else {
+      selected = null;
+      source = null;
+      refreshUI();
+      render();
+    }
+  });
+  canvas.addEventListener("pointercancel", () => (gesture = null));
+  canvas.addEventListener("lostpointercapture", () => (gesture = null));
+  canvas.addEventListener("pointerleave", () => {
+    preview.visible = false;
     render();
   });
-  boostButton.addEventListener("click", () => {
-    boost = !boost;
-    boostButton.setAttribute("aria-pressed", String(boost));
-    canvas.focus({ preventScroll: true });
+  canvas.addEventListener(
+    "wheel",
+    (event) => {
+      event.preventDefault();
+      zoom = THREE.MathUtils.clamp(zoom - event.deltaY * 0.001, 0.7, 1.8);
+      cameraPose();
+      render();
+    },
+    { passive: false },
+  );
+  canvas.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      selected = null;
+      source = null;
+      preview.visible = false;
+      refreshUI();
+      render();
+      return;
+    }
+    if (
+      ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key) &&
+      node(selected)
+    ) {
+      event.preventDefault();
+      const n = node(selected);
+      moveNode(
+        n.x +
+          (event.key === "ArrowLeft"
+            ? -0.5
+            : event.key === "ArrowRight"
+              ? 0.5
+              : 0),
+        n.z +
+          (event.key === "ArrowUp"
+            ? -0.5
+            : event.key === "ArrowDown"
+              ? 0.5
+              : 0),
+      );
+    }
+    if (["q", "e"].includes(event.key.toLowerCase())) {
+      event.preventDefault();
+      rotateNode(event.key.toLowerCase() === "q" ? -1 : 1);
+    }
   });
-  document
-    .querySelector("#quality-toggle")
-    .addEventListener("click", (event) => {
-      highQuality = !highQuality;
-      renderer.shadowMap.enabled = highQuality;
-      scene.traverse((object) => {
-        if (object.material) object.material.needsUpdate = true;
-      });
-      event.currentTarget.setAttribute("aria-pressed", String(highQuality));
-      event.currentTarget.textContent = highQuality
-        ? "화질 · High"
-        : "화질 · Standard";
-      sizeScene();
-    });
   motionButton.addEventListener("click", () => {
     paused = !paused;
-    sync();
+    motionButton.setAttribute("aria-pressed", String(paused));
+    motionButton.textContent = paused ? "모션 꺼짐" : "모션 켜짐";
+    pose();
+    render();
+    wake();
+  });
+  $("#quality-toggle").addEventListener("click", (event) => {
+    highQuality = !highQuality;
+    renderer.shadowMap.enabled = highQuality;
+    scene.traverse((o) => {
+      if (o.material) o.material.needsUpdate = true;
+    });
+    event.currentTarget.setAttribute("aria-pressed", String(highQuality));
+    event.currentTarget.textContent = highQuality ? "고화질" : "표준 화질";
+    sizeScene();
+  });
+  function pauseRendering() {
+    cancelAnimationFrame(raf);
+    raf = 0;
+    previous = 0;
+    gesture = null;
+    preview.visible = false;
+  }
+  window.addEventListener("world-overlay-open", pauseRendering);
+  window.addEventListener("world-overlay-close", wake);
+  document.addEventListener("visibilitychange", () => {
+    pauseRendering();
+    wake();
   });
   reducedMotion.addEventListener("change", () => {
     paused = reducedMotion.matches;
-    autopilot = null;
-    targetRing.visible = false;
-    clearInput();
-    sync();
+    motionButton.setAttribute("aria-pressed", String(paused));
+    motionButton.textContent = paused ? "모션 꺼짐" : "모션 켜짐";
+    wake();
   });
-  document.addEventListener("visibilitychange", () => {
-    clearInput();
-    sync();
-  });
-  new IntersectionObserver(
-    ([entry]) => {
-      inViewport = entry.isIntersecting;
-      if (!inViewport) clearInput();
-      sync();
-    },
-    { threshold: 0.05 },
-  ).observe(container);
   new ResizeObserver(sizeScene).observe(container);
   canvas.addEventListener("webglcontextlost", (event) => {
     event.preventDefault();
-    paused = true;
-    clearInput();
-    autopilot = null;
-    cancelAnimationFrame(raf);
+    pauseRendering();
     container.classList.remove("webgl-ready");
     window.dispatchEvent(new Event("identity-scene-unavailable"));
   });
-  pose();
-  sizeScene();
+  motionButton.setAttribute("aria-pressed", String(paused));
+  motionButton.textContent = paused ? "모션 꺼짐" : "모션 켜짐";
   container.classList.add("webgl-ready");
-  updateNearby();
-  window.dispatchEvent(new Event("world-ready"));
-  sync();
+  cameraPose();
+  rebuild();
+  sizeScene();
 }
