@@ -32,6 +32,7 @@ function openProject(id) {
     );
   }
   dialog.showModal();
+  window.dispatchEvent(new Event("world-overlay-open"));
   document.body.classList.add("dialog-open");
   dialog.querySelector(".dialog-close").focus();
 }
@@ -90,6 +91,7 @@ dialog.addEventListener("close", () => {
   content.querySelectorAll("img").forEach((img) => img.removeAttribute("src"));
   document.body.classList.remove("dialog-open");
   previousFocus?.focus();
+  window.dispatchEvent(new Event("world-overlay-close"));
 });
 const captions = {
   ot: "설비와 제어 시스템을 이해하고, 현장에서 동작하는 소프트웨어를 만듭니다.",
@@ -159,6 +161,12 @@ function showWorldZone(id) {
       return `<button type="button" data-world-project="${id}">${escapeHTML(p.title)} <span aria-hidden="true">↗</span></button>`;
     })
     .join("");
+  document
+    .querySelector("#world-card-projects")
+    .insertAdjacentHTML(
+      "beforeend",
+      '<div class="zone-library-links"><button type="button" data-open-library="projects">전체 프로젝트 ↗</button><button type="button" data-open-library="experience">경력·학력 ↗</button><button type="button" data-open-library="identity">소개 ↗</button><button type="button" data-open-library="contact">연락처 ↗</button></div>',
+    );
   worldCard.hidden = false;
   document.querySelector("#world-status").textContent =
     `${zone.title}. ${zone.description}`;
@@ -236,3 +244,68 @@ window.addEventListener("identity-scene-unavailable", () => {
   document.querySelector("#world-controls").textContent =
     "아래 구역 버튼으로 기술과 프로젝트를 탐색하세요.";
 });
+
+// The world is the main page; all portfolio sections live in its terminal.
+const library = document.querySelector("#library-dialog");
+let libraryReturnFocus = null;
+function selectLibrarySection(id) {
+  if (!["identity", "projects", "experience", "contact"].includes(id)) return;
+  library
+    .querySelectorAll(".library-body > section,.library-body > footer")
+    .forEach((section) => (section.hidden = section.id !== id));
+  library
+    .querySelectorAll("[data-library]")
+    .forEach((b) =>
+      b.setAttribute("aria-pressed", String(b.dataset.library === id)),
+    );
+  library.querySelector(".library-body").scrollTop = 0;
+}
+function openLibrary(id = "identity") {
+  selectLibrarySection(id);
+  if (!library.open) {
+    libraryReturnFocus = document.activeElement;
+    library.showModal();
+  }
+  library.querySelector(`[data-library="${id}"]`).focus();
+  window.dispatchEvent(new Event("world-overlay-open"));
+}
+library.addEventListener("click", (event) => {
+  const tab = event.target.closest("[data-library]");
+  if (tab) selectLibrarySection(tab.dataset.library);
+  if (event.target.closest("[data-return-world]")) library.close();
+});
+document
+  .querySelector("#library-close")
+  .addEventListener("click", () => library.close());
+library.addEventListener("close", () => {
+  if (libraryReturnFocus?.isConnected)
+    libraryReturnFocus.focus({ preventScroll: true });
+  else
+    document.querySelector("#identity-canvas").focus({ preventScroll: true });
+  window.dispatchEvent(new Event("world-overlay-close"));
+});
+window.addEventListener("world-library", () => openLibrary());
+document.querySelector("#world-terminal").addEventListener("click", () => {
+  if (worldAvailable)
+    window.dispatchEvent(
+      new CustomEvent("identity-layer", { detail: "terminal" }),
+    );
+  else openLibrary();
+});
+document
+  .querySelector("#terminal-marker")
+  .addEventListener("click", () =>
+    document.querySelector("#world-terminal").click(),
+  );
+worldCard.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-open-library]");
+  if (button) openLibrary(button.dataset.openLibrary);
+});
+// Legacy section URLs also open the requested terminal page.
+function followSectionHash() {
+  const id = location.hash.slice(1);
+  if (["identity", "projects", "experience", "contact"].includes(id))
+    openLibrary(id);
+}
+window.addEventListener("hashchange", followSectionHash);
+followSectionHash();

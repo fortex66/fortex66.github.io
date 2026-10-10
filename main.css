@@ -1954,3 +1954,500 @@ dialog::backdrop {
     white-space: pre-line;
   }
 }
+
+/* The playable world is the entire main viewport. */
+html:has(.library-body),
+body:has(.library-body) {
+  height: 100%;
+  overflow: hidden;
+  scroll-behavior: auto;
+}
+body:has(.library-body) {
+  background: #101e21;
+}
+.hero-world {
+  height: 100dvh;
+  height: 100svh;
+  overflow: hidden;
+}
+.hero-world .shell.hero-grid {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+.hero-world .world-intro {
+  position: absolute;
+  z-index: 3;
+  left: 26px;
+  top: 70px;
+  display: block;
+  margin: 0;
+  pointer-events: none;
+  max-width: 380px;
+}
+.hero-world .world-intro .eyebrow {
+  font-size: 9px;
+  color: #98b6a9;
+}
+.hero-world .world-intro h1 {
+  font-size: 24px;
+  line-height: 1.2;
+  margin: 9px 0;
+  white-space: normal;
+  letter-spacing: -0.035em;
+}
+.hero-world .world-intro h1 span {
+  display: inline-block;
+  font: 10px var(--mono);
+  margin-left: 12px;
+  letter-spacing: 0.05em;
+  color: #a8ddc6;
+}
+.hero-world .world-intro .hero-description {
+  font-size: 11px;
+  color: #7ea08f;
+}
+.hero-world .world-experience {
+  display: grid;
+  grid-template-rows: 45px minmax(0, 1fr) 42px 61px;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+.hero-world .world-experience .scene-viewport {
+  height: 100%;
+  min-height: 0;
+  grid-row: 2;
+}
+.hero-world .scene-topline {
+  padding-inline: 24px;
+}
+.hero-world .world-toolbar {
+  padding: 8px 24px;
+  grid-row: 3;
+  justify-content: flex-start;
+}
+.hero-world #world-terminal {
+  margin-left: auto;
+  color: #c4e3d3;
+  border: 1px solid #3f6c56;
+  border-radius: 3px;
+  padding: 7px 12px;
+}
+.hero-world .scene-tabs {
+  grid-row: 4;
+  margin-inline: 24px;
+}
+.hero-world .scene-tabs button {
+  padding-block: 8px;
+  font-size: 12px;
+}
+.hero-world .scene-tabs button > span {
+  margin-bottom: 3px;
+  font-size: 8px;
+}
+.hero-world .scene-caption,
+.hero-world .scene-footnote {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.hero-world .world-quest {
+  top: 113px;
+  left: 26px;
+}
+.hero-world .world-start {
+  bottom: 22px;
+  left: 26px;
+}
+.hero-world .world-card {
+  max-height: calc(100% - 110px);
+}
+.world-career {
+  white-space: pre-line;
+}
+.zone-library-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin-top: 15px;
+}
+.zone-library-links button {
+  background: #e2ecdd;
+  color: #3e654d;
+  border: 1px solid #cbd9c5;
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 10px;
+  text-align: left;
+}
+#library-dialog {
+  width: min(1120px, calc(100% - 48px));
+  max-width: 1120px;
+  height: min(88dvh, 920px);
+  max-height: 90dvh;
+  padding: 0;
+  overflow: hidden;
+}
+#library-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 25px 32px 20px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.library-header .eyebrow {
+  color: #71907c;
+  font-size: 9px;
+}
+.library-header h2 {
+  font-size: 24px;
+  margin-top: 8px;
+  font-weight: 550;
+  letter-spacing: -0.03em;
+}
+#library-close {
+  font-size: 11px;
+  padding: 9px 0;
+  background: none;
+  color: #53705e;
+  white-space: nowrap;
+}
+.library-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 32px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.library-tabs button {
+  background: none;
+  padding: 8px 14px;
+  border-radius: 3px;
+  color: #5d7966;
+  font-size: 12px;
+}
+.library-tabs button[aria-pressed="true"] {
+  background: #203e30;
+  color: #eef5e9;
+}
+.library-body {
+  overflow: auto;
+  overscroll-behavior: contain;
+  flex: 1;
+  min-height: 0;
+}
+.library-body > [hidden] {
+  display: none !important;
+}
+.library-body .section {
+  padding: 38px 32px;
+  width: 100%;
+  border: 0;
+  scroll-margin-top: 0;
+}
+.library-body .shell {
+  width: 100%;
+  margin: 0;
+}
+.library-body .section-heading {
+  margin-bottom: 30px;
+}
+.library-body .section-heading h2 {
+  font-size: 32px;
+}
+.library-body .identity-grid {
+  gap: 45px;
+}
+.library-body .identity-summary {
+  font-size: 17px;
+}
+.library-body .research-note {
+  margin-top: 30px;
+}
+.library-body .featured-art {
+  height: 200px;
+}
+.library-body .featured-copy {
+  padding: 22px;
+}
+.library-body .featured-copy h3 {
+  font-size: 21px;
+}
+.library-body .contact-section {
+  padding: 38px 32px;
+  min-height: 100%;
+}
+.library-body .contact-section h2 {
+  font-size: 32px;
+}
+.library-body .contact-links {
+  margin-top: 35px;
+}
+.library-body .footer-bottom [data-return-world] {
+  background: none;
+  color: #acccb9;
+  font-size: 10px;
+  padding: 0;
+}
+.noscript-notice {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 120px;
+  z-index: 10;
+  background: #e9f1e2;
+  color: #163c2c;
+  border-radius: 4px;
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  .hero-world .world-intro {
+    top: 63px;
+    left: 18px;
+  }
+  .hero-world .world-intro h1 {
+    font-size: 21px;
+  }
+  .hero-world .world-quest {
+    top: 105px;
+    left: 18px;
+  }
+  .hero-world .world-toolbar {
+    padding-inline: 16px;
+  }
+  .hero-world .scene-tabs {
+    margin-inline: 16px;
+  }
+  .hero-world .world-start {
+    left: 18px;
+    bottom: 128px;
+  }
+  .hero-world .world-card {
+    max-height: calc(100% - 130px);
+  }
+}
+@media (max-width: 650px) {
+  .hero-world .world-experience {
+    grid-template-rows: 37px minmax(0, 1fr) 47px 54px;
+  }
+  .hero-world .scene-topline {
+    padding: 6px 14px;
+  }
+  .hero-world .world-intro {
+    top: 55px;
+    left: 16px;
+  }
+  .hero-world .world-intro h1 {
+    font-size: 20px;
+  }
+  .hero-world .world-intro h1 span {
+    font-size: 8px;
+    margin-left: 9px;
+  }
+  .hero-world .world-intro .eyebrow {
+    font-size: 8px;
+  }
+  .hero-world .world-intro .hero-description {
+    font-size: 9px;
+  }
+  .hero-world .world-quest {
+    top: 95px;
+    left: 0;
+    padding: 12px 16px;
+    height: 112px;
+    background: linear-gradient(#10212077, transparent);
+    pointer-events: none;
+  }
+  .hero-world .world-quest .eyebrow {
+    display: none;
+  }
+  .hero-world .world-quest strong {
+    margin: 0;
+    font-size: 10px;
+  }
+  .hero-world .world-quest p {
+    top: 9px;
+    font-size: 7px;
+  }
+  .hero-world .quest-track {
+    margin-top: 9px;
+  }
+  .hero-world .quest-track span {
+    width: 19px;
+    height: 19px;
+    font-size: 7px;
+  }
+  .hero-world .world-card {
+    top: 165px;
+    right: 12px;
+    max-height: calc(100% - 270px);
+    padding: 16px;
+  }
+  .hero-world .world-toolbar {
+    padding: 5px 12px;
+    gap: 12px;
+  }
+  .hero-world .world-toolbar p {
+    font-size: 7px;
+  }
+  .hero-world .world-toolbar kbd {
+    font-size: 6px;
+  }
+  .hero-world #world-terminal {
+    font-size: 9px;
+    padding: 7px;
+  }
+  .hero-world #world-reset {
+    font-size: 8px;
+  }
+  .hero-world .scene-tabs button {
+    font-size: 10px;
+    padding-block: 7px;
+  }
+  .hero-world .scene-tabs button > span {
+    font-size: 6px;
+  }
+  .hero-world .world-interact {
+    font-size: 9px;
+  }
+  .hero-world .world-start {
+    bottom: 118px;
+  }
+  .hero-world .world-start .button {
+    font-size: 11px;
+    padding: 11px 15px;
+  }
+  #library-dialog {
+    width: calc(100% - 20px);
+    height: 92dvh;
+    max-height: 92dvh;
+  }
+  .library-header {
+    padding: 18px 18px 14px;
+    gap: 10px;
+  }
+  .library-header h2 {
+    font-size: 20px;
+  }
+  .library-header .eyebrow {
+    font-size: 7px;
+  }
+  #library-close {
+    font-size: 9px;
+  }
+  .library-tabs {
+    padding: 10px 12px;
+    gap: 2px;
+    justify-content: space-between;
+  }
+  .library-tabs button {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .library-body .section,
+  .library-body .contact-section {
+    padding: 28px 20px;
+  }
+  .library-body .section-heading h2,
+  .library-body .contact-section h2 {
+    font-size: 27px;
+  }
+  .library-body .identity-summary {
+    font-size: 15px;
+  }
+  .library-body .identity-grid {
+    gap: 20px;
+  }
+  .library-body .contact-links > a {
+    gap: 10px;
+  }
+  .library-body .contact-links span {
+    font-size: 9px;
+  }
+}
+@media (max-height: 620px) {
+  .hero-world .world-intro {
+    top: 56px;
+  }
+  .hero-world .world-intro .hero-description {
+    display: none;
+  }
+  .hero-world .world-quest {
+    top: 84px;
+  }
+  .hero-world .world-quest strong {
+    display: none;
+  }
+  .hero-world .world-quest .eyebrow {
+    display: none;
+  }
+  .hero-world .world-quest p {
+    position: static;
+    margin-top: 6px;
+  }
+  .hero-world .world-card {
+    top: 12px;
+    max-height: calc(100% - 75px);
+    width: min(330px, calc(100% - 24px));
+  }
+  .hero-world .world-start {
+    bottom: 105px;
+  }
+  .hero-world .scene-topline .mono {
+    font-size: 7px;
+  }
+  .hero-world .world-toolbar p {
+    display: none;
+  }
+  .hero-world .world-experience {
+    grid-template-rows: 34px minmax(0, 1fr) 37px 45px;
+  }
+  .hero-world .scene-tabs button {
+    padding-block: 3px;
+  }
+  .hero-world .touch-controls button {
+    width: 30px;
+    height: 30px;
+  }
+  .hero-world .world-interact {
+    bottom: 16px;
+  }
+  .hero-world .world-intro h1 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 650px) {
+  .hero-world .world-intro::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -18px -16px -35px;
+    background: linear-gradient(#102120 65%, #10212000);
+  }
+  .hero-world .world-quest {
+    height: 76px;
+    background: linear-gradient(#102120 45%, #10212000);
+  }
+}
+@media (max-height: 620px) and (min-width: 651px) {
+  .hero-world .world-start { bottom: 16px; }
+  .hero-world .world-start > span { display: none; }
+  .hero-world .world-marker { min-width: 82px; padding: 9px; font-size: 10px; }
+  .hero-world .world-marker small { font-size: 6px; }
+}
