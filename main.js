@@ -115,3 +115,124 @@ window.addEventListener("identity-scene-unavailable", () => {
   document.querySelector(".scene-footnote span").textContent =
     "EQUIPMENT → DATA → INTELLIGENCE";
 });
+
+// Content is discoverable through the world as well as the regular archive.
+const worldZones = {
+  ot: {
+    label: "01 / EQUIPMENT — OT",
+    title: "Observe & Control",
+    description:
+      "현장 설비와 제어 시스템을 이해하고, 반복 가능한 공정으로 연결합니다. 로봇·PLC·임베디드 장비가 제 엔지니어링의 출발점입니다.",
+    career: "SL Corporation / Production Engineering Center\n2025.07 — PRESENT",
+    projects: ["process", "vision", "g90", "embedded", "battery"],
+  },
+  it: {
+    label: "02 / DATA — IT",
+    title: "Connect & Structure",
+    description:
+      "장비의 신호를 소프트웨어와 데이터 시스템으로 연결합니다. 실시간 모니터링, 산업 통신, 웹과 HMI를 통해 현장을 더 잘 이해할 수 있게 만듭니다.",
+    career: "Automation Company / Software Developer\n2020.10 — 2023.06",
+    projects: ["water", "viewer", "journey", "smartfarm"],
+  },
+  ai: {
+    label: "03 / INTELLIGENCE — AI",
+    title: "Interpret & Assist",
+    description:
+      "공정 지식과 데이터, 엔지니어링 제약을 AI와 결합합니다. 사람의 해석과 변경 검토를 돕는 제조 지능화 시스템을 만들고 있습니다.",
+    career: "RESEARCH DIRECTION\nKnowledge-guided manufacturing AI",
+    projects: ["plc-ai", "local-llm"],
+  },
+};
+let worldAvailable = false;
+const worldCard = document.querySelector("#world-card");
+function showWorldZone(id) {
+  const zone = worldZones[id];
+  if (!zone) return;
+  document.querySelector("#world-card-label").textContent = zone.label;
+  document.querySelector("#world-card-title").textContent = zone.title;
+  document.querySelector("#world-card-description").textContent =
+    zone.description;
+  document.querySelector("#world-card-career").textContent = zone.career;
+  document.querySelector("#world-card-projects").innerHTML = zone.projects
+    .map((id) => {
+      const p = projects.find((p) => p.id === id);
+      return `<button type="button" data-world-project="${id}">${escapeHTML(p.title)} <span aria-hidden="true">↗</span></button>`;
+    })
+    .join("");
+  worldCard.hidden = false;
+  document.querySelector("#world-status").textContent =
+    `${zone.title}. ${zone.description}`;
+}
+function closeWorldCard() {
+  worldCard.hidden = true;
+  document.querySelector("#identity-canvas").focus({ preventScroll: true });
+}
+document
+  .querySelector("#world-card-close")
+  .addEventListener("click", closeWorldCard);
+worldCard.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    e.preventDefault();
+    closeWorldCard();
+  }
+});
+worldCard.addEventListener("click", (event) => {
+  const b = event.target.closest("[data-world-project]");
+  if (b) openProject(b.dataset.worldProject);
+});
+window.addEventListener("world-ready", () => {
+  worldAvailable = true;
+});
+window.addEventListener("world-zone", (event) => {
+  const { id, visited } = event.detail;
+  showWorldZone(id);
+  document.querySelector("#world-progress").textContent =
+    `${visited.length} / 3`;
+  document
+    .querySelectorAll("[data-objective]")
+    .forEach((el) =>
+      el.classList.toggle("connected", visited.includes(el.dataset.objective)),
+    );
+  document
+    .querySelectorAll("[data-destination]")
+    .forEach((el) =>
+      el.classList.toggle("visited", visited.includes(el.dataset.destination)),
+    );
+  document
+    .querySelector(".hero-world")
+    .classList.toggle("world-complete", visited.length === 3);
+  document.querySelector(".world-quest strong").textContent =
+    visited.length === 3
+      ? "Equipment → Data → Intelligence 연결 완료"
+      : "세 시스템을 하나로 연결하기";
+});
+window.addEventListener("identity-layer", (event) => {
+  worldCard.hidden = true;
+  if (!worldAvailable) showWorldZone(event.detail);
+});
+document
+  .querySelectorAll("[data-destination]")
+  .forEach((b) =>
+    b.addEventListener("click", () =>
+      document.querySelector(`[data-layer="${b.dataset.destination}"]`).click(),
+    ),
+  );
+document.querySelector("#world-reset").addEventListener("click", () => {
+  worldCard.hidden = true;
+  document.querySelector("#world-progress").textContent = "0 / 3";
+  document
+    .querySelectorAll(".connected,.visited")
+    .forEach((el) => el.classList.remove("connected", "visited"));
+  document.querySelector(".hero-world").classList.remove("world-complete");
+  document.querySelector(".world-quest strong").textContent =
+    "세 시스템을 하나로 연결하기";
+  document.querySelector("#world-status").textContent =
+    "탐험을 처음부터 시작합니다.";
+  window.dispatchEvent(new Event("world-reset"));
+});
+window.addEventListener("identity-scene-unavailable", () => {
+  worldAvailable = false;
+  document.querySelector(".world-quest").hidden = true;
+  document.querySelector("#world-controls").textContent =
+    "아래 구역 버튼으로 기술과 프로젝트를 탐색하세요.";
+});

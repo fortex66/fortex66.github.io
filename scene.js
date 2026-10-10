@@ -260,36 +260,282 @@ function initializeScene() {
       particles.push({ dot, path, offset: i / 3 });
     }
   });
-  const floor = new THREE.GridHelper(15, 30, 0x274747, 0x1b3034);
-  floor.position.y = -0.32;
+  // A playable island: the explorer connects the three engineering stations.
+  const deck = box(root, 12, 0.32, 8.5, mat(0x162c2c, 0.4), 0, -0.32, 0.5);
+  edge(deck, 0x4b8171, 0.8);
+  const floor = new THREE.GridHelper(12, 24, 0x3b6759, 0x28473e);
+  floor.position.set(0, -0.15, 0.5);
   floor.material.transparent = true;
-  floor.material.opacity = 0.3;
+  floor.material.opacity = 0.55;
   root.add(floor);
-  let selected = "ot",
-    paused = reducedMotion.matches,
+  const routeMaterial = glow(0x426e5c);
+  // Illuminated corridor: the front of each station is a clear walking route.
+  for (let x = -4.3; x <= 4.3; x += 0.32)
+    box(root, 0.1, 0.025, 0.08, routeMaterial, x, -0.13, 2.7);
+  Object.values(positions).forEach((pos) => {
+    for (let z = pos.z + 1.5; z < 2.7; z += 0.3)
+      box(root, 0.08, 0.025, 0.1, routeMaterial, pos.x, -0.13, z);
+  });
+  const beacons = {};
+  Object.entries(positions).forEach(([id, p]) => {
+    const beacon = new THREE.Mesh(
+      new THREE.TorusGeometry(0.3, 0.028, 8, 40),
+      glow(colors[id]),
+    );
+    beacon.rotation.x = Math.PI / 2;
+    beacon.position.set(p.x, -0.08, p.z + 1.65);
+    root.add(beacon);
+    beacons[id] = beacon;
+  });
+  // Small software explorer; the visitor, not a claimed real-world machine.
+  const explorer = new THREE.Group();
+  explorer.position.set(0, -0.1, 3.5);
+  root.add(explorer);
+  const suit = mat(0xb0ded0, 0.3),
+    visor = mat(0x142c35, 0.5),
+    boot = mat(0x52776a, 0.6);
+  const body = box(explorer, 0.38, 0.42, 0.28, suit, 0, 0.49, 0);
+  edge(body, 0xd4f0db, 0.7);
+  const head = box(explorer, 0.44, 0.32, 0.35, suit, 0, 0.91, 0);
+  edge(head, 0xbde9d3, 0.5);
+  box(explorer, 0.35, 0.14, 0.025, visor, 0, 0.94, 0.19);
+  box(explorer, 0.075, 0.045, 0.02, glow(0x87e3d4), -0.1, 0.95, 0.21);
+  box(explorer, 0.075, 0.045, 0.02, glow(0x87e3d4), 0.1, 0.95, 0.21);
+  cylinder(explorer, 0.016, 0.17, metal, 0, 1.16, 0);
+  const antenna = new THREE.Mesh(
+    new THREE.SphereGeometry(0.046, 12, 8),
+    glow(0xc9ecb7),
+  );
+  antenna.position.set(0, 1.25, 0);
+  explorer.add(antenna);
+  const feet = [
+    box(explorer, 0.14, 0.2, 0.22, boot, -0.12, 0.16, 0.015),
+    box(explorer, 0.14, 0.2, 0.22, boot, 0.12, 0.16, 0.015),
+  ];
+  const arms = [
+    box(explorer, 0.1, 0.34, 0.12, suit, -0.26, 0.5, 0),
+    box(explorer, 0.1, 0.34, 0.12, suit, 0.26, 0.5, 0),
+  ];
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(0.32, 24),
+    new THREE.MeshBasicMaterial({
+      color: 0x050e10,
+      transparent: true,
+      opacity: 0.5,
+    }),
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.015;
+  explorer.add(shadow);
+  const targetRing = new THREE.Mesh(
+    new THREE.TorusGeometry(0.23, 0.012, 8, 36),
+    glow(0xb0e4d2),
+  );
+  targetRing.rotation.x = Math.PI / 2;
+  targetRing.position.y = -0.1;
+  targetRing.visible = false;
+  root.add(targetRing);
+  const keys = new Set(),
+    held = new Set(),
+    visited = new Set();
+  const markers = [...document.querySelectorAll("[data-destination]")];
+  const interact = document.querySelector("#world-interact");
+  const startUI = document.querySelector(".world-start");
+  const destinations = Object.fromEntries(
+    Object.entries(positions).map(([id, p]) => [
+      id,
+      new THREE.Vector3(p.x, -0.1, p.z + 1.75),
+    ]),
+  );
+  const viewCenter = new THREE.Vector3(0, 0.4, 0.5);
+  let paused = reducedMotion.matches,
     inViewport = true,
     raf = 0,
     time = 0,
-    previous = 0;
-  const pointer = new THREE.Vector2();
+    previous = 0,
+    autopilot = null,
+    nearby = null,
+    started = false,
+    walkTime = 0;
+  const raycaster = new THREE.Raycaster(),
+    pointer = new THREE.Vector2();
+  const walkPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.1);
+  const direction = new THREE.Vector3(),
+    destinationPoint = new THREE.Vector3();
+  const focusable = () =>
+    !document.querySelector("#project-dialog").open &&
+    !document.hidden &&
+    inViewport;
+  function cameraPose() {
+    if (innerWidth < 650) {
+      viewCenter.x = explorer.position.x;
+      viewCenter.z = explorer.position.z - 0.9;
+    } else {
+      viewCenter.set(0, 0.4, 0.5);
+    }
+    camera.position.set(viewCenter.x + 10, 10, viewCenter.z + 14);
+    camera.lookAt(viewCenter);
+    camera.updateMatrixWorld();
+  }
   function sizeScene() {
     const width = container.clientWidth,
       height = container.clientHeight;
     renderer.setSize(width, height, false);
     const aspect = width / height,
-      vertical = 3.7;
+      vertical = innerWidth < 650 ? 4.2 : 4.6;
     camera.left = -vertical * aspect;
     camera.right = vertical * aspect;
     camera.top = vertical;
     camera.bottom = -vertical;
     camera.updateProjectionMatrix();
+    cameraPose();
     render();
+  }
+  function updateMarkers() {
+    Object.entries(positions).forEach(([id, pos]) => {
+      const p = new THREE.Vector3(pos.x, pos.y + 2.8, pos.z).project(camera);
+      const marker = markers.find((m) => m.dataset.destination === id);
+      marker.style.left = `${(p.x + 1) * 0.5 * container.clientWidth}px`;
+      const projectedY = (1 - p.y) * 0.5 * container.clientHeight;
+      marker.style.top = `${innerWidth < 650 ? Math.max(155, projectedY) : projectedY}px`;
+      marker.classList.add("positioned");
+      marker.hidden = Math.abs(p.x) > 0.78 || p.y > 1 || p.y < -0.75;
+    });
   }
   function render() {
     renderer.render(scene, camera);
+    updateMarkers();
+  }
+  function selectZone(id) {
+    visited.add(id);
+    nearby = undefined;
+    updateNearby();
+    pads[id].children[0].material = highlightedPad;
+    beacons[id].material.emissiveIntensity = 1.8;
+    if (visited.size === 3) {
+      routeMaterial.color.setHex(0xb0e4d2);
+      routeMaterial.emissive.setHex(0x70c39e);
+      coreMat.opacity = 0.45;
+    }
+    document
+      .querySelectorAll("[data-layer]")
+      .forEach((b) =>
+        b.setAttribute("aria-pressed", String(b.dataset.layer === id)),
+      );
+    window.dispatchEvent(
+      new CustomEvent("world-zone", { detail: { id, visited: [...visited] } }),
+    );
+    render();
+  }
+  function updateNearby() {
+    let next = null,
+      best = 1.55;
+    for (const [id, point] of Object.entries(destinations)) {
+      const d = point.distanceTo(explorer.position);
+      if (d < best) {
+        best = d;
+        next = id;
+      }
+    }
+    if (next !== nearby) {
+      nearby = next;
+      interact.disabled = !next;
+      interact.textContent = next
+        ? `${visited.has(next) ? "다시 보기" : "연결하기"} / ${next.toUpperCase()} ↗`
+        : "구역 가까이 이동하세요";
+    }
+  }
+  function begin() {
+    started = true;
+    startUI.classList.add("is-started");
+    canvas.focus({ preventScroll: true });
+    wake();
+  }
+  function travel(id) {
+    begin();
+    if (reducedMotion.matches) {
+      explorer.position.copy(destinations[id]);
+      cameraPose();
+      updateNearby();
+      selectZone(id);
+      return;
+    }
+    autopilot = { point: destinations[id].clone(), zone: id };
+    targetRing.position.copy(destinations[id]);
+    targetRing.visible = true;
+    wake();
+  }
+  function blocked(x, z) {
+    if (Math.abs(x) > 5.55 || z < -3.25 || z > 4.35) return true;
+    return Object.values(positions).some(
+      (p) => Math.abs(x - p.x) < 1.48 && Math.abs(z - p.z) < 1.35,
+    );
+  }
+  function move(delta) {
+    if (!started || !focusable()) return false;
+    direction.set(0, 0, 0);
+    const right =
+      keys.has("d") || keys.has("arrowright") || held.has("right") ? 1 : 0;
+    const left =
+      keys.has("a") || keys.has("arrowleft") || held.has("left") ? 1 : 0;
+    const down =
+      keys.has("s") || keys.has("arrowdown") || held.has("down") ? 1 : 0;
+    const up = keys.has("w") || keys.has("arrowup") || held.has("up") ? 1 : 0;
+    if (right || left || down || up) {
+      autopilot = null;
+      direction.set(
+        (right - left) * 0.814 + (down - up) * 0.581,
+        0,
+        (down - up) * 0.814 - (right - left) * 0.581,
+      );
+    } else if (autopilot) {
+      direction.copy(autopilot.point).sub(explorer.position);
+      direction.y = 0;
+      if (direction.length() < 0.1) {
+        const id = autopilot.zone;
+        autopilot = null;
+        targetRing.visible = false;
+        updateNearby();
+        if (id) selectZone(id);
+        return false;
+      }
+      // Walk along the clear front corridor before approaching the station.
+      if (Math.abs(direction.x) > 0.12 && explorer.position.z < 2.7)
+        direction.set(0, 0, 1);
+      else if (Math.abs(direction.x) > 0.12) direction.z = 0;
+    }
+    if (direction.lengthSq() === 0) return false;
+    direction.normalize();
+    const step = 2.7 * delta;
+    const x = explorer.position.x + direction.x * step,
+      z = explorer.position.z + direction.z * step;
+    let moved = false;
+    if (!blocked(x, explorer.position.z)) {
+      explorer.position.x = x;
+      moved = true;
+    }
+    if (!blocked(explorer.position.x, z)) {
+      explorer.position.z = z;
+      moved = true;
+    }
+    if (!moved) {
+      autopilot = null;
+      targetRing.visible = false;
+      return false;
+    }
+    explorer.rotation.y = Math.atan2(direction.x, direction.z);
+    walkTime += delta * 11;
+    if (!reducedMotion.matches) {
+      feet[0].position.y = 0.16 + Math.max(0, Math.sin(walkTime)) * 0.08;
+      feet[1].position.y = 0.16 + Math.max(0, -Math.sin(walkTime)) * 0.08;
+      arms[0].rotation.x = Math.sin(walkTime) * 0.22;
+      arms[1].rotation.x = -Math.sin(walkTime) * 0.22;
+    }
+    updateNearby();
+    cameraPose();
+    return true;
   }
   function pose() {
-    // A horizontal yaw swings the robot arm left and right around its base.
     robotArm.rotation.y = Math.sin(time * 0.85) * 0.38;
     server.position.y = Math.sin(time * 0.8 + 1) * 0.065;
     ai.position.y = 1.35 + Math.sin(time * 0.95) * 0.14;
@@ -298,81 +544,185 @@ function initializeScene() {
       dot.position.copy(path.getPointAt((time * 0.12 + offset) % 1)),
     );
   }
+  function hasInput() {
+    return keys.size > 0 || held.size > 0 || autopilot !== null;
+  }
   function frame(now) {
     raf = 0;
-    if (paused || document.hidden || !inViewport) {
+    if (document.hidden || !inViewport) {
       previous = 0;
       return;
     }
-    time += previous ? Math.min((now - previous) / 1000, 0.05) : 0;
+    const dt = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
     previous = now;
-    root.rotation.y = THREE.MathUtils.lerp(
-      root.rotation.y,
-      pointer.x * 0.08,
-      0.035,
-    );
-    root.rotation.x = THREE.MathUtils.lerp(
-      root.rotation.x,
-      pointer.y * 0.025,
-      0.035,
-    );
-    pose();
+    const moved = move(dt);
+    if (!paused) {
+      time += dt;
+      pose();
+    }
+    if (!moved) {
+      feet.forEach((f) => (f.position.y = 0.16));
+      arms.forEach((a) => (a.rotation.x = 0));
+    }
     render();
-    raf = requestAnimationFrame(frame);
+    if (!paused || hasInput()) raf = requestAnimationFrame(frame);
+    else previous = 0;
+  }
+  function wake() {
+    if (!raf && !document.hidden && inViewport) {
+      previous = 0;
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  function clearInput() {
+    keys.clear();
+    held.clear();
+    document
+      .querySelectorAll(".is-held")
+      .forEach((b) => b.classList.remove("is-held"));
   }
   function sync() {
     cancelAnimationFrame(raf);
     raf = 0;
     previous = 0;
-    const running = !paused && !document.hidden && inViewport;
     motionButton.setAttribute("aria-pressed", String(paused));
     motionButton.setAttribute(
       "aria-label",
-      paused ? "3D 움직임 재생" : "3D 움직임 정지",
+      paused ? "배경 움직임 재생" : "배경 움직임 정지",
     );
-    motionButton.textContent = paused ? "Play motion ▷" : "Pause motion Ⅱ";
+    motionButton.textContent = paused ? "Play ambience ▷" : "Pause ambience Ⅱ";
     render();
-    if (running) raf = requestAnimationFrame(frame);
+    if (!paused || hasInput()) wake();
   }
-  container.addEventListener("pointermove", (event) => {
-    if (paused || reducedMotion.matches || event.pointerType === "touch")
-      return;
-    const rect = container.getBoundingClientRect();
-    pointer.set(
-      (event.clientX - rect.left) / rect.width - 0.5,
-      (event.clientY - rect.top) / rect.height - 0.5,
-    );
+  canvas.addEventListener("keydown", (event) => {
+    const key = event.key.toLowerCase();
+    if (
+      [
+        "w",
+        "a",
+        "s",
+        "d",
+        "arrowup",
+        "arrowdown",
+        "arrowleft",
+        "arrowright",
+      ].includes(key)
+    ) {
+      event.preventDefault();
+      if (!focusable()) return;
+      begin();
+      keys.add(key);
+      wake();
+    } else if (["e", "enter", " "].includes(key)) {
+      event.preventDefault();
+      if (nearby && !event.repeat) selectZone(nearby);
+    }
   });
-  container.addEventListener("pointerleave", () => pointer.set(0, 0));
+  document.addEventListener("keyup", (event) =>
+    keys.delete(event.key.toLowerCase()),
+  );
+  canvas.addEventListener("blur", clearInput);
+  window.addEventListener("blur", clearInput);
+  document.querySelectorAll("[data-move]").forEach((button) => {
+    button.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      begin();
+      held.add(button.dataset.move);
+      button.classList.add("is-held");
+      button.setPointerCapture(e.pointerId);
+      wake();
+    });
+    const release = () => {
+      held.delete(button.dataset.move);
+      button.classList.remove("is-held");
+    };
+    button.addEventListener("pointerup", release);
+    button.addEventListener("pointercancel", release);
+    button.addEventListener("lostpointercapture", release);
+  });
+  document.querySelector("#world-start").addEventListener("click", begin);
+  interact.addEventListener("click", () => {
+    if (nearby) selectZone(nearby);
+  });
+  container.addEventListener("pointerdown", (event) => {
+    if (event.target !== canvas) return;
+    begin();
+    const r = canvas.getBoundingClientRect();
+    pointer.set(
+      ((event.clientX - r.left) / r.width) * 2 - 1,
+      -((event.clientY - r.top) / r.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+    for (const [id, pad] of Object.entries(pads)) {
+      if (raycaster.intersectObject(pad, true).length) {
+        travel(id);
+        return;
+      }
+    }
+    if (raycaster.ray.intersectPlane(walkPlane, destinationPoint)) {
+      if (blocked(destinationPoint.x, destinationPoint.z)) return;
+      if (reducedMotion.matches) {
+        explorer.position.copy(destinationPoint);
+        cameraPose();
+        updateNearby();
+        render();
+      } else {
+        autopilot = { point: destinationPoint.clone(), zone: null };
+        targetRing.position.copy(destinationPoint);
+        targetRing.visible = true;
+        wake();
+      }
+    }
+  });
+  window.addEventListener("identity-layer", (event) => travel(event.detail));
+  window.addEventListener("world-reset", () => {
+    clearInput();
+    autopilot = null;
+    visited.clear();
+    targetRing.visible = false;
+    explorer.position.set(0, -0.1, 3.5);
+    explorer.rotation.y = 0;
+    started = false;
+    startUI.classList.remove("is-started");
+    coreMat.opacity = 0.25;
+    routeMaterial.color.setHex(0x426e5c);
+    routeMaterial.emissive.setHex(0x426e5c);
+    Object.values(pads).forEach((p) => (p.children[0].material = dark));
+    Object.values(beacons).forEach((b) => (b.material.emissiveIntensity = 0.6));
+    nearby = undefined;
+    updateNearby();
+    cameraPose();
+    render();
+  });
   motionButton.addEventListener("click", () => {
     paused = !paused;
     sync();
   });
   reducedMotion.addEventListener("change", () => {
     paused = reducedMotion.matches;
-    pointer.set(0, 0);
-    root.rotation.set(0, 0, 0);
+    autopilot = null;
+    targetRing.visible = false;
+    clearInput();
     sync();
   });
-  document.addEventListener("visibilitychange", sync);
+  document.addEventListener("visibilitychange", () => {
+    clearInput();
+    sync();
+  });
   new IntersectionObserver(
     ([entry]) => {
       inViewport = entry.isIntersecting;
+      if (!inViewport) clearInput();
       sync();
     },
     { threshold: 0.05 },
   ).observe(container);
   new ResizeObserver(sizeScene).observe(container);
-  window.addEventListener("identity-layer", (event) => {
-    selected = event.detail;
-    Object.entries(pads).forEach(([id, pad]) => {
-      pad.children[0].material = id === selected ? highlightedPad : dark;
-    });
-    render();
-  });
   canvas.addEventListener("webglcontextlost", (event) => {
     event.preventDefault();
     paused = true;
+    clearInput();
+    autopilot = null;
     cancelAnimationFrame(raf);
     container.classList.remove("webgl-ready");
     window.dispatchEvent(new Event("identity-scene-unavailable"));
@@ -380,5 +730,7 @@ function initializeScene() {
   pose();
   sizeScene();
   container.classList.add("webgl-ready");
+  updateNearby();
+  window.dispatchEvent(new Event("world-ready"));
   sync();
 }
