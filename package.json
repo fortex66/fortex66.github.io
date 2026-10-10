@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare-assets": "node scripts/version-assets.mjs",
     "build": "node scripts/build.mjs",
     "preview": "python3 -m http.server 4173"
   }
