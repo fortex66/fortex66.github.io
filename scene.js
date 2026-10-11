@@ -59,33 +59,52 @@ function createFactory(){
   }
   function bolts(parent,w,h,z){for(const x of [-w/2,w/2])for(const y of [-h/2,h/2]){const b=cylinder(parent,.035,.025,steel,x,y,z);b.rotation.x=Math.PI/2;}}
 
-  // A single straight conveyor follows the career sequence from present to past.
-  // Career boundaries add breathing room without changing travel direction.
+  // Straight exhibition lanes joined by tangent-continuous, gentle bends.
+  // All stations remain on straight sections; only career transitions turn.
   const stops=window.factoryStops,stationSpecs=[],zones=[];
+  const laneOffsets=[-4,3,-3];
   let distance=0;
   stops.forEach((stop,i)=>{
-    if(i)distance+=6.6+(stop.era!==stops[i-1].era?4:0);
-    stationSpecs.push({point:new THREE.Vector3(distance,1,0),normal:new THREE.Vector3(0,0,1)});
+    if(i)distance+=stop.era!==stops[i-1].era?18:6.6;
     let zone=zones.at(-1);
-    if(!zone||zone.id!==stop.era){zone={id:stop.era,title:stop.eraTitle||'SELECTED WORK',period:stop.period||'',start:distance,end:distance};zones.push(zone);}
+    if(!zone||zone.id!==stop.era){zone={id:stop.era,title:stop.eraTitle,period:stop.period,start:distance,end:distance,z:laneOffsets[zones.length],specs:[]};zones.push(zone);}
     zone.end=distance;
+    const spec={point:new THREE.Vector3(distance,1,zone.z),normal:new THREE.Vector3(0,0,1)};
+    stationSpecs.push(spec);zone.specs.push(spec);
   });
-  const midpoint=distance/2,routeLength=distance+8;
+  const midpoint=distance/2,routeWidth=distance+6;
   stationSpecs.forEach(spec=>spec.point.x-=midpoint);
-  const curve=new THREE.LineCurve3(new THREE.Vector3(-midpoint-4,1,0),new THREE.Vector3(midpoint+4,1,0));
-  stationSpecs.forEach(spec=>spec.u=(spec.point.x+midpoint+4)/routeLength);
+  const curve=new THREE.CurvePath();
+  zones.forEach((zone,i)=>{
+    const start=new THREE.Vector3(zone.start-midpoint-3,1,zone.z);
+    const end=new THREE.Vector3(zone.end-midpoint+3,1,zone.z);
+    if(i){
+      const previous=zones[i-1],from=new THREE.Vector3(previous.end-midpoint+3,1,previous.z);
+      const handle=(start.x-from.x)/3;
+      const bend=new THREE.CubicBezierCurve3(from,from.clone().add(new THREE.Vector3(handle,0,0)),start.clone().sub(new THREE.Vector3(handle,0,0)),start);
+      bend.arcLengthDivisions=300;curve.add(bend);
+    }
+    const offset=curve.curves.length?curve.getLength():0;
+    zone.specs.forEach(spec=>spec.distance=offset+spec.point.x-start.x);
+    curve.add(new THREE.LineCurve3(start,end));
+  });
+  const routeLength=curve.getLength();
+  stationSpecs.forEach(spec=>spec.u=spec.distance/routeLength);
   const begin=stationSpecs[0].u,end=stationSpecs.at(-1).u;
   const positions=stationSpecs.map(s=>(s.u-begin)/(end-begin));
-  function pose(t){const point=curve.getPointAt(t),tangent=curve.getTangentAt(t);return{point,tangent,normal:new THREE.Vector3(0,0,1)};}
-  const floorMap=texture((c,w,h)=>{c.fillStyle='#293540';c.fillRect(0,0,w,h);c.strokeStyle='#43505b';c.lineWidth=1;c.strokeRect(0,0,w,h);c.beginPath();c.moveTo(w/2,0);c.lineTo(w/2,h);c.moveTo(0,h/2);c.lineTo(w,h/2);c.stroke();},512,512);floorMap.wrapS=floorMap.wrapT=THREE.RepeatWrapping;floorMap.repeat.set(routeLength/5,5);
-  const floor=mesh(scene,new THREE.PlaneGeometry(routeLength+12,25),new THREE.MeshStandardMaterial({map:floorMap,color:0x43576a,roughness:.86,metalness:.12}),0,-.18,1);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
-  const zoneMat=standard(0x152433,.25,.72);
+  // CurvePath.getPoint is already arc-length based across its component curves.
+  function pose(t){const point=curve.getPoint(t),tangent=curve.getTangent(t);return{point,tangent,normal:new THREE.Vector3(-tangent.z,0,tangent.x).normalize()};}
+  const floorMap=texture((c,w,h)=>{c.fillStyle='#293540';c.fillRect(0,0,w,h);c.strokeStyle='#43505b';c.lineWidth=1;c.strokeRect(0,0,w,h);c.beginPath();c.moveTo(w/2,0);c.lineTo(w/2,h);c.moveTo(0,h/2);c.lineTo(w,h/2);c.stroke();},512,512);floorMap.wrapS=floorMap.wrapT=THREE.RepeatWrapping;floorMap.repeat.set(routeWidth/5,6);
+  const floor=mesh(scene,new THREE.PlaneGeometry(routeWidth+12,29),new THREE.MeshStandardMaterial({map:floorMap,color:0x43576a,roughness:.86,metalness:.12}),0,-.18,1);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
+  const zoneMaterials=[standard(0x152433,.25,.72),standard(0x242c32,.25,.72),standard(0x1d2b36,.25,.72)];
+  const zoneAccents=[cobalt,amber,aluminum];
   zones.forEach((zone,i)=>{
-    const cx=(zone.start+zone.end)/2-midpoint,width=zone.end-zone.start+5.5;
-    rounded(scene,width,.13,7.5,zoneMat,cx,-.08,2,.04);
-    box(scene,width,.012,.024,cobalt,cx,.005,-1.75);
-    box(scene,width,.012,.024,cobalt,cx,.005,5.75);
-    if(i){const boundary=zone.start-midpoint-5.3;for(const z of [-1.6,5.6]){box(scene,.06,.65,.06,steel,boundary,.25,z);box(scene,.1,.09,.1,glow,boundary,.62,z);}}
+    const cx=(zone.start+zone.end)/2-midpoint,width=zone.end-zone.start+6;
+    rounded(scene,width,.13,7.5,zoneMaterials[i],cx,-.08,zone.z+2,.04);
+    box(scene,width,.012,.024,zoneAccents[i],cx,.005,zone.z-1.75);
+    box(scene,width,.012,.024,zoneAccents[i],cx,.005,zone.z+5.75);
+    // Small entry lights mark the next space without adding interface clutter.
+    for(const z of [-1.6,5.6]){const x=zone.start-midpoint-2.8;box(scene,.06,.65,.06,steel,x,.25,zone.z+z);box(scene,.1,.09,.1,glow,x,.62,zone.z+z);}
   });
 
   // Instanced slats and support legs keep the entire route inexpensive to draw.
@@ -189,7 +208,7 @@ function createFactory(){
   const eraMarkers=zones.map(zone=>{
     const element=document.createElement('div');element.className='map-era';
     const title=document.createElement('strong'),period=document.createElement('span');title.textContent=zone.title;period.textContent=zone.period;element.append(title,period);document.querySelector('#overview-markers').append(element);
-    return {point:new THREE.Vector3((zone.start+zone.end)/2-midpoint,0,-3.25),element};
+    return {point:new THREE.Vector3((zone.start+zone.end)/2-midpoint,0,zone.z-3.25),element};
   });
   const markers=stations.map((group,i)=>({group,element:document.querySelector(`#overview-markers [data-stop="${i}"]`)}));
   const camPos=new THREE.Vector3(),camTarget=new THREE.Vector3(),roadPos=new THREE.Vector3(),roadTarget=new THREE.Vector3();
@@ -203,7 +222,7 @@ function createFactory(){
     // Fit the long line to the usable viewport, including compact landscape screens.
     const halfFov=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
     const usableHeight=Math.max(.4,(stage.clientHeight-220)/stage.clientHeight);
-    const mapHeight=mobile?(routeLength+6)/(2*halfFov*usableHeight):Math.max((routeLength+6)/(2*halfFov*camera.aspect*.86),19/(2*halfFov*usableHeight));
+    const mapHeight=mobile?(routeWidth+6)/(2*halfFov*usableHeight):Math.max((routeWidth+6)/(2*halfFov*camera.aspect*.86),29/(2*halfFov*usableHeight));
     overviewTarget.set(0,0,1.6);
     overviewPos.set(0,mapHeight,mobile?1.65:mapHeight*.32+1.6);
     camPos.copy(roadPos).lerp(overviewPos,overviewMix);camTarget.copy(roadTarget).lerp(overviewTarget,overviewMix);

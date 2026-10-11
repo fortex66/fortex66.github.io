@@ -503,25 +503,9 @@ button:disabled {
   font-size:13px;
   color:#a6b8c7
 }
-.about-recognition {
-  display:flex;
-  gap:25px;
-  border-top:1px solid var(--line);
-  padding:23px 0;
-  font-size:12px
-}
-.about-recognition>span {
-  font:8px var(--mono);
-  color:#8fa3b5;
-  min-width:135px;
-  padding-top:6px
-}
-.about-recognition small {
-  display:block;
-  font-size:10px;
-  color:#7f94a8;
-  margin-top:3px
-}
+
+
+
 .about-contact {
   display:flex;
   gap:35px;
@@ -707,19 +691,17 @@ dialog::backdrop {
   .about-details {
     padding:0
   }
-  .career-row,.about-recognition {
+  .career-row {
     display:block
   }
-  .career-row>span,.about-recognition>span {
+  .career-row>span {
     display:block;
     margin-bottom:10px
   }
   .career-row {
     padding:18px 0
   }
-  .about-recognition {
-    padding:18px 0
-  }
+
   .about-intro h2 {
     font-size:80px
   }
@@ -1074,4 +1056,10 @@ dialog::backdrop {
   .map-era strong { font-size:12px; line-height:1.5; }
   .map-era span { font-size:8px; margin-top:5px; }
   .map-marker,.map-marker>span { width:23px; height:23px; }
+}
+
+/* Content views own the screen, including when WebGL is unavailable. */
+#portfolio[data-mode="list"] #scene-viewport,
+#portfolio[data-mode="about"] #scene-viewport {
+  visibility:hidden;
 }

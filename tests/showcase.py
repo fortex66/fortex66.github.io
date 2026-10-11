@@ -48,22 +48,23 @@ with sync_playwright() as p:
     # Index contains all projects, with direct detail and road-entry actions.
     page.locator('.mode-nav [data-mode="list"]').click()
     assert page.locator('.project-row').count()==11
-    assert page.locator('.era-heading h3').all_text_contents()==['SL Corporation','Automation Company','Undergraduate Years']
+    assert page.locator('.era-heading h3').all_text_contents()==['SL Corporation','Industrial Automation Company','University Years']
+    assert page.locator('.career-projects').nth(1).locator('.project-name').evaluate_all("nodes=>nodes.map(n=>n.dataset.project)")==['water','embedded','viewer']
     page.screenshot(path=str(out/'list.png'))
     for button in page.locator('.project-name').all():
         title=button.locator('h3').inner_text();button.click()
         if button.get_attribute('data-project')=='water':
             assert '2024.06 — 2024.09' in page.locator('#dialog-content').inner_text()
-            assert 'Independent project' in page.locator('#dialog-content').inner_text()
+            assert 'Contract project commissioned by Industrial Automation Company' in page.locator('#dialog-content').inner_text()
         if button.get_attribute('data-project')=='viewer':
-            assert '2021 · Automation Company' in page.locator('#dialog-content').inner_text()
+            assert '2021 · Industrial Automation Company' in page.locator('#dialog-content').inner_text()
         assert page.locator('#dialog-title').inner_text()==title
         assert page.locator('.system-flow').is_visible()
         assert page.locator('#dialog-content img').count()==0
         assert not re.search(r'[가-힣]',page.locator('#project-dialog').inner_text())
         page.keyboard.press('Escape')
         assert button.evaluate('e=>e===document.activeElement')
-    page.locator('.locate-project[data-stop="7"]').click()
+    page.locator('.locate-project[data-stop="5"]').click()
     assert page.locator('#station-title').inner_text()=='Water Treatment SCADA'
     page.screenshot(path=str(out/'water.png'))
     page.locator('.mode-nav [data-mode="about"]').click()
@@ -71,6 +72,8 @@ with sync_playwright() as p:
     for phrase in ['SL Corporation','Production Engineering Center','Software Developer','Computer Science','2018.03 — 2025.02']:
         assert phrase in about
     assert 'SA Team' not in about and 'Yeungnam' not in about
+    for removed in ['RECOGNITION','CREDENTIALS','SQLD','Mentoring','Engineer Information Processing']:
+        assert removed not in about
     page.screenshot(path=str(out/'about.png'))
     # Portrait overview must keep every marker, including the end stations, in view.
     for w,h in [(390,844),(320,568),(844,390),(740,390)]:
@@ -105,8 +108,10 @@ with sync_playwright() as p:
     fallback.goto(url,wait_until='networkidle');assert fallback.locator('.scene-fallback').is_visible()
     assert not fallback.locator('#motion-toggle').is_visible()
     fallback.locator('.mode-nav [data-mode="list"]').click();assert fallback.locator('.project-row').count()==11
+    assert not fallback.locator('.scene-fallback').is_visible()
     fallback.locator('.project-name[data-project="plc-ai"]').click();assert fallback.locator('#dialog-title').inner_text()=='PLC AI Studio'
     fallback.keyboard.press('Escape');fallback.locator('.mode-nav [data-mode="about"]').click()
+    assert not fallback.locator('.scene-fallback').is_visible()
     assert not re.search(r'[가-힣]',fallback.locator('body').inner_text())
     assert not errors,errors
     browser.close()
