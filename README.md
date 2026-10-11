@@ -1,36 +1,43 @@
-# Eonsang Son — Interactive Portfolio
+# Eonsang Son — The Factory Road
 
-A full-screen Three.js portfolio built around Eonsang's identity, career, and projects. Seven spatial chapters replace the former engineering-room scene: a dimensional signature, experience timeline, PLC AI Studio, Water Treatment SCADA, industrial control, selected projects, and contact.
+A Three.js portfolio built as one continuous conveyor route through three factory process loops. Eleven stations represent the existing automation, industrial software, applied AI, and web projects. The scene starts immediately, with no entry gate or game mechanics.
 
-Scroll, drag/swipe, use the arrow keys, or select a chapter from Overview. The project index provides direct access to all 11 existing records. The site starts immediately; there is no game, score, mission, or entry gate.
+## Four views
 
-## Visuals and content
+- **ROAD:** scroll or drag continuously along the conveyor. Small wheel deltas move the camera proportionally; there are no chapter thresholds or automatic jumps. A carrier follows the same path. Select equipment or the current project title action to read its story.
+- **OVERVIEW:** the same factory viewed from above, with eleven selectable station markers. Selecting one returns to its exact point on ROAD.
+- **LIST:** a direct, text-only index of every project. Open project details or use the adjacent road link to visit its station.
+- **ABOUT:** identity, professional experience, education, recognition, credentials, and contact links.
 
-- Original extruded typography, reflective geometry, layered controller assemblies, and canvas-drawn system diagrams.
-- **No project screenshots, photographs, or recordings are displayed or requested.** Project panels describe architecture and responsibilities with text and original diagrams. Historical media files remain in the repository for older cached pages.
-- Diagram labels are based on the existing portfolio records. They are conceptual explanations, not live telemetry or product screenshots.
-- The interface and diagrams are English. Career and education dates are retained from the existing portfolio; no university name is displayed.
-- Robin Payot's portfolio was requested as a reference for an immersive, full-screen, scroll-driven presentation. Public site information was reviewed, but the reference's live 3D experience could not be executed in the development environment. No reference code, imagery, or models are bundled.
+The header is limited to these views and the name. ROAD shows only the current project title/action, a compact progress scrubber, and motion control. Arrow keys move along the route; Home/End reach its endpoints. Portrait layouts rotate the overview camera to fit the three loops vertically.
 
-## Run and build
+## Content and visuals
+
+The factory is a conceptual presentation of the project portfolio, not a reconstruction of an employer's production line. All equipment is original procedural geometry: robot cells, inspection gantries, controllers, tanks, battery modules, and abstract software diagrams. No project photos, screenshots, or GIF recordings are displayed or requested. Historical assets remain for cached versions of the site.
+
+All interface text and diagrams are English. Public project descriptions, roles, dates, collaborators, and links are preserved. Confidential automotive/process descriptions remain abstract. The university name is omitted; the Computer Science bachelor's degree and dates remain.
+
+The navigation follows the user's description of Robin Payot's ROAD / OVERVIEW / LIST / ABOUT experience, adapted into a factory conveyor. No reference code or assets are used.
+
+## Development
 
 ```sh
 npm run preview
 npm run build
 ```
 
-The preview serves the checkout at `http://localhost:4173`. The build produces `dist/`, verifies entry-point assets, and updates the hashed CSS/JS filenames in `index.html`. Commit those generated assets with source changes so GitHub Pages serves matching versions. Older tracked bundles remain for cached HTML.
+The local preview uses port 4173. The build verifies `dist/` and regenerates hashed entry-point CSS/JS files. Commit source and matching bundles together for GitHub Pages; retain older tracked bundles for cached HTML.
 
-Three.js is vendored locally. The scene needs no external models, fonts, images, or HDR environments. The local `assets/immersive/letterforms.json` contains normalized glyph outlines from DejaVu Sans Bold; its license is included alongside it. Studio reflections and project diagrams are generated in the browser.
+Three.js is vendored locally. Spline geometry, project equipment, diagrams, studio reflections, and typography textures are generated in the browser. Conveyor slats and supports use instanced geometry. No external models, font services, image services, or HDR maps are required.
 
-## Accessibility and resilience
+## Accessibility and fallback
 
-Chapter buttons, project actions, a filterable project index, and standard dialogs provide access independently of canvas picking. Dialogs restore focus to the originating control. Reduced motion disables idle animation and makes camera transitions immediate; a separate motion toggle is available. Rendering pauses while the page is hidden or dialogs are open. If WebGL fails or its context is lost, the chapter navigation and all project details remain available.
+The full portfolio remains available through LIST and ABOUT without WebGL. Equipment picking has equivalent HTML actions. Project dialogs restore focus. Overview markers and the progress slider are keyboard accessible. Reduced motion disables idle motion and easing; the ambient-motion control can also pause the scene. Rendering stops while content panels or dialogs are open, or when the tab is hidden.
 
 ## Verification
 
 ```sh
-CHROMIUM_PATH=/usr/bin/chromium python3 tests/showcase.py
+CHROMIUM_PATH=/usr/bin/chromium SCREENSHOT_DIR=/absolute/path python3 tests/showcase.py
 ```
 
-Playwright covers all seven chapter actions; keyboard, wheel, drag, and overview navigation; actual 3D diagram picking; all 11 project details and filters; nested dialogs and focus return; portrait and landscape layouts; animation/pause; English interface; deep links; and unavailable-WebGL fallback. Network assertions ensure project screenshots and recordings are not requested. Screenshots can be saved with `SCREENSHOT_DIR=/absolute/path`.
+Browser checks cover proportional forward/reverse scrolling; drag, keyboard, and slider controls; all eleven overview markers and route jumps; project dialogs, content, and focus; responsive layouts; motion pause; no photo/recording requests; mode deep links; and WebGL fallback.
