@@ -2,8 +2,8 @@ const projects = window.portfolioProjects || [];
 // The employment/education periods are source-backed; project dates are not inferred.
 const eras = [
   {id:'sl', title:'SL Corporation', period:'2025.07 — PRESENT', projects:['plc-ai','local-llm','g90','vision','process']},
-  {id:'automation', title:'Automation Company', period:'2020.10 — 2023.06', projects:['embedded','viewer']},
-  {id:'undergraduate', title:'Undergraduate Years', period:'2018.03 — 2025.02', projects:['water','battery','journey','smartfarm']}
+  {id:'automation', title:'Industrial Automation Company', period:'2020–2023 / CONTRACT 2024', projects:['water','embedded','viewer']},
+  {id:'undergraduate', title:'University Years', period:'2018.03 — 2025.02', projects:['battery','journey','smartfarm']}
 ];
 const stops = eras.flatMap(era=>era.projects.map(id=>({...projects.find(p=>p.id===id),era:era.id,eraTitle:era.title,period:era.period}))).map((p,index)=>({...p,index}));
 window.factoryStops = stops;

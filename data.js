@@ -26,7 +26,7 @@ window.portfolioProjects = [
   {
     "id": "water",
     "projectPeriod": "2024.06 — 2024.09",
-    "context": "Independent project during undergraduate study",
+    "context": "Contract project commissioned by Industrial Automation Company",
     "title": "Water Treatment SCADA",
     "category": "industrial",
     "label": "CONNECTED INDUSTRIAL SYSTEMS",
@@ -184,7 +184,7 @@ window.portfolioProjects = [
   {
     "id": "viewer",
     "projectPeriod": "2021",
-    "context": "Automation Company",
+    "context": "Industrial Automation Company",
     "title": "ForTex-Viewer",
     "category": "software",
     "label": "PLC / WEB / VISUALIZATION",

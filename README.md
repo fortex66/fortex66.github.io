@@ -1,19 +1,19 @@
 # Eonsang Son — The Factory Road
 
-A Three.js portfolio built as one continuous conveyor route from recent work to earlier experience. Eleven stations represent the existing automation, industrial software, applied AI, and web projects. The scene starts immediately, with no entry gate or game mechanics.
+A Three.js portfolio built as one continuous conveyor route with straight project lanes and gently curved career transitions. Eleven stations represent the existing automation, industrial software, applied AI, and web projects. The scene starts immediately, with no entry gate or game mechanics.
 
 ## Four views
 
 - **ROAD:** scroll or drag continuously along the conveyor. Small wheel deltas move the camera proportionally; there are no chapter thresholds or automatic jumps. A carrier follows the same path. Select equipment or the current project title action to read its story.
 - **OVERVIEW:** the same factory viewed from above, with eleven selectable station markers. Selecting one returns to its exact point on ROAD.
 - **LIST:** a direct, text-only index of every project. Open project details or use the adjacent road link to visit its station.
-- **ABOUT:** identity, professional experience, education, recognition, credentials, and contact links.
+- **ABOUT:** identity, professional experience, education, and contact links.
 
-The header is limited to these views and the name. ROAD shows only the current project title/action, a compact progress scrubber, and motion control. Arrow keys move along the route; Home/End reach its endpoints. Portrait layouts rotate the overview camera to fit the straight line vertically, with recent work at the top.
+The header is limited to these views and the name. ROAD shows only the current project title/action, a compact progress scrubber, and motion control. Arrow keys move along the route; Home/End reach its endpoints. Portrait layouts rotate the overview camera to fit the route vertically, with recent work at the top.
 
 ## Career sequence
 
-The road and list share three career chapters: SL Corporation (2025.07–present), Automation Company (2020.10–2023.06), and Undergraduate Years (2018.03–2025.02). These periods overlap, so this is a career-chapter sequence, not a globally date-sorted list. Within a chapter, projects without confirmed dates retain an editorial order; no dates are invented. ForTex-Viewer is dated 2021 at the automation company. Water Treatment SCADA is dated 2024.06–2024.09 and identified as an independent project during undergraduate study, not coursework.
+The road and list share three career chapters: SL Corporation (2025.07–present), Industrial Automation Company (employment 2020.10–2023.06; contract work in 2024), and University Years (2018.03–2025.02). These periods overlap, so this is a career-chapter sequence, not a globally date-sorted list. Within a chapter, projects without confirmed dates retain an editorial order; no dates are invented. ForTex-Viewer is dated 2021 at the automation company. Water Treatment SCADA is dated 2024.06–2024.09 and placed in the automation company chapter as contract work commissioned by that company, after the employment period.
 
 ## Content and visuals
 
