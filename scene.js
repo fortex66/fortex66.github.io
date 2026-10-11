@@ -173,10 +173,81 @@ function createFactory(){
     for(let i=0;i<points.length;i++)for(let j=i+1;j<points.length;j++)tube(g,[points[i],points[j]],.014,steel);
     return g;
   }
+  function headlamp(parent){
+    // An original, generic automotive lamp: tapered housing, optics and twin DRLs.
+    const lamp=new THREE.Group();lamp.name='automotive-headlamp';lamp.position.set(.78,1.62,.4);parent.add(lamp);
+    const outline=new THREE.Shape();outline.moveTo(-1.1,-.37);outline.lineTo(.84,-.32);outline.quadraticCurveTo(1.15,-.27,1.18,-.05);outline.lineTo(.98,.29);outline.quadraticCurveTo(.88,.4,.68,.4);outline.lineTo(-1.06,.34);outline.quadraticCurveTo(-1.18,.28,-1.1,-.37);
+    const housingGeometry=new THREE.ExtrudeGeometry(outline,{depth:.34,bevelEnabled:true,bevelThickness:.045,bevelSize:.04,bevelSegments:3,curveSegments:16,steps:1});housingGeometry.translate(0,0,-.2);
+    mesh(lamp,housingGeometry,graphite);
+    const inset=mesh(lamp,new THREE.ShapeGeometry(outline),black,0,0,.17);inset.scale.set(.94,.9,1);
+    const led=new THREE.MeshStandardMaterial({color:0xe8f5ff,emissive:0xbedfff,emissiveIntensity:2,metalness:.15,roughness:.2});
+    for(const x of [-.69,-.08,.53]){
+      const cup=cylinder(lamp,.175,.1,steel,x,0,.23);cup.rotation.x=Math.PI/2;
+      const optical=cylinder(lamp,.136,.06,black,x,0,.3);optical.rotation.x=Math.PI/2;
+      const lens=sphere(lamp,.108,cobalt,x,0,.34);lens.scale.z=.42;
+      ring(lamp,.116,.015,aluminum,x,0,.362);
+      sphere(lamp,.03,led,x+.035,.035,.39);
+    }
+    for(const y of [-.235,.235])tube(lamp,[[-.98,y,.29],[-.35,y,.32],[.52,y,.32],[.86,y*.83,.29]],.028,led);
+    tube(lamp,[[.94,-.19,.26],[1.01,-.04,.26],[.9,.2,.26]],.019,amber);
+    const glass=new THREE.MeshPhysicalMaterial({color:0xc4e5f4,metalness:.08,roughness:.08,transparent:true,opacity:.13,clearcoat:1,side:THREE.DoubleSide,depthWrite:false});
+    const cover=mesh(lamp,new THREE.ShapeGeometry(outline),glass,0,0,.41);cover.castShadow=false;
+    for(const x of [-.75,.65]){box(lamp,.13,.18,.15,steel,x,-.46,0);cylinder(lamp,.035,.07,black,x,-.37,.22).rotation.x=Math.PI/2;}
+    return lamp;
+  }
+  function llmMonitoring(parent){
+    const monitor=new THREE.Group();monitor.name='llm-monitoring-console';parent.add(monitor);
+    for(const x of [-1.35,1.35])column(monitor,x,.2,-.75,1.7);
+    rounded(monitor,3.96,2.3,.18,graphite,0,1.98,-.57,.08);
+    const dashboard=texture((c,w,h)=>{
+      c.fillStyle='#0b1725';c.fillRect(0,0,w,h);
+      c.fillStyle='#e4eff7';c.font='600 108px Arial';c.fillText('LOCAL LLM',70,139);
+      c.fillStyle='#91b2cc';c.font='34px monospace';c.fillText('LANGUAGE → TOOLS → MONITORING',73,207);
+      c.fillStyle='#152e45';c.fillRect(70,265,560,430);c.strokeStyle='#6ea6cd';c.lineWidth=3;c.strokeRect(70,265,560,430);
+      c.fillStyle='#e7f2fa';c.font='600 138px Arial';c.fillText('LLM',197,473);
+      c.fillStyle='#9fc4df';c.font='36px monospace';c.fillText('LOCAL INFERENCE',187,536);
+      const network=[[150,603],[240,645],[350,595],[465,644],[546,602]];
+      c.strokeStyle='#608da9';c.lineWidth=3;for(let i=0;i<network.length-1;i++){c.beginPath();c.moveTo(...network[i]);c.lineTo(...network[i+1]);c.stroke();}
+      c.fillStyle='#c0e5ff';for(const [x,y] of network){c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.fill();}
+      c.fillStyle='#e4eff7';c.font='54px Arial';c.fillText('LabVIEW',775,330);
+      c.fillStyle='#93b4cf';c.font='29px monospace';c.fillText('SYSTEM MONITORING',777,379);
+      for(let i=0;i<4;i++){const y=435+i*65;c.strokeStyle='#243e53';c.beginPath();c.moveTo(775,y);c.lineTo(w-75,y);c.stroke();}
+      for(let line=0;line<2;line++){c.strokeStyle=line?'#a0b8c9':'#80d1ff';c.lineWidth=5;c.beginPath();for(let i=0;i<70;i++){const x=775+i*9,y=525+line*65-Math.sin(i*.18+line)*28-Math.cos(i*.53)*12;i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();}
+      c.strokeStyle='#93bbd5';c.lineWidth=4;c.beginPath();c.moveTo(657,477);c.lineTo(735,477);c.lineTo(721,465);c.moveTo(735,477);c.lineTo(721,489);c.stroke();
+      c.fillStyle='#a9c3d5';c.font='34px monospace';c.fillText('REQUEST',90,810);c.fillText('VALIDATED TOOL CALL',470,810);c.fillText('STATUS',1260,810);
+      c.strokeStyle='#416983';c.lineWidth=4;c.beginPath();c.moveTo(90,742);c.lineTo(w-90,742);c.stroke();
+    },1536,900);
+    mesh(monitor,new THREE.PlaneGeometry(3.78,2.16),new THREE.MeshBasicMaterial({map:dashboard,toneMapped:false}),0,1.98,-.466);
+    rounded(monitor,3.65,.15,.85,white,0,.65,.43);rounded(monitor,2.35,.045,.48,graphite,-.15,.76,.47);
+    for(let row=0;row<3;row++)for(let col=0;col<12;col++)box(monitor,.12,.014,.06,aluminum,-1.02+col*.15,.79,.3+row*.1);
+    const mouse=rounded(monitor,.19,.06,.26,graphite,1.37,.77,.46);
+    for(let i=0;i<3;i++){
+      const signal=sphere(monitor,.026,glow,0,1.98+2.16*(.5-742/900),-.442);
+      animations.push(t=>signal.position.x=-1.65+((t*.18+i/3)%1)*3.3);
+    }
+    tube(monitor,[[-1.35,.45,-.75],[-1.35,.31,-.1],[1.2,.31,-.1],[1.2,.52,.43]],.028,black);
+  }
+  function rearEquipment(parent){
+    const cell=new THREE.Group();cell.name='plc-connected-equipment';parent.add(cell);
+    rounded(cell,3.8,.18,1.3,graphite,0,.05,-2.02,.06);
+    rounded(cell,2.9,.65,.85,white,0,.58,-2.02);
+    for(const x of [-1.6,1.6])column(cell,x,.2,-2.1,2.8);
+    rounded(cell,3.4,.22,.25,white,0,3,-2.1);box(cell,2.85,.06,.31,steel,0,2.87,-2.1);
+    rounded(cell,.46,.4,.43,graphite,.4,2.7,-2.06);cylinder(cell,.04,.8,steel,.4,2.13,-2.06);rounded(cell,.23,.2,.28,white,.4,1.68,-2.06);
+    rounded(cell,1.6,.12,.67,steel,0,1,-1.96);for(const x of [-.6,.6])cylinder(cell,.13,.16,graphite,x,1.14,-1.96);
+    const glazing=new THREE.MeshPhysicalMaterial({color:0x7196b0,transparent:true,opacity:.14,roughness:.2,metalness:.15,depthWrite:false,side:THREE.DoubleSide});
+    const window=mesh(cell,new THREE.PlaneGeometry(2.8,1.65),glazing,0,1.86,-1.56);window.castShadow=false;
+    for(const x of [-1.4,1.4])box(cell,.055,1.7,.06,aluminum,x,1.86,-1.54);
+    box(cell,.4,.035,.045,steel,1.04,1.68,-1.49);
+    column(cell,1.73,.2,-2.05,2.4);cylinder(cell,.075,.13,glow,1.73,2.7,-2.05);cylinder(cell,.075,.13,amber,1.73,2.54,-2.05);
+    tube(cell,[[-1,.5,-1.63],[-1.2,.26,-1.24],[-1.2,.26,-.8],[-1,.43,-.55]],.034,black);
+  }
   stationSpecs.forEach((spec,i)=>{
     const g=platform(spec,i),id=window.factoryStops[i].id;
     if(id==='g90'){
-      robot(g,-1,.1,1.05);rounded(g,1.65,.48,.85,white,.8,.6,.1,.09);rounded(g,1.1,.2,.7,graphite,.8,.92,.1);for(const x of [.22,1.35])cylinder(g,.035,.48,steel,x,1.1,.1);
+      robot(g,-1.45,-.4,.9);rounded(g,1.95,.48,.95,white,.78,.6,.3,.09);rounded(g,1.8,.15,.8,graphite,.78,.96,.3);
+      for(const x of [.14,1.4])cylinder(g,.045,.35,steel,x,1.16,.35);
+      headlamp(g);
       for(const x of [-1.8,1.8])column(g,x,.2,-1.05,2.8);box(g,3.7,.11,.11,aluminum,0,3,-1.05);box(g,1.1,.02,.06,glow,0,2.93,-1.05);
     }else if(id==='vision'){
       gantry(g);sensor(g,-.7,2.43,-.55);sensor(g,.7,2.43,-.55);rounded(g,1.8,.22,1.2,steel,0,.47,.2);rounded(g,.6,.45,.4,white,0,.8,.2);robot(g,-1.4,.2,.65);
@@ -196,9 +267,10 @@ function createFactory(){
       for(const z of [-.5,.5]){rounded(g,3.3,.2,.57,white,0,.72,z);for(let j=0;j<6;j++){cylinder(g,.12,.15,graphite,-1.3+j*.52,.85,z);const sprout=sphere(g,.11,standard(0x6b8990,.1,.75),-1.3+j*.52,1.02,z);sprout.scale.set(.55,1.7,.7);}}
       screen(g,'SmartFarm','WEB / MARKETPLACE',1.05,.6,0,2.1,-.6);
     }else if(id==='plc-ai'){
+      rearEquipment(g);
       cabinet(g,-1,-.55,1.1);const graph=nodes(g,.65,-.3);screen(g,'PLC AI STUDIO','CONTEXT / RULES / REVIEW',2.1,.86,.35,1.02,.73);rounded(g,1.25,.14,1.25,steel,.7,.38,-.3);animations.push(t=>graph.rotation.y=Math.sin(t*.25)*.12);
     }else if(id==='local-llm'){
-      robot(g,-1,.1,.8);cabinet(g,1,-.5,.9);screen(g,'LOCAL LLM','TOOL CALL → LabVIEW',1.8,.8,.1,2.42,-.3);tube(g,[[-1,.4,.1],[-.5,.35,.7],[1,.35,.7],[1,.8,-.2]],.04,black);
+      llmMonitoring(g);
     }else if(id==='journey'){
       for(const [x,y,z,title] of [[-1.1,1.45,0,'DISCOVER'],[.8,2,-.3,'COLLABORATE'],[.25,.75,.6,'CHAT']]){screen(g,title,'JourneyMate',1.55,.84,x,y,z);column(g,x,.2,z-.1,Math.max(.2,y-.65));}
       tube(g,[[-1.1,1,0],[-.6,1,.2],[.8,1.5,-.3]],.019,glow);
