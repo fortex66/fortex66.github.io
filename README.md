@@ -1,10 +1,15 @@
-# Eonsang Son · 3D engineering portfolio
+# Eonsang Son · Engineering Lab
 
-A scroll-led Three.js portfolio centered on robotic automation and applied AI for smart manufacturing. The opening scene is one production cell: a robot works beside a moving conveyor, parts pass an inline vision gantry, and operations software and an AI workstation sit behind the line. Factory / Robotics / Operations / AI views bring the camera closer to each workflow.
+A personal Three.js workspace shaped by Eonsang Son's software and factory experience. A dual-monitor desk, miniature robot bench, original project screens, and a field notebook replace the standalone technology diagrams. This is a conceptual room, not a photograph or reconstruction of a real office.
 
-The inspection screen and part indicators are deterministic concept animations, not an actual AI inference pipeline, live equipment telemetry, or a claim about a deployed customer installation. The public project archive remains the record of actual work.
+Select a physical object or its numbered, keyboard-accessible button to open its story:
 
-Projects, experience, identity, and contact information remain available directly through the navigation, independent of the 3D scene. Project details open in accessible dialogs with filtering and keyboard focus restoration. There are no game mechanics, characters, collectibles, or scores.
+- **01 — Main monitor:** Water Treatment SCADA
+- **02 — Code workspace:** PLC AI Studio
+- **03 — Robot and controller bench:** Industrial Embedded Controllers
+- **04 — Field notebook:** experience and education
+
+The room, desk, workbench, and notes views move the camera without game controls. All 11 projects, About, Experience, and Contact remain directly accessible through the navigation, independently of WebGL. The interface is English; historical source screenshots retain their original language.
 
 ## Run
 
@@ -13,31 +18,31 @@ npm run build
 python3 -m http.server 4173
 ```
 
-GitHub Pages serves the root. `npm run build` also generates `dist/` and content-versioned CSS/JavaScript references to avoid mixing cached assets across deployments. Previously published versioned files are retained for older cached HTML.
+GitHub Pages serves the root. The build also generates `dist/` and content-versioned CSS/JavaScript references to prevent mixed cached revisions. Previously published versioned files remain for older cached HTML.
 
-## Structure
+## Project records and scene assets
 
-- `index.html`: four presentation chapters and portfolio dialogs
-- `main.css`: responsive presentation and archive styles
-- `main.js`: chapter selection, archive filters, and dialog navigation
-- `scene.js`: locally modeled equipment, studio lighting, camera transitions, and ambient motion
-- `data.js`: project descriptions and links
-- `vendor/`: vendored Three.js, without a runtime CDN dependency
+`assets/lab/water.webp` and `assets/lab/controller.webp` are lightweight frames extracted at three seconds from the existing `imgs/water.gif` and `imgs/fortex_dif.gif` project recordings. They total about 104 KB; the large original GIFs load only when visitors request a recording in project details.
 
-Reduced-motion preferences disable ambient motion and use immediate camera changes. Unsupported WebGL leaves descriptions and direct project access available. Rendering pauses while dialogs are open or the page is hidden. Mobile uses a stacked scene/text layout with ordinary page scrolling.
+The PLC AI Studio screen is labeled a concept interface. The notebook, room, furniture, robot, materials, and studio lighting are locally generated visuals. They do not imply ownership of a particular workspace or hardware. No external 3D models, HDR files, or runtime CDNs are required.
+
+## Implementation
+
+- `index.html`: introduction, semantic object buttons, camera controls, and archive dialogs
+- `scene.js`: room geometry, original project textures, object raycasting, projected buttons, camera transitions, and ambient motion
+- `main.js`: object stories, archive filtering, focus restoration, and view descriptions
+- `main.css`: desktop and mobile layouts
+- `data.js`: source-backed project records
+- `vendor/`: vendored Three.js
+
+Reduced motion disables ambient movement and uses immediate camera changes. Rendering stops while dialogs are open or the page is hidden. Unsupported WebGL preserves direct project access and disables unavailable camera controls.
 
 ## Verify
 
-With Playwright and Chromium installed and the preview server running:
+With Playwright, Chromium, and the preview server running:
 
 ```sh
 CHROMIUM_PATH=/usr/bin/chromium python3 tests/showcase.py
 ```
 
-`PORTFOLIO_URL` overrides the preview URL. `SCREENSHOT_DIR` selects screenshot output. Checks cover chapter navigation, project filters and dialogs, responsive layouts, reduced motion, production-cycle animation and pause, direct section links, English content, and WebGL fallback.
-
-## Visual direction
-
-The production cell shares one industrial foundation, with coated-metal robot castings, a conveyor frame, glass rack panels, mounting details, an inspection camera, and local studio environment reflections. All geometry and material textures are generated locally; no external model or HDR downloads are required. English is used throughout the interface and project descriptions. Original project recordings are preserved and can contain Korean source interfaces.
-
-Reference review: [Sanghoon Lee](https://hun0130.github.io/) for a clear professional identity, [Lusion](https://lusion.co/) for visual storytelling, and [Robin Payot](https://robinpayot.com/) for a portfolio centered on a 3D experience. These informed the direction; their assets, content, and implementations are not reused.
+`PORTFOLIO_URL` overrides the URL; `SCREENSHOT_DIR` chooses screenshot output. Tests cover physical object selection, four numbered stories and camera views, focus restoration, 11 project records and filters, nested dialogs, responsive portrait/landscape layouts, animation/pause, English interface content, deep links, and WebGL fallback.

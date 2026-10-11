@@ -128,23 +128,32 @@ function followSectionHash() {
 }
 window.addEventListener('hashchange', followSectionHash);
 followSectionHash();
-let activeScene = 'overview';
-function updateChapter() {
-  const chapters = [...document.querySelectorAll('[data-scene]')];
-  const target = chapters.reduce((best, chapter) => Math.abs(chapter.getBoundingClientRect().top) < Math.abs(best.getBoundingClientRect().top) ? chapter : best);
-  if (target.dataset.scene === activeScene) return;
-  activeScene = target.dataset.scene;
-  document.querySelectorAll('[data-view]').forEach(link => link.setAttribute('aria-current', String(link.dataset.view === activeScene)));
-  window.dispatchEvent(new CustomEvent('showcase-view', {detail:activeScene}));
-}
-window.addEventListener('scroll', updateChapter, {passive:true});
-window.addEventListener('resize', updateChapter);
-window.addEventListener('showcase-ready', updateChapter);
+const viewCopy = {
+  room: ['THE ROOM / 01', 'A space shaped by real projects.'],
+  desk: ['THE DESK / 02', 'Software that meets the factory floor.'],
+  bench: ['THE WORKBENCH / 03', 'Build it. Test it. Understand it.'],
+  notes: ['FIELD NOTES / 04', 'Experience behind the software.'],
+};
+document.querySelectorAll('[data-lab-view]').forEach(button => button.addEventListener('click', () => {
+  const id = button.dataset.labView;
+  document.querySelector('.lab').dataset.view = id;
+  document.querySelectorAll('[data-lab-view]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+  document.querySelector('#lab-view-label').textContent = viewCopy[id][0];
+  document.querySelector('#lab-view-caption').textContent = viewCopy[id][1];
+  window.dispatchEvent(new CustomEvent('lab-view', {detail: id}));
+}));
+document.querySelectorAll('[data-lab-project]').forEach(button => button.addEventListener('click', () => {
+  button.focus({preventScroll: true});
+  if (button.dataset.labProject === 'experience') openLibrary('experience');
+  else openProject(button.dataset.labProject);
+}));
 window.addEventListener('identity-scene-unavailable', () => {
-  document.querySelector('.scene-loading strong').textContent = 'Robotics · Automation · Applied AI';
+  document.querySelector('.scene-loading strong').textContent = 'The lab is available through its project menu';
   document.querySelector('.scene-loading > span:last-child').textContent = '3D is unavailable in this browser. Explore my work through the Projects menu.';
   document.querySelector('.loading-orbit').hidden = true;
   document.querySelector('#motion-toggle').hidden = true;
+  document.querySelectorAll('[data-lab-view]').forEach(button => button.disabled = true);
+  document.querySelector('.lab-context small').textContent = 'Use Work, Experience, or Contact in the menu.';
 });
 setTimeout(() => {
   if (!document.querySelector('.webgl-ready')) window.dispatchEvent(new Event('identity-scene-unavailable'));
