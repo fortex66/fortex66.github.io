@@ -163,24 +163,15 @@ function initializeScene() {
   });
   const pads = {};
   const positions = {
-    ot: new THREE.Vector3(-3.25, 0, 0.75),
-    it: new THREE.Vector3(0, 0.3, 0),
-    ai: new THREE.Vector3(3.25, 0.6, -0.75),
+    ot: new THREE.Vector3(-2.7, 0, -.65),
+    it: new THREE.Vector3(0, 0, -1.7),
+    ai: new THREE.Vector3(2.7, 0, -1.45),
   };
-  // Thin machined plinths replace the block-like factory platforms.
+  // All equipment belongs to one production cell, rather than separate display stands.
   const plinthMetal = new THREE.MeshPhysicalMaterial({color:0x182132,metalness:.86,roughness:.24,clearcoat:.45});
   const plinthTop = new THREE.MeshPhysicalMaterial({color:0x333d4b,metalness:.74,roughness:.3,clearcoat:.25});
   Object.entries(positions).forEach(([id,pos]) => {
-    pos.y = 0;
-    const group = new THREE.Group();group.position.copy(pos);root.add(group);
-    cylinder(group,1.66,.13,plinthMetal,0,-.015,0);
-    cylinder(group,1.59,.028,plinthTop,0,.066,0);
-    cylinder(group,1.48,.08,dark,0,-.12,0);
-    const rim = new THREE.Mesh(new THREE.TorusGeometry(1.63,.012,12,128),glow(id==='ot'?0xd3ae7c:id==='it'?0x7babed:0xb3a0f0));
-    rim.rotation.x=Math.PI/2;rim.position.y=-.035;group.add(rim);
-    const groove = new THREE.Mesh(new THREE.TorusGeometry(1.48,.006,8,128),mat(0x79869b,.85,.3));
-    groove.rotation.x=Math.PI/2;groove.position.y=.083;group.add(groove);
-    pads[id]=group;
+    const group = new THREE.Group();group.position.copy(pos);group.position.y=-.13;root.add(group);pads[id]=group;
   });
   // Purpose-built industrial equipment, modeled in real proportions.
   const paint = new THREE.MeshPhysicalMaterial({
@@ -725,56 +716,91 @@ function initializeScene() {
     const ring=new THREE.Mesh(new THREE.TorusGeometry(.163,.007,10,64),glow(0x8dabda));
     ring.position.set(-.45,.54+i*.43,.345);ai.add(ring);
   }
-  // A studio floor and soft contact pools ground the three products.
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(18,96),new THREE.ShadowMaterial({opacity:.22}));
-  floor.rotation.x=-Math.PI/2;floor.position.y=-.205;floor.receiveShadow=true;root.add(floor);
-  const shadowMap=texture((c,w,h)=>{const g=c.createRadialGradient(w/2,h/2,10,w/2,h/2,w/2);g.addColorStop(0,'rgba(0,0,0,.65)');g.addColorStop(.55,'rgba(0,0,0,.28)');g.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=g;c.fillRect(0,0,w,h);},256,256);
-  Object.entries(positions).forEach(([id,pos],index)=>{
-    const shadow=new THREE.Mesh(new THREE.PlaneGeometry(4.7,4.7),new THREE.MeshBasicMaterial({map:shadowMap,transparent:true,depthWrite:false}));
-    shadow.rotation.x=-Math.PI/2;shadow.position.set(pos.x,-.195,pos.z);root.add(shadow);
-    const labelTexture=texture((c,w,h)=>{c.clearRect(0,0,w,h);c.fillStyle='#bbcce4';c.font='500 30px monospace';c.textAlign='center';c.fillText(['01  /  CONTROL','02  /  SOFTWARE','03  /  INTELLIGENCE'][index],w/2,44);},512,64);
-    const label=new THREE.Mesh(new THREE.PlaneGeometry(1.85,.23),new THREE.MeshBasicMaterial({map:labelTexture,transparent:true,depthWrite:false}));
-    label.rotation.x=-Math.PI/2;label.position.set(pos.x,-.19,pos.z+2);root.add(label);
-  });
-  // Flow between equipment, software and intelligence, not a live telemetry view.
-  const paths = [
-    new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-2, 0.25, 1.5),
-      new THREE.Vector3(-1.5, 0.45, 1.5),
-      new THREE.Vector3(-1.35, 0.45, 0.8),
-      new THREE.Vector3(-1.2, 0.55, 0.5),
-    ]),
-    new THREE.CatmullRomCurve3([
-      new THREE.Vector3(1.2, 0.65, 0.6),
-      new THREE.Vector3(1.7, 0.8, 0.6),
-      new THREE.Vector3(1.9, 0.85, -0.1),
-      new THREE.Vector3(2, 0.85, -0.3),
-    ]),
-  ];
-  const particles = [];
-  paths.forEach((path) => {
-    const geometry = new THREE.BufferGeometry().setFromPoints(
-      path.getPoints(45),
-    );
-    root.add(
-      new THREE.Line(
-        geometry,
-        new THREE.LineBasicMaterial({
-          color: 0x8cb2ea,
-          transparent: true,
-          opacity: 0.7,
-        }),
-      ),
-    );
-    for (let i = 0; i < 3; i++) {
-      const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.04, 8, 6),
-        glow(colors.it),
-      );
-      root.add(dot);
-      particles.push({ dot, path, offset: i / 3 });
+  // A compact smart-factory cell: physical automation in front, operations behind it.
+  rounded(root,9.35,.18,5.25,plinthMetal,0,-.12,-.35,.09);
+  rounded(root,9.2,.025,5.1,mat(0x323e4e,.35,.65),0,-.016,-.35,.035);
+  for(let x=-4.3;x<4.5;x+=.55) box(root,.008,.004,4.8,mat(0x495567,.4,.65),x,.002,-.35);
+  for(let z=-2.6;z<2.2;z+=.55) box(root,9,.004,.008,mat(0x495567,.4,.65),0,.002,z);
+  // Front guard line and corner fasteners are physical cell details.
+  box(root,8.9,.008,.035,glow(0x658fc7),0,.012,2.13);
+  for(const x of [-4.45,4.45]) for(const z of [-2.75,2.05]) cylinder(root,.045,.015,steel,x,.02,z);
+
+  const conveyor=new THREE.Group();root.add(conveyor);
+  const beltHeight=.83, beltZ=1.08;
+  rounded(conveyor,8.25,.16,.98,anodized,0,beltHeight-.13,beltZ,.055);
+  box(conveyor,8.05,.035,.76,rubber,0,beltHeight,beltZ);
+  for(const z of [beltZ-.47,beltZ+.47]) {
+    rounded(conveyor,8.3,.08,.055,steel,0,beltHeight-.025,z,.016);
+    for(const x of [-3.6,-1.3,1.3,3.6]) {
+      box(conveyor,.065,.66,.065,anodized,x,.34,z);
+      rounded(conveyor,.18,.045,.18,rubber,x,.025,z,.02);
     }
-  });
+  }
+  const rollers=[];
+  for(let x=-3.9;x<=3.9;x+=.24){
+    const roller=cylinder(conveyor,.05,.79,steel,x,beltHeight-.035,beltZ);
+    roller.rotation.x=Math.PI/2;rollers.push(roller);
+  }
+  const beltMarks=[];
+  for(let i=0;i<24;i++)beltMarks.push(box(conveyor,.035,.003,.73,mat(0x334255,.15,.65),-4+i/24*8,beltHeight+.02,beltZ));
+  // Repeated parts are illustrative cycle animation, not production or quality metrics.
+  const products=[];
+  for(let i=0;i<4;i++){
+    const part=new THREE.Group();conveyor.add(part);
+    rounded(part,.48,.075,.47,anodized,0,0,0,.035);
+    rounded(part,.3,.13,.29,paint,0,.09,0,.035);
+    const inspectionTag=box(part,.14,.007,.13,mat(0x526d95,.2,.4),0,.162,0);
+    for(const x of [-.17,.17])for(const z of [-.16,.16])cylinder(part,.016,.02,steel,x,.048,z);
+    products.push({part,inspectionTag,index:i});
+  }
+  // An inline vision gantry makes AI-assisted inspection visible as a manufacturing workflow.
+  const inspection=new THREE.Group();inspection.position.set(1.15,0,beltZ);root.add(inspection);
+  for(const z of [-.69,.69]){
+    rounded(inspection,.12,1.96,.12,anodized,0,1,z,.024);
+    rounded(inspection,.34,.05,.3,steel,0,.035,z,.018);
+  }
+  rounded(inspection,.26,.16,1.58,steel,0,1.98,0,.035);
+  rounded(inspection,.32,.21,.33,graphite,0,1.81,0,.035);
+  cylinder(inspection,.10,.075,steel,0,1.675,0);
+  cylinder(inspection,.068,.018,glow(0x79b8f5),0,1.632,0);
+  const scanMaterial=new THREE.MeshBasicMaterial({color:0x83bbff,transparent:true,opacity:.2,side:THREE.DoubleSide,depthWrite:false});
+  const scanVolume=new THREE.Mesh(new THREE.ConeGeometry(.38,.69,4,1,true),scanMaterial);
+  scanVolume.position.y=1.27;scanVolume.rotation.y=Math.PI/4;inspection.add(scanVolume);
+  const scanLine=box(inspection,.025,.008,.71,glow(0x8fccff),0,beltHeight+.025,0);
+  const signalLamp=cylinder(inspection,.058,.095,glow(0x90b8eb),0,2.115,.55);
+  // A local inspection readout is explicitly marked as a demonstration.
+  const inspectionCanvas=document.createElement('canvas');inspectionCanvas.width=512;inspectionCanvas.height=256;
+  const inspectionTexture=new THREE.CanvasTexture(inspectionCanvas);inspectionTexture.colorSpace=THREE.SRGBColorSpace;
+  const display=new THREE.Mesh(new THREE.PlaneGeometry(1.0,.5),new THREE.MeshBasicMaterial({map:inspectionTexture}));
+  display.position.set(.95,1.5,.72);inspection.add(display);
+  rounded(inspection,1.07,.57,.07,graphite,.95,1.5,.68,.025);
+  let previousInspection='';
+  function updateFactory(cycleTime){
+    beltMarks.forEach((mark,i)=>mark.position.x=((i/24*8+cycleTime*.42)%8)-4);
+    products.forEach(({part,index,inspectionTag})=>{
+      const x=((index*2+cycleTime*.42+1.15)%8)-4;
+      part.position.set(x,beltHeight+.065,beltZ);
+      inspectionTag.material.color.setHex(x>1.4?0x78bfa7:0x526d95);
+    });
+    const active=products.some(({part})=>Math.abs(part.position.x-1.15)<.35);
+    scanVolume.visible=active;scanLine.visible=active;
+    signalLamp.material.emissiveIntensity=active?1.2:.35;
+    const status=active?'INSPECTING':'MONITORING';
+    if(status!==previousInspection){
+      previousInspection=status;
+      const c=inspectionCanvas.getContext('2d');c.fillStyle='#081322';c.fillRect(0,0,512,256);
+      c.fillStyle='#8fb4e6';c.font='18px monospace';c.fillText('VISION / AI-ASSISTED REVIEW',24,35);
+      c.fillStyle='#e2efff';c.font='bold 39px sans-serif';c.fillText(status,24,98);
+      c.strokeStyle='#6497d2';c.lineWidth=2;c.strokeRect(24,127,76,72);c.beginPath();c.moveTo(40,162);c.lineTo(52,177);c.lineTo(85,142);c.stroke();
+      c.fillStyle='#b4c8e5';c.font='18px monospace';c.fillText('Geometry / surface',125,153);c.fillText('Engineer review',125,185);
+      c.fillStyle='#627d9f';c.font='16px monospace';c.fillText('CONCEPT DEMO / NOT LIVE',24,235);inspectionTexture.needsUpdate=true;
+    }
+  }
+  // Visible service conduit runs from the production cell to its operations software.
+  cable(root,[[-2.2,.15,.5],[-2.2,.09,-2.3],[0,.09,-2.3],[2.5,.09,-2.3]],.028,0x527ba7);
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.ShadowMaterial({opacity:.22}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=-.22;floor.receiveShadow=true;root.add(floor);
+  const focusPoints={ot:new THREE.Vector3(-2.4,.7,.2),it:new THREE.Vector3(0,.7,-1.3),ai:new THREE.Vector3(1.7,.7,.25)};
   // A studio presentation of the engineering system, without game objects.
   let selected = 'overview', paused = reducedMotion.matches, raf = 0, last = 0, time = 0;
   const focus = new THREE.Vector3(0, 1, 0);
@@ -796,9 +822,10 @@ function initializeScene() {
     distance += (targetDistance - distance) * ease;
     camera.position.set(focus.x + distance * .32 + pointer.x * .25, focus.y + distance * .32 + pointer.y * .15, focus.z + distance * .89);
     camera.lookAt(focus);
-    robotArm.rotation.y = Math.sin(time * .75) * .3;
+    robotArm.rotation.y = Math.sin(time * .65) * .42 + .28;
+    updateFactory(time);
     gpuFans.forEach(fan => fan.rotation.z = time * 2);
-    particles.forEach(({dot, path, offset}) => dot.position.copy(path.getPointAt((time * .1 + offset) % 1)));
+
     renderer.render(scene, camera);
   }
   function frame(now) {
@@ -812,8 +839,8 @@ function initializeScene() {
   function wake() { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
   function choose(id) {
     selected = id;
-    desired.copy(positions[id] || new THREE.Vector3(0,0,0)); desired.y += 1;
-    targetDistance = id === 'overview' ? (innerWidth < 650 ? 19.5 : 15) : 8.8;
+    desired.copy(focusPoints[id] || new THREE.Vector3(0,1,0));
+    targetDistance = id === 'overview' ? (innerWidth < 650 ? 20 : 16) : 9.5;
     if (reducedMotion.matches) { focus.copy(desired); distance = targetDistance; draw(0); }
     wake();
   }
@@ -830,7 +857,7 @@ function initializeScene() {
     const rect = canvas.getBoundingClientRect();
     const ray = new THREE.Raycaster();
     ray.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1, -(event.clientY-rect.top)/rect.height*2+1), camera);
-    const hits = Object.entries(pads).flatMap(([id,pad]) => ray.intersectObject(pad,true).map(hit=>({...hit,id}))).sort((a,b)=>a.distance-b.distance);
+    const hits = [...Object.entries(pads),['ai',inspection],['ot',conveyor]].flatMap(([id,pad]) => ray.intersectObject(pad,true).map(hit=>({...hit,id}))).sort((a,b)=>a.distance-b.distance);
     if (hits[0]) document.querySelector('#chapter-'+hits[0].id).scrollIntoView({behavior:reducedMotion.matches?'instant':'smooth'});
   });
   function motionLabel() { motionButton.textContent = paused ? 'Play motion' : 'Pause motion'; motionButton.setAttribute('aria-pressed',String(paused)); }

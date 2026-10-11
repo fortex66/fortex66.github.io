@@ -1,5 +1,6 @@
 import os
 import re
+from hashlib import sha256
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 out=Path(os.environ.get('SCREENSHOT_DIR','/tmp/showcase-qa'));out.mkdir(exist_ok=True)
@@ -18,7 +19,15 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':w,'height':h});page.locator('[data-view="overview"]').click();page.wait_for_timeout(400);page.screenshot(path=str(out/f'mobile-{w}.png'))
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
  page.locator('#motion-toggle').click();assert page.locator('#motion-toggle').get_attribute('aria-pressed')=='false'
+ before=sha256(page.locator('#identity-canvas').screenshot()).hexdigest()
+ page.wait_for_timeout(600)
+ after=sha256(page.locator('#identity-canvas').screenshot()).hexdigest()
+ assert before!=after,'The production cell should animate when motion is enabled'
  page.locator('#motion-toggle').click();assert page.locator('#motion-toggle').get_attribute('aria-pressed')=='true'
+ page.wait_for_timeout(200)
+ frozen=sha256(page.locator('#identity-canvas').screenshot()).hexdigest()
+ page.wait_for_timeout(400)
+ assert frozen==sha256(page.locator('#identity-canvas').screenshot()).hexdigest(),'Pause should freeze the production cell'
  page.goto(os.environ.get('PORTFOLIO_URL','http://localhost:4173')+'/#experience',wait_until='networkidle');assert page.locator('#experience').is_visible()
  for section in ['identity','projects','experience','contact']:
   page.locator(f'[data-library="{section}"]').click()
