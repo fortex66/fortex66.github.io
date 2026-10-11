@@ -21,10 +21,10 @@
     <meta property="og:url" content="https://fortex66.github.io/" />
     <title>Eonsang Son — Manufacturing Software Engineer</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./main-eab8c75f769e.css" />
-    <script defer src="./data-78ba64376c11.js"></script>
-    <script defer src="./main-336ba3ddb638.js"></script>
-    <script type="module" src="./scene-1f22027b3bcb.js"></script>
+    <link rel="stylesheet" href="./main-5abec79f74ba.css" />
+    <script defer src="./data-b56693c3b2ae.js"></script>
+    <script defer src="./main-5f96bb0b7e01.js"></script>
+    <script type="module" src="./scene-405278a81e74.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#list">Skip to project list</a>
@@ -40,19 +40,20 @@
     <main id="portfolio" data-mode="road">
       <h1 class="sr-only">Eonsang Son — Software, automation, and applied AI</h1>
       <div id="scene-viewport">
-        <canvas id="identity-canvas" aria-label="Three connected factory conveyor loops. Scroll or drag to follow the line. Overview and List provide direct access to every project."></canvas>
+        <canvas id="identity-canvas" aria-label="One straight factory conveyor, from recent work to earlier experience. Scroll or drag to follow the line. Overview and List provide direct access to every project."></canvas>
         <div class="scene-loading" role="status"><span></span><p>Preparing the line</p></div>
         <div class="scene-fallback" hidden><span>THE FACTORY ROAD</span><h2>Software.<br>Built from the field.</h2><p>3D is unavailable. Explore every project in List.</p><button data-mode="list">Open project list →</button></div>
         <span id="object-tooltip" hidden aria-hidden="true"></span>
       </div>
       <div id="overview-markers" hidden aria-label="Factory project stations"></div>
       <section id="station-card" aria-labelledby="station-title">
-        <p><span id="station-number">01</span><span id="station-category">AUTOMOTIVE / PROCESS ENGINEERING</span></p>
-        <h2 id="station-title">G90 · GV90 Programs</h2>
+        <p><span id="station-number">01</span><span id="station-category">SL Corporation</span></p>
+        <h2 id="station-title">PLC AI Studio</h2>
+        <span id="station-period">2025.07 — PRESENT</span>
         <button id="station-open">Explore project <span>→</span></button>
       </section>
       <section id="list-panel" class="content-panel" aria-labelledby="list-title" hidden>
-        <div class="panel-heading"><h2 id="list-title">Selected work<span> / 11</span></h2><p>2020 — PRESENT</p></div>
+        <div class="panel-heading"><h2 id="list-title">Selected work<span> / 11</span></h2><p>PRESENT → EARLIER WORK</p></div>
         <div id="project-list" tabindex="-1"></div>
       </section>
       <section id="about-panel" class="content-panel" aria-labelledby="about-title" hidden>
@@ -69,7 +70,7 @@
       <p id="road-status" class="sr-only" aria-live="polite"></p>
     </main>
     <footer class="road-footer">
-      <span id="interaction-hint">Scroll to follow the line <span>↓</span></span>
+      <span id="interaction-hint">Scroll back through time <span>↓</span></span>
       <div class="road-scrubber"><span id="road-position">01 / 11</span><input id="road-progress" type="range" min="0" max="1000" value="0" aria-label="Position along the factory road" /></div>
       <button id="motion-toggle" aria-pressed="false" aria-label="Pause ambient motion">Motion on <span>◌</span></button>
     </footer>

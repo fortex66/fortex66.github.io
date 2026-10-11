@@ -1,6 +1,6 @@
 # Eonsang Son — The Factory Road
 
-A Three.js portfolio built as one continuous conveyor route through three factory process loops. Eleven stations represent the existing automation, industrial software, applied AI, and web projects. The scene starts immediately, with no entry gate or game mechanics.
+A Three.js portfolio built as one continuous conveyor route from recent work to earlier experience. Eleven stations represent the existing automation, industrial software, applied AI, and web projects. The scene starts immediately, with no entry gate or game mechanics.
 
 ## Four views
 
@@ -9,7 +9,11 @@ A Three.js portfolio built as one continuous conveyor route through three factor
 - **LIST:** a direct, text-only index of every project. Open project details or use the adjacent road link to visit its station.
 - **ABOUT:** identity, professional experience, education, recognition, credentials, and contact links.
 
-The header is limited to these views and the name. ROAD shows only the current project title/action, a compact progress scrubber, and motion control. Arrow keys move along the route; Home/End reach its endpoints. Portrait layouts rotate the overview camera to fit the three loops vertically.
+The header is limited to these views and the name. ROAD shows only the current project title/action, a compact progress scrubber, and motion control. Arrow keys move along the route; Home/End reach its endpoints. Portrait layouts rotate the overview camera to fit the straight line vertically, with recent work at the top.
+
+## Career sequence
+
+The road and list share three career chapters: SL Corporation (2025.07–present), Automation Company (2020.10–2023.06), and Undergraduate Years (2018.03–2025.02). These periods overlap, so this is a career-chapter sequence, not a globally date-sorted list. Within a chapter, projects without confirmed dates retain an editorial order; no dates are invented. ForTex-Viewer is dated 2021 at the automation company. Water Treatment SCADA is dated 2024.06–2024.09 and identified as an independent project during undergraduate study, not coursework.
 
 ## Content and visuals
 
@@ -28,7 +32,7 @@ npm run build
 
 The local preview uses port 4173. The build verifies `dist/` and regenerates hashed entry-point CSS/JS files. Commit source and matching bundles together for GitHub Pages; retain older tracked bundles for cached HTML.
 
-Three.js is vendored locally. Spline geometry, project equipment, diagrams, studio reflections, and typography textures are generated in the browser. Conveyor slats and supports use instanced geometry. No external models, font services, image services, or HDR maps are required.
+Three.js is vendored locally. Route geometry, project equipment, diagrams, studio reflections, and typography textures are generated in the browser. Conveyor slats and supports use instanced geometry. No external models, font services, image services, or HDR maps are required.
 
 ## Accessibility and fallback
 

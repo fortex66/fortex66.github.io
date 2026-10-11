@@ -13,7 +13,7 @@ function fail(error){console.warn('Factory view unavailable',error);window.dispa
 
 function createFactory(){
   const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x111b27,.014);
-  const camera=new THREE.PerspectiveCamera(38,1,.1,240);
+  const camera=new THREE.PerspectiveCamera(38,1,.1,500);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
@@ -59,29 +59,33 @@ function createFactory(){
   }
   function bolts(parent,w,h,z){for(const x of [-w/2,w/2])for(const y of [-h/2,h/2]){const b=cylinder(parent,.035,.025,steel,x,y,z);b.rotation.x=Math.PI/2;}}
 
-  // One continuous open spline makes three nearly circular process loops.
-  const radius=6.2,centers=[-26,0,26],points=[],stationSpecs=[];
-  const fractions=[[.17,.38,.6,.82],[.17,.38,.6,.82],[.17,.5,.82]];
-  const startAngle=Math.PI/2-.2,endAngle=Math.PI/2-Math.PI*2+.2;
-  centers.forEach((cx,loop)=>{
-    if(loop){points.push(new THREE.Vector3(cx-23.4,4,8.4));points.push(new THREE.Vector3(cx-2.6,1,8.4));}
-    for(let j=0;j<=52;j++){const a=startAngle+(endAngle-startAngle)*j/52;points.push(new THREE.Vector3(cx+Math.cos(a)*radius,1,Math.sin(a)*radius));}
-    for(const f of fractions[loop]){const a=startAngle+(endAngle-startAngle)*f;stationSpecs.push({point:new THREE.Vector3(cx+Math.cos(a)*radius,1,Math.sin(a)*radius),normal:new THREE.Vector3(Math.cos(a),0,Math.sin(a)),loop});}
+  // A single straight conveyor follows the career sequence from present to past.
+  // Career boundaries add breathing room without changing travel direction.
+  const stops=window.factoryStops,stationSpecs=[],zones=[];
+  let distance=0;
+  stops.forEach((stop,i)=>{
+    if(i)distance+=6.6+(stop.era!==stops[i-1].era?4:0);
+    stationSpecs.push({point:new THREE.Vector3(distance,1,0),normal:new THREE.Vector3(0,0,1)});
+    let zone=zones.at(-1);
+    if(!zone||zone.id!==stop.era){zone={id:stop.era,title:stop.eraTitle||'SELECTED WORK',period:stop.period||'',start:distance,end:distance};zones.push(zone);}
+    zone.end=distance;
   });
-  const curve=new THREE.CatmullRomCurve3(points,false,'centripetal');curve.arcLengthDivisions=2400;curve.updateArcLengths();
-  const samples=Array.from({length:2401},(_,i)=>curve.getPointAt(i/2400));
-  stationSpecs.forEach(spec=>{let best=0;for(let i=1;i<samples.length;i++)if(samples[i].distanceToSquared(spec.point)<samples[best].distanceToSquared(spec.point))best=i;spec.u=best/2400;});
+  const midpoint=distance/2,routeLength=distance+8;
+  stationSpecs.forEach(spec=>spec.point.x-=midpoint);
+  const curve=new THREE.LineCurve3(new THREE.Vector3(-midpoint-4,1,0),new THREE.Vector3(midpoint+4,1,0));
+  stationSpecs.forEach(spec=>spec.u=(spec.point.x+midpoint+4)/routeLength);
   const begin=stationSpecs[0].u,end=stationSpecs.at(-1).u;
   const positions=stationSpecs.map(s=>(s.u-begin)/(end-begin));
-  function pose(t){const point=curve.getPointAt(t),tangent=curve.getTangentAt(t);return{point,tangent,normal:new THREE.Vector3(-tangent.z,0,tangent.x).normalize()};}
-  const floorMap=texture((c,w,h)=>{c.fillStyle='#293540';c.fillRect(0,0,w,h);c.strokeStyle='#43505b';c.lineWidth=1;c.strokeRect(0,0,w,h);c.beginPath();c.moveTo(w/2,0);c.lineTo(w/2,h);c.moveTo(0,h/2);c.lineTo(w,h/2);c.stroke();},512,512);floorMap.wrapS=floorMap.wrapT=THREE.RepeatWrapping;floorMap.repeat.set(16,10);
-  const floor=mesh(scene,new THREE.PlaneGeometry(85,45),new THREE.MeshStandardMaterial({map:floorMap,color:0x43576a,roughness:.86,metalness:.12}),0,-.18,0);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
+  function pose(t){const point=curve.getPointAt(t),tangent=curve.getTangentAt(t);return{point,tangent,normal:new THREE.Vector3(0,0,1)};}
+  const floorMap=texture((c,w,h)=>{c.fillStyle='#293540';c.fillRect(0,0,w,h);c.strokeStyle='#43505b';c.lineWidth=1;c.strokeRect(0,0,w,h);c.beginPath();c.moveTo(w/2,0);c.lineTo(w/2,h);c.moveTo(0,h/2);c.lineTo(w,h/2);c.stroke();},512,512);floorMap.wrapS=floorMap.wrapT=THREE.RepeatWrapping;floorMap.repeat.set(routeLength/5,5);
+  const floor=mesh(scene,new THREE.PlaneGeometry(routeLength+12,25),new THREE.MeshStandardMaterial({map:floorMap,color:0x43576a,roughness:.86,metalness:.12}),0,-.18,1);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
   const zoneMat=standard(0x152433,.25,.72);
-  centers.forEach((cx,i)=>{
-    cylinder(scene,10.9,.13,zoneMat,cx,-.08,0);
-    const circle=ring(scene,10.75,.015,cobalt,cx,.005,0);circle.rotation.x=-Math.PI/2;
-    const map=texture((c,w,h)=>{c.fillStyle='#b9c9d4';c.font='300 64px Arial';c.textAlign='center';c.fillText(['01 / FIELD','02 / SYSTEMS','03 / IDEAS'][i],w/2,95);c.fillStyle='#7b94a7';c.font='22px monospace';c.fillText('EONSANG SON  /  SELECTED WORK',w/2,155);},1024,220);
-    const name=mesh(scene,new THREE.PlaneGeometry(4.8,1),new THREE.MeshBasicMaterial({map,transparent:true,opacity:.55,depthWrite:false}),cx,.007,0);name.rotation.x=-Math.PI/2;name.castShadow=false;
+  zones.forEach((zone,i)=>{
+    const cx=(zone.start+zone.end)/2-midpoint,width=zone.end-zone.start+5.5;
+    rounded(scene,width,.13,7.5,zoneMat,cx,-.08,2,.04);
+    box(scene,width,.012,.024,cobalt,cx,.005,-1.75);
+    box(scene,width,.012,.024,cobalt,cx,.005,5.75);
+    if(i){const boundary=zone.start-midpoint-5.3;for(const z of [-1.6,5.6]){box(scene,.06,.65,.06,steel,boundary,.25,z);box(scene,.1,.09,.1,glow,boundary,.62,z);}}
   });
 
   // Instanced slats and support legs keep the entire route inexpensive to draw.
@@ -182,6 +186,11 @@ function createFactory(){
     }
   });
 
+  const eraMarkers=zones.map(zone=>{
+    const element=document.createElement('div');element.className='map-era';
+    const title=document.createElement('strong'),period=document.createElement('span');title.textContent=zone.title;period.textContent=zone.period;element.append(title,period);document.querySelector('#overview-markers').append(element);
+    return {point:new THREE.Vector3((zone.start+zone.end)/2-midpoint,0,-3.25),element};
+  });
   const markers=stations.map((group,i)=>({group,element:document.querySelector(`#overview-markers [data-stop="${i}"]`)}));
   const camPos=new THREE.Vector3(),camTarget=new THREE.Vector3(),roadPos=new THREE.Vector3(),roadTarget=new THREE.Vector3();
   const overviewPos=new THREE.Vector3(),overviewTarget=new THREE.Vector3(0,0,0);
@@ -191,14 +200,17 @@ function createFactory(){
     const mobile=portrait;
     roadPos.copy(point).addScaledVector(normal,mobile?-12:-8.6).addScaledVector(tangent,mobile?-9.5:-7.2);roadPos.y=point.y+(mobile?11.5:7.4);
     roadTarget.copy(point).addScaledVector(normal,2.6).addScaledVector(tangent,.5);roadTarget.y=point.y+(mobile?-1.9:.1);
-    const mapHeight=Math.max(110,78*stage.clientHeight/Math.max(260,stage.clientHeight-230)/.728);
-    const wideScale=1.25*(stage.clientHeight<550?1.22:1);
-    overviewPos.set(mobile?0:8*wideScale,mobile?mapHeight:53*wideScale,mobile?.05:38*wideScale);
+    // Fit the long line to the usable viewport, including compact landscape screens.
+    const halfFov=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+    const usableHeight=Math.max(.4,(stage.clientHeight-220)/stage.clientHeight);
+    const mapHeight=mobile?(routeLength+6)/(2*halfFov*usableHeight):Math.max((routeLength+6)/(2*halfFov*camera.aspect*.86),19/(2*halfFov*usableHeight));
+    overviewTarget.set(0,0,1.6);
+    overviewPos.set(0,mapHeight,mobile?1.65:mapHeight*.32+1.6);
     camPos.copy(roadPos).lerp(overviewPos,overviewMix);camTarget.copy(roadTarget).lerp(overviewTarget,overviewMix);
     if(!paused){camPos.x+=pointer.x*.15*(1-overviewMix);camPos.z+=pointer.y*.15*(1-overviewMix);}
     scene.fog.density=THREE.MathUtils.lerp(.014,.003,overviewMix);
     camera.position.copy(camPos);
-    camera.up.set(overviewMix* (mobile?1:0),1-overviewMix*(mobile?1:0),0).normalize();
+    camera.up.set(overviewMix* (mobile?-1:0),1-overviewMix*(mobile?1:0),0).normalize();
     camera.lookAt(camTarget);camera.updateMatrixWorld();
     carrier.position.copy(point);carrier.rotation.y=Math.atan2(tangent.x,tangent.z);
     key.position.set(point.x-10,20,point.z+14);key.target.position.set(point.x,0,point.z);
@@ -209,9 +221,14 @@ function createFactory(){
     if(mode!=='overview')return;
     for(const {group,element} of markers){
       const p=group.localToWorld(new THREE.Vector3(0,3.3,0)).project(camera);
-      const x=(p.x+1)*.5*stage.clientWidth,y=(1-p.y)*.5*stage.clientHeight;
+      const x=(p.x+1)*.5*stage.clientWidth-(portrait?28:0),y=(1-p.y)*.5*stage.clientHeight;
       element.style.left=x+'px';element.style.top=y+'px';
       element.hidden=p.z>1||x<15||x>stage.clientWidth-15||y<95||y>stage.clientHeight-75;
+    }
+    for(const {point,element} of eraMarkers){
+      const p=point.clone().project(camera);
+      element.style.left=(portrait?stage.clientWidth*.61:(p.x+1)*.5*stage.clientWidth)+'px';
+      element.style.top=((1-p.y)*.5*stage.clientHeight-(portrait?0:28))+'px';
     }
   }
   function draw(delta=0){
@@ -238,7 +255,7 @@ function createFactory(){
     camera.aspect=w/Math.max(h,1);camera.fov=portrait?40:38;camera.updateProjectionMatrix();renderer.shadowMap.needsUpdate=true;draw();wake();
   }
   window.addEventListener('factory-progress',e=>{desired=e.detail;tooltip.hidden=true;if(reduced.matches){current=desired;renderer.shadowMap.needsUpdate=true;draw();}wake();});
-  // Direct selections zoom to their station instead of racing around every intervening loop.
+  // Direct selections zoom to their station instead of racing around every intervening station.
   window.addEventListener('factory-jump',e=>{current=desired=e.detail;if(!reduced.matches&&mode!=='road')overviewMix=mode==='overview'?1:.55;renderer.shadowMap.needsUpdate=true;wake();});
   window.addEventListener('factory-mode',e=>{mode=e.detail;tooltip.hidden=true;if(reduced.matches){overviewMix=mode==='overview'?1:0;draw();}wake();});
   const raycaster=new THREE.Raycaster();
