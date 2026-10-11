@@ -1,6 +1,8 @@
 # Eonsang Son · 3D engineering portfolio
 
-A scroll-led Three.js presentation of industrial equipment, software systems, and manufacturing AI. The opening scene shows the connected system; scrolling or selecting OT / IT / AI moves the camera closer to the relevant equipment. The robot, cooling fans, and data signals animate subtly. These are conceptual visuals, not live equipment telemetry.
+A scroll-led Three.js portfolio centered on robotic automation and applied AI for smart manufacturing. The opening scene is one production cell: a robot works beside a moving conveyor, parts pass an inline vision gantry, and operations software and an AI workstation sit behind the line. Factory / Robotics / Operations / AI views bring the camera closer to each workflow.
+
+The inspection screen and part indicators are deterministic concept animations, not an actual AI inference pipeline, live equipment telemetry, or a claim about a deployed customer installation. The public project archive remains the record of actual work.
 
 Projects, experience, identity, and contact information remain available directly through the navigation, independent of the 3D scene. Project details open in accessible dialogs with filtering and keyboard focus restoration. There are no game mechanics, characters, collectibles, or scores.
 
@@ -32,10 +34,10 @@ With Playwright and Chromium installed and the preview server running:
 CHROMIUM_PATH=/usr/bin/chromium python3 tests/showcase.py
 ```
 
-`PORTFOLIO_URL` overrides the preview URL. `SCREENSHOT_DIR` selects screenshot output. Checks cover chapter navigation, project filters and dialogs, responsive layouts, reduced motion, motion controls, direct section links, and WebGL fallback.
+`PORTFOLIO_URL` overrides the preview URL. `SCREENSHOT_DIR` selects screenshot output. Checks cover chapter navigation, project filters and dialogs, responsive layouts, reduced motion, production-cycle animation and pause, direct section links, English content, and WebGL fallback.
 
 ## Visual direction
 
-The studio uses thin machined plinths, coated-metal robot castings, glass rack panels, fine mounting details, and local studio environment reflections. All geometry and material textures are generated locally; no external model or HDR downloads are required. English is used throughout the interface and project descriptions. Original project recordings are preserved and can contain Korean source interfaces.
+The production cell shares one industrial foundation, with coated-metal robot castings, a conveyor frame, glass rack panels, mounting details, an inspection camera, and local studio environment reflections. All geometry and material textures are generated locally; no external model or HDR downloads are required. English is used throughout the interface and project descriptions. Original project recordings are preserved and can contain Korean source interfaces.
 
 Reference review: [Sanghoon Lee](https://hun0130.github.io/) for a clear professional identity, [Lusion](https://lusion.co/) for visual storytelling, and [Robin Payot](https://robinpayot.com/) for a portfolio centered on a 3D experience. These informed the direction; their assets, content, and implementations are not reused.

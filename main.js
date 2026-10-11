@@ -141,7 +141,7 @@ window.addEventListener('scroll', updateChapter, {passive:true});
 window.addEventListener('resize', updateChapter);
 window.addEventListener('showcase-ready', updateChapter);
 window.addEventListener('identity-scene-unavailable', () => {
-  document.querySelector('.scene-loading strong').textContent = 'Equipment → Software → AI';
+  document.querySelector('.scene-loading strong').textContent = 'Robotics · Automation · Applied AI';
   document.querySelector('.scene-loading > span:last-child').textContent = '3D is unavailable in this browser. Explore my work through the Projects menu.';
   document.querySelector('.loading-orbit').hidden = true;
   document.querySelector('#motion-toggle').hidden = true;
