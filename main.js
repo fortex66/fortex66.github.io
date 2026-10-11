@@ -1,6 +1,11 @@
 const projects = window.portfolioProjects || [];
-const order = ['g90','vision','process','embedded','water','viewer','battery','smartfarm','plc-ai','local-llm','journey'];
-const stops = order.map((id,index)=>({...projects.find(p=>p.id===id),index}));
+// The employment/education periods are source-backed; project dates are not inferred.
+const eras = [
+  {id:'sl', title:'SL Corporation', period:'2025.07 — PRESENT', projects:['plc-ai','local-llm','g90','vision','process']},
+  {id:'automation', title:'Automation Company', period:'2020.10 — 2023.06', projects:['embedded','viewer']},
+  {id:'undergraduate', title:'Undergraduate Years', period:'2018.03 — 2025.02', projects:['water','battery','journey','smartfarm']}
+];
+const stops = eras.flatMap(era=>era.projects.map(id=>({...projects.find(p=>p.id===id),era:era.id,eraTitle:era.title,period:era.period}))).map((p,index)=>({...p,index}));
 window.factoryStops = stops;
 const portfolio=document.querySelector('#portfolio');
 const dialog=document.querySelector('#project-dialog');
@@ -17,14 +22,14 @@ function openProject(id){
   const p=stops.find(p=>p.id===id);if(!p)return;
   returnFocus=document.activeElement;
   document.querySelector('#dialog-index').textContent=`PROJECT / ${String(p.index+1).padStart(2,'0')}`;
-  content.innerHTML=`<p class="eyebrow">${escapeHTML(p.label)}</p><h2 id="dialog-title">${escapeHTML(p.title)}</h2><p class="dialog-summary">${escapeHTML(p.summary)}</p><div class="system-flow" aria-label="System architecture">${p.flow.map((label,i)=>`<div><small>0${i+1}</small><span>${escapeHTML(label)}</span></div>`).join('')}</div><p class="project-description">${escapeHTML(p.details)}</p><dl><div><dt>MY ROLE</dt><dd>${escapeHTML(p.role)}</dd></div><div><dt>TOOLS & TECHNOLOGIES</dt><dd>${p.stack.map(escapeHTML).join(' / ')}</dd></div>${p.status?`<div><dt>STATUS</dt><dd>${escapeHTML(p.status)}</dd></div>`:''}</dl><div class="project-links">${(p.links||[]).map(l=>`<a href="${escapeHTML(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(l.label)} →</a>`).join('')}</div>`;
+  content.innerHTML=`<p class="eyebrow">${escapeHTML(p.label)}</p><h2 id="dialog-title">${escapeHTML(p.title)}</h2><p class="dialog-summary">${escapeHTML(p.summary)}</p><div class="system-flow" aria-label="System architecture">${p.flow.map((label,i)=>`<div><small>0${i+1}</small><span>${escapeHTML(label)}</span></div>`).join('')}</div><p class="project-description">${escapeHTML(p.details)}</p><dl>${p.projectPeriod?`<div><dt>PROJECT PERIOD</dt><dd>${escapeHTML(p.projectPeriod)}${p.context?` · ${escapeHTML(p.context)}`:''}</dd></div>`:''}<div><dt>MY ROLE</dt><dd>${escapeHTML(p.role)}</dd></div><div><dt>TOOLS & TECHNOLOGIES</dt><dd>${p.stack.map(escapeHTML).join(' / ')}</dd></div>${p.status?`<div><dt>STATUS</dt><dd>${escapeHTML(p.status)}</dd></div>`:''}</dl><div class="project-links">${(p.links||[]).map(l=>`<a href="${escapeHTML(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(l.label)} →</a>`).join('')}</div>`;
   dialog.showModal();dialog.scrollTop=0;dialog.querySelector('.dialog-close').focus();
   window.dispatchEvent(new Event('factory-overlay'));
 }
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
 dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
 dialog.addEventListener('close',()=>{returnFocus?.focus({preventScroll:true});window.dispatchEvent(new Event('factory-resume'));});
-document.querySelector('#project-list').innerHTML=stops.map(p=>`<article class="project-row"><button class="project-name" data-project="${p.id}"><span class="list-number">${String(p.index+1).padStart(2,'0')}</span><h3>${escapeHTML(p.title)}</h3><span class="list-category">${escapeHTML(p.category)}</span></button><button class="locate-project" data-stop="${p.index}" aria-label="Visit ${escapeHTML(p.title)} on the road"><span>On the road</span> →</button></article>`).join('');
+document.querySelector('#project-list').innerHTML=eras.map(era=>`<section class="career-projects" aria-label="${escapeHTML(era.title)}"><header class="era-heading"><h3>${escapeHTML(era.title)}</h3><span>${escapeHTML(era.period)}</span></header>${stops.filter(p=>p.era===era.id).map(p=>`<article class="project-row"><button class="project-name" data-project="${p.id}"><span class="list-number">${String(p.index+1).padStart(2,'0')}</span><h3>${escapeHTML(p.title)}</h3><span class="list-category">${escapeHTML(p.projectPeriod||p.category)}</span></button><button class="locate-project" data-stop="${p.index}" aria-label="Visit ${escapeHTML(p.title)} on the road"><span>On the road</span> →</button></article>`).join('')}</section>`).join('');
 markerContainer.innerHTML=stops.map(p=>`<button class="map-marker" data-stop="${p.index}" aria-label="Visit ${escapeHTML(p.title)}"><span>${String(p.index+1).padStart(2,'0')}</span><strong>${escapeHTML(p.title)}</strong></button>`).join('');
 document.querySelectorAll('[data-project]').forEach(b=>b.addEventListener('click',()=>openProject(b.dataset.project)));
 function setMode(next,updateHash=true){
@@ -37,7 +42,7 @@ function setMode(next,updateHash=true){
   card.hidden=mode!=='road';
   document.querySelector('.road-scrubber').hidden=mode!=='road';
   document.querySelector('#motion-toggle').hidden=!ready||!['road','overview'].includes(mode);
-  document.querySelector('#interaction-hint').innerHTML=mode==='road'?'Scroll to follow the line <span>↓</span>':mode==='overview'?'Select a station to explore':'Eonsang Son / Selected work';
+  document.querySelector('#interaction-hint').innerHTML=mode==='road'?'Scroll back through time <span>↓</span>':mode==='overview'?'Select a station to explore':'Eonsang Son / Selected work';
   document.body.classList.toggle('content-mode',mode==='list'||mode==='about');
   if(updateHash)history.replaceState(null,'','#'+mode);
   window.dispatchEvent(new CustomEvent('factory-mode',{detail:mode}));
@@ -50,7 +55,8 @@ function setProgress(value){
   const p=stops[active];
   card.dataset.project=p.id;
   document.querySelector('#station-number').textContent=String(active+1).padStart(2,'0');
-  document.querySelector('#station-category').textContent=p.label;
+  document.querySelector('#station-category').textContent=p.eraTitle;
+  document.querySelector('#station-period').textContent=p.projectPeriod||p.period;
   document.querySelector('#station-title').textContent=p.title;
   document.querySelector('#road-position').textContent=`${String(active+1).padStart(2,'0')} / 11`;
   slider.setAttribute('aria-valuetext',`${Math.round(progress*100)}%, near ${p.title}`);

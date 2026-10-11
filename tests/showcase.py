@@ -48,16 +48,22 @@ with sync_playwright() as p:
     # Index contains all projects, with direct detail and road-entry actions.
     page.locator('.mode-nav [data-mode="list"]').click()
     assert page.locator('.project-row').count()==11
+    assert page.locator('.era-heading h3').all_text_contents()==['SL Corporation','Automation Company','Undergraduate Years']
     page.screenshot(path=str(out/'list.png'))
     for button in page.locator('.project-name').all():
         title=button.locator('h3').inner_text();button.click()
+        if button.get_attribute('data-project')=='water':
+            assert '2024.06 — 2024.09' in page.locator('#dialog-content').inner_text()
+            assert 'Independent project' in page.locator('#dialog-content').inner_text()
+        if button.get_attribute('data-project')=='viewer':
+            assert '2021 · Automation Company' in page.locator('#dialog-content').inner_text()
         assert page.locator('#dialog-title').inner_text()==title
         assert page.locator('.system-flow').is_visible()
         assert page.locator('#dialog-content img').count()==0
         assert not re.search(r'[가-힣]',page.locator('#project-dialog').inner_text())
         page.keyboard.press('Escape')
         assert button.evaluate('e=>e===document.activeElement')
-    page.locator('.locate-project[data-stop="4"]').click()
+    page.locator('.locate-project[data-stop="7"]').click()
     assert page.locator('#station-title').inner_text()=='Water Treatment SCADA'
     page.screenshot(path=str(out/'water.png'))
     page.locator('.mode-nav [data-mode="about"]').click()
@@ -80,7 +86,7 @@ with sync_playwright() as p:
         assert page.locator('.map-marker:visible').count()==11,(w,page.locator('.map-marker:visible').count())
         page.screenshot(path=str(out/f'overview-{w}.png'))
         page.locator('.map-marker[data-stop="10"]').click()
-        assert page.locator('#station-title').inner_text()=='JourneyMate'
+        assert page.locator('#station-title').inner_text()=='SmartFarm'
         page.locator('.mode-nav [data-mode="about"]').click()
         assert page.locator('#about-panel').is_visible()
     # Ambient motion never advances the road on its own and stops on demand.
@@ -99,7 +105,7 @@ with sync_playwright() as p:
     fallback.goto(url,wait_until='networkidle');assert fallback.locator('.scene-fallback').is_visible()
     assert not fallback.locator('#motion-toggle').is_visible()
     fallback.locator('.mode-nav [data-mode="list"]').click();assert fallback.locator('.project-row').count()==11
-    fallback.locator('[data-project="plc-ai"]').click();assert fallback.locator('#dialog-title').inner_text()=='PLC AI Studio'
+    fallback.locator('.project-name[data-project="plc-ai"]').click();assert fallback.locator('#dialog-title').inner_text()=='PLC AI Studio'
     fallback.keyboard.press('Escape');fallback.locator('.mode-nav [data-mode="about"]').click()
     assert not re.search(r'[가-힣]',fallback.locator('body').inner_text())
     assert not errors,errors

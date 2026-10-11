@@ -25,6 +25,8 @@ window.portfolioProjects = [
   },
   {
     "id": "water",
+    "projectPeriod": "2024.06 — 2024.09",
+    "context": "Independent project during undergraduate study",
     "title": "Water Treatment SCADA",
     "category": "industrial",
     "label": "CONNECTED INDUSTRIAL SYSTEMS",
@@ -89,7 +91,7 @@ window.portfolioProjects = [
   },
   {
     "id": "process",
-    "title": "Manufacturing Process Optimization",
+    "title": "Variable Control Technology Development",
     "category": "industrial",
     "label": "PROCESS / CLOSED-LOOP CONTROL",
     "summary": "Feedback-driven control for more consistent manufacturing processes.",
@@ -110,7 +112,7 @@ window.portfolioProjects = [
   },
   {
     "id": "vision",
-    "title": "Vision & Robot Alignment",
+    "title": "Vision Robot Active Align",
     "category": "industrial",
     "label": "VISION / ROBOTICS / MES",
     "summary": "Connecting vision, robotics, and production data.",
@@ -132,7 +134,7 @@ window.portfolioProjects = [
   },
   {
     "id": "g90",
-    "title": "G90 · GV90 Programs",
+    "title": "G90 · GV90 Manufacturing Process Development",
     "category": "industrial",
     "label": "AUTOMOTIVE / PROCESS ENGINEERING",
     "summary": "Participation in G90 and GV90 production programs.",
@@ -181,6 +183,8 @@ window.portfolioProjects = [
   },
   {
     "id": "viewer",
+    "projectPeriod": "2021",
+    "context": "Automation Company",
     "title": "ForTex-Viewer",
     "category": "software",
     "label": "PLC / WEB / VISUALIZATION",
