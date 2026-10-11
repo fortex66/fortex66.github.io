@@ -11,62 +11,76 @@
     />
     <meta
       property="og:title"
-      content="Eonsang Son — Engineering Lab"
+      content="Eonsang Son — An Interactive Portfolio"
     />
     <meta
       property="og:description"
-      content="Step inside Eonsang's engineering lab: software, real projects, and factory experience."
+      content="Explore Eonsang Son’s career, industrial software, and applied AI through an interactive 3D portfolio."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://fortex66.github.io/" />
     <title>Eonsang Son — Manufacturing Software Engineer</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./main-29c8549831ec.css" />
+    <link rel="stylesheet" href="./main-edeb955eeec1.css" />
     <script defer src="./data-78ba64376c11.js"></script>
-    <script defer src="./main-6ac4c257a5d6.js"></script>
-    <script type="module" src="./scene-8db7076c4596.js"></script>
+    <script defer src="./main-b0974e05686f.js"></script>
+    <script type="module" src="./scene-f4d1c1cb3af9.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#lab-title">Skip to introduction</a>
-    <header class="lab-header">
-      <a href="./" class="lab-wordmark">ES<span> / ENGINEERING LAB</span></a>
-      <nav aria-label="Portfolio navigation">
-        <button data-open-library="identity">About</button>
-        <button data-open-library="projects">Work</button>
-        <button data-open-library="experience">Experience</button>
-        <button data-open-library="contact">Contact</button>
+    <a class="skip-link" href="#chapter-title">Skip to current chapter</a>
+    <header class="exhibit-header">
+      <button class="wordmark" data-chapter="0" aria-label="Eonsang Son, introduction">EONSANG SON<span>SOFTWARE ENGINEER</span></button>
+      <nav aria-label="Main navigation">
+        <button id="overview-toggle" aria-expanded="false" aria-controls="overview"><span class="grid-icon" aria-hidden="true">⊞</span> Overview</button>
+        <button data-open-library="projects">Project index <span class="nav-count">11</span></button>
+        <button data-open-library="contact">Contact →</button>
       </nav>
     </header>
-    <main class="lab" aria-labelledby="lab-title">
-      <div class="lab-intro">
-        <p class="eyebrow">A PERSONAL ENGINEERING SPACE</p>
-        <h1 id="lab-title" tabindex="-1">Eonsang<br/><span>Son.</span></h1>
-        <p class="lab-role">Software engineer.<br/>Built on factory experience.</p>
-        <button class="lab-work-link" data-open-library="projects">Explore my work <span>+</span></button>
-        <p class="lab-current">SL CORPORATION<span>Production Engineering Center</span></p>
+    <main class="exhibit" aria-labelledby="chapter-title" data-chapter="0">
+      <div id="scene-viewport" class="exhibit-stage">
+        <span class="object-tooltip" hidden aria-hidden="true"></span>
+        <canvas id="identity-canvas" aria-label="An interactive 3D portfolio of Eonsang Son. Use the chapter navigation, scroll, or swipe to explore his identity, career, and projects."></canvas>
+        <div class="scene-loading" role="status"><span class="loading-orbit" aria-hidden="true"></span><strong>Shaping the story</strong><span>Projects and experience are also available from the menu.</span></div>
+        <div class="scene-fallback" hidden aria-hidden="true">EONSANG<br><span>SON.</span></div>
       </div>
-      <div class="lab-room" id="scene-viewport">
-        <div class="scene-loading" role="status"><span class="loading-orbit" aria-hidden="true"></span><strong>Opening the lab</strong><span>You can explore my work from the menu.</span></div>
-        <canvas id="identity-canvas" aria-label="Eonsang's conceptual engineering workspace: project screens, a robot workbench, and field notes. Use the numbered buttons to open the related work."></canvas>
-        <button class="lab-hotspot" data-lab-project="water" aria-label="Open Water Treatment SCADA project"><span>01</span><strong>Water Treatment SCADA</strong></button>
-        <button class="lab-hotspot" data-lab-project="plc-ai" aria-label="Open PLC AI Studio project"><span>02</span><strong>PLC AI Studio</strong></button>
-        <button class="lab-hotspot" data-lab-project="embedded" aria-label="Open Industrial Embedded Controllers project"><span>03</span><strong>Control software</strong></button>
-        <button class="lab-hotspot" data-lab-project="experience" aria-label="Open experience and field notes"><span>04</span><strong>Field notes</strong></button>
-      </div>
-      <div class="lab-context">
-        <span class="eyebrow" id="lab-view-label">THE ROOM / 01</span>
-        <p id="lab-view-caption">A space shaped by real projects.</p>
-        <small>Select a numbered object to open its story.</small>
-      </div>
+      <div class="scene-topline" aria-hidden="true"><span id="scene-category">A PERSONAL PORTFOLIO</span><span>SOFTWARE / AUTOMATION / APPLIED AI</span></div>
+      <article class="chapter-copy" id="chapter-copy">
+        <p class="chapter-kicker" id="chapter-kicker">01 — INTRODUCTION</p>
+        <h1 id="chapter-title" tabindex="-1">Software.<br>With a real-world instinct.</h1>
+        <p id="chapter-summary">I’m Eonsang. I develop software for machines, people, and the space between.</p>
+        <button id="chapter-action" class="chapter-action">Meet the engineer <span>→</span></button>
+      </article>
+      <aside class="chapter-note"><span id="chapter-date">CURRENTLY AT</span><strong id="chapter-note-title">SL Corporation</strong><span id="chapter-note-detail">Production Engineering Center</span></aside>
+      <div class="scene-caption" id="scene-caption">A story in seven scenes.</div>
+      <section id="overview" class="overview" aria-labelledby="overview-title" hidden>
+        <div class="overview-heading"><p class="chapter-kicker">THE WHOLE PICTURE</p><h2 id="overview-title">Choose a chapter.</h2><button id="overview-close" aria-label="Close overview">Close ×</button></div>
+        <div class="overview-grid">
+          <button data-chapter="0"><span>01 / IDENTITY</span><strong>Eonsang Son</strong><small>Software, shaped by the field.</small></button>
+          <button data-chapter="1"><span>02 / EXPERIENCE</span><strong>The path so far</strong><small>Education → software → manufacturing.</small></button>
+          <button data-chapter="2"><span>03 / APPLIED AI</span><strong>PLC AI Studio</strong><small>Context. Reasoning. Human review.</small></button>
+          <button data-chapter="3"><span>04 / INDUSTRIAL WEB</span><strong>Water Treatment</strong><small>From plant data to the browser.</small></button>
+          <button data-chapter="4"><span>05 / AUTOMATION</span><strong>Closer to the machine</strong><small>Control software and factory projects.</small></button>
+          <button data-chapter="5"><span>06 / SELECTED WORK</span><strong>Beyond one discipline</strong><small>Energy, collaboration, and the web.</small></button>
+          <button data-chapter="6"><span>07 / CONTACT</span><strong>Let’s talk</strong><small>Have something in mind?</small></button>
+        </div>
+      </section>
+      <p id="chapter-status" class="sr-only" aria-live="polite"></p>
     </main>
-    <footer class="lab-footer">
-      <nav aria-label="Workspace views">
-        <button data-lab-view="room" aria-pressed="true">The room</button>
-        <button data-lab-view="desk" aria-pressed="false">The desk</button>
-        <button data-lab-view="bench" aria-pressed="false">Workbench</button>
-        <button data-lab-view="notes" aria-pressed="false">Field notes</button>
+    <footer class="exhibit-footer">
+      <div class="explore-hint"><span class="scroll-symbol" aria-hidden="true">↓</span><span>Scroll or drag to explore<small>Arrow keys work, too.</small></span></div>
+      <nav class="chapter-nav" aria-label="3D portfolio chapters">
+        <button id="previous-chapter" aria-label="Previous chapter">←</button>
+        <div class="chapter-dots">
+          <button data-chapter="0" aria-label="1. Introduction" aria-current="step"><span>01</span></button>
+          <button data-chapter="1" aria-label="2. Experience"><span>02</span></button>
+          <button data-chapter="2" aria-label="3. PLC AI Studio"><span>03</span></button>
+          <button data-chapter="3" aria-label="4. Water Treatment SCADA"><span>04</span></button>
+          <button data-chapter="4" aria-label="5. Automation"><span>05</span></button>
+          <button data-chapter="5" aria-label="6. Selected work"><span>06</span></button>
+          <button data-chapter="6" aria-label="7. Contact"><span>07</span></button>
+        </div>
+        <button id="next-chapter" aria-label="Next chapter">→</button>
       </nav>
-      <p>CONCEPT SPACE <span>/ ORIGINAL PROJECT RECORDS</span></p>
       <button id="motion-toggle" aria-pressed="false">Pause motion</button>
     </footer>
     <dialog id="library-dialog" aria-labelledby="library-title">
@@ -163,7 +177,6 @@
                 Industrial automation to manufacturing AI. Select a project to see the system and my role.
               </p>
             </div>
-            <div id="featured-projects" class="featured-grid"></div>
             <div class="archive-heading">
               <h3>Project archive <span id="project-count"></span></h3>
               <div class="filters" role="group" aria-label="Filter projects">
@@ -250,24 +263,24 @@
             <h2>Build the next process<br /><span>with me.</span></h2>
             <div class="contact-links">
               <a href="mailto:fortex66@naver.com"
-                >Email <span>fortex66@naver.com ↗</span></a
+                >Email <span>fortex66@naver.com →</span></a
               ><a
                 href="https://github.com/fortex66"
                 target="_blank"
                 rel="noopener noreferrer"
-                >GitHub <span>fortex66 ↗</span></a
+                >GitHub <span>fortex66 →</span></a
               ><a
                 href="https://fortex66.tistory.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                >Tech Blog <span>fortex66.tistory.com ↗</span></a
+                >Tech Blog <span>fortex66.tistory.com →</span></a
               >
             </div>
             <div class="footer-bottom">
               <span>Eonsang Son</span
               ><span class="mono">ROBOTICS. AUTOMATION. APPLIED AI.</span
               ><button type="button" data-return-world>
-                Back to the lab ↗
+                Back to the experience →
               </button>
             </div>
           </div>

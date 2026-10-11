@@ -17,20 +17,7 @@ function openProject(id) {
   const project = projects.find((p) => p.id === id);
   if (!project) return;
   previousFocus = document.activeElement;
-  content.innerHTML = `<p class="eyebrow">${escapeHTML(project.label)}</p><h2 id="dialog-title">${escapeHTML(project.title)}</h2><p class="dialog-summary">${escapeHTML(project.summary)}</p>${flowMarkup(project.flow)}<p class="project-detail">${escapeHTML(project.details)}</p><dl class="project-facts"><div><dt>ROLE</dt><dd>${escapeHTML(project.role)}</dd></div><div><dt>TOOLS</dt><dd>${project.stack.map(escapeHTML).join(" · ")}</dd></div>${project.status ? `<div><dt>STATUS</dt><dd>${escapeHTML(project.status)}</dd></div>` : ""}</dl><div class="dialog-links">${(project.links || []).map((link) => `<a class="button button-dark" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(link.label)} ↗</a>`).join("")}</div>${project.demo ? '<div class="demo-area"><button type="button" class="demo-button text-link">View original project recording ↓</button><p class="demo-note">Original project recording. Source interfaces may be in Korean.</p></div>' : ""}`;
-  if (project.demo) {
-    content.querySelector(".demo-button").addEventListener(
-      "click",
-      (event) => {
-        const image = document.createElement("img");
-        image.src = project.demo;
-        image.alt = `${project.title} project recording`;
-        image.className = "project-demo";
-        event.currentTarget.replaceWith(image);
-      },
-      { once: true },
-    );
-  }
+  content.innerHTML = `<p class="eyebrow">${escapeHTML(project.label)}</p><h2 id="dialog-title">${escapeHTML(project.title)}</h2><p class="dialog-summary">${escapeHTML(project.summary)}</p>${flowMarkup(project.flow)}<p class="project-detail">${escapeHTML(project.details)}</p><dl class="project-facts"><div><dt>ROLE</dt><dd>${escapeHTML(project.role)}</dd></div><div><dt>TOOLS</dt><dd>${project.stack.map(escapeHTML).join(" · ")}</dd></div>${project.status ? `<div><dt>STATUS</dt><dd>${escapeHTML(project.status)}</dd></div>` : ""}</dl><div class="dialog-links">${(project.links || []).map((link) => `<a class="button button-dark" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(link.label)} →</a>`).join("")}</div>`;
   dialog.showModal();
   window.dispatchEvent(new Event("world-overlay-open"));
   document.body.classList.add("dialog-open");
@@ -43,22 +30,12 @@ function renderArchive(filter = "all") {
   archive.innerHTML = visible
     .map(
       (p) =>
-        `<button class="archive-item" type="button" data-project="${p.id}"><span class="archive-number mono">${String(projects.indexOf(p) + 1).padStart(2, "0")}</span><span class="archive-main"><strong>${escapeHTML(p.title)}</strong><span>${escapeHTML(p.summary)}</span></span><span class="archive-category mono">${escapeHTML(p.category.toUpperCase())}</span><span class="archive-arrow" aria-hidden="true">↗</span></button>`,
+        `<button class="archive-item" type="button" data-project="${p.id}"><span class="archive-number mono">${String(projects.indexOf(p) + 1).padStart(2, "0")}</span><span class="archive-main"><strong>${escapeHTML(p.title)}</strong><span>${escapeHTML(p.summary)}</span></span><span class="archive-category mono">${escapeHTML(p.category.toUpperCase())}</span><span class="archive-arrow" aria-hidden="true">→</span></button>`,
     )
     .join("");
   document.querySelector("#filter-status").textContent =
     `${visible.length} projects shown`;
 }
-document.querySelector("#featured-projects").innerHTML = projects
-  .filter((p) => p.featured)
-  .map(
-    (p, i) =>
-      `<button type="button" class="featured-project ${i === 0 ? "featured-ai" : "featured-water"}" data-project="${p.id}"><div class="featured-art" aria-hidden="true"><span class="art-label mono">${i === 0 ? "ANALYZE / STRUCTURE / REVIEW" : "OBSERVE / CONNECT / CONTROL"}</span><div class="art-diagram">${i === 0 ? '<div class="diagram-window"><span>PLC AI STUDIO</span><div class="ladder"><i></i><i></i><i></i></div></div><div class="art-cube">AI</div>' : '<div class="water-pipe"></div><div class="water-tank"><span></span></div><div class="water-metric"><small>LIVE DATA</small><svg viewBox="0 0 160 60"><path d="M0 48L25 42L45 50L70 20L92 30L110 8L132 22L160 12"/></svg></div>'}</div><span class="art-caption mono">${i === 0 ? "AI + RULES → HUMAN REVIEW" : "PLC → SERVER → WEB"}</span></div><div class="featured-copy"><span class="eyebrow">${escapeHTML(p.label)}</span><h3>${escapeHTML(p.title)} <span aria-hidden="true">↗</span></h3><p>${escapeHTML(p.summary)}</p><div class="tag-list">${p.stack
-        .slice(0, 3)
-        .map((t) => `<span>${escapeHTML(t)}</span>`)
-        .join("")}</div></div></button>`,
-  )
-  .join("");
 renderArchive();
 document.querySelector("#project-count").textContent = `/ ${projects.length}`;
 document.querySelector("#projects").addEventListener("click", (event) => {
@@ -128,33 +105,104 @@ function followSectionHash() {
 }
 window.addEventListener('hashchange', followSectionHash);
 followSectionHash();
-const viewCopy = {
-  room: ['THE ROOM / 01', 'A space shaped by real projects.'],
-  desk: ['THE DESK / 02', 'Software that meets the factory floor.'],
-  bench: ['THE WORKBENCH / 03', 'Build it. Test it. Understand it.'],
-  notes: ['FIELD NOTES / 04', 'Experience behind the software.'],
-};
-document.querySelectorAll('[data-lab-view]').forEach(button => button.addEventListener('click', () => {
-  const id = button.dataset.labView;
-  document.querySelector('.lab').dataset.view = id;
-  document.querySelectorAll('[data-lab-view]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-  document.querySelector('#lab-view-label').textContent = viewCopy[id][0];
-  document.querySelector('#lab-view-caption').textContent = viewCopy[id][1];
-  window.dispatchEvent(new CustomEvent('lab-view', {detail: id}));
-}));
-document.querySelectorAll('[data-lab-project]').forEach(button => button.addEventListener('click', () => {
-  button.focus({preventScroll: true});
-  if (button.dataset.labProject === 'experience') openLibrary('experience');
-  else openProject(button.dataset.labProject);
-}));
-window.addEventListener('identity-scene-unavailable', () => {
-  document.querySelector('.scene-loading strong').textContent = 'The lab is available through its project menu';
-  document.querySelector('.scene-loading > span:last-child').textContent = '3D is unavailable in this browser. Explore my work through the Projects menu.';
-  document.querySelector('.loading-orbit').hidden = true;
-  document.querySelector('#motion-toggle').hidden = true;
-  document.querySelectorAll('[data-lab-view]').forEach(button => button.disabled = true);
-  document.querySelector('.lab-context small').textContent = 'Use Work, Experience, or Contact in the menu.';
+
+// One navigation model for wheel, touch, keyboard, the map, and 3D picking.
+const chapters = [
+  {kicker:'01 — INTRODUCTION', title:'Software.<br>With a real-world instinct.', summary:'I’m Eonsang. I develop software for machines, people, and the space between.', action:'Meet the engineer', section:'identity', date:'CURRENTLY AT', note:'SL Corporation', detail:'Production Engineering Center', category:'A PERSONAL PORTFOLIO', caption:'A story in seven scenes.'},
+  {kicker:'02 — EXPERIENCE & EDUCATION', title:'Built on<br>the factory floor.', summary:'From Computer Science to industrial software. Now bringing that experience to manufacturing.', action:'Explore my experience', section:'experience', date:'2025.07 — PRESENT', note:'SL Corporation', detail:'Production Engineering Center', category:'THE PATH SO FAR', caption:'Three chapters. One continuous practice.'},
+  {kicker:'03 — PLC AI STUDIO', title:'Make complex<br>logic understandable.', summary:'An AI workspace for PLC program analysis, deterministic checks, and human review.', action:'Explore the project', project:'plc-ai', date:'IN DEVELOPMENT', note:'PLC AI Studio', detail:'Python / PLC / Local LLM', category:'APPLIED AI FOR ENGINEERING', caption:'Illustrative program model · Engineers remain in control.'},
+  {kicker:'04 — WATER TREATMENT SCADA', title:'The whole plant.<br>One clear view.', summary:'Live equipment data, alarms, and control, brought together in a web application.', action:'Explore the project', project:'water', date:'COLLABORATIVE PROJECT', note:'Water Treatment SCADA', detail:'React / Node.js / Modbus TCP', category:'INDUSTRIAL SOFTWARE, MADE VISIBLE', caption:'System architecture · Built with seonghyeon0312.'},
+  {kicker:'05 — AUTOMATION & CONTROL', title:'Close to<br>the machine.', summary:'Embedded controllers, robotic integration, and production programs. Software tested against the physical world.', action:'Explore industrial work', section:'projects', filter:'industrial', date:'FIELD EXPERIENCE', note:'G90 · GV90 Programs', detail:'Equipment integration / Process engineering', category:'FROM CODE TO PRODUCTION', caption:'Industrial Embedded Controllers · Software architecture.'},
+  {kicker:'06 — SELECTED PROJECTS', title:'Curiosity.<br>Put into practice.', summary:'Battery control, collaborative web apps, and local AI. Different problems, the same drive to build.', action:'View all 11 projects', section:'projects', date:'SELECTED WORK', note:'Beyond one discipline', detail:'Energy / Web / Industrial AI', category:'AN EXPANDING PRACTICE', caption:'Select a floating project to open its story.'},
+  {kicker:'07 — CONTACT', title:'Good things start<br>with a conversation.', summary:'For conversations about software, automation, and the next idea worth building.', action:'Get in touch', section:'contact', date:'FIND ME ONLINE', note:'fortex66', detail:'GitHub / Tech blog / Email', category:'THE NEXT CHAPTER', caption:'Eonsang Son — Software engineer.'},
+];
+let chapterIndex = 0, overviewOpen = false;
+const exhibit = document.querySelector('.exhibit');
+const overview = document.querySelector('#overview');
+const overviewToggle = document.querySelector('#overview-toggle');
+const chapterAction = document.querySelector('#chapter-action');
+function setOverview(open) {
+  overviewOpen = open;
+  overview.hidden = !open;
+  exhibit.classList.toggle('is-overview', open);
+  overviewToggle.setAttribute('aria-expanded', String(open));
+  // Avoid hidden chapter actions remaining in keyboard navigation.
+  document.querySelector('#chapter-copy').inert = open;
+  window.dispatchEvent(new CustomEvent('portfolio-overview', {detail:open}));
+  if (open) document.querySelector('#overview-close').focus();
+  else overviewToggle.focus();
+}
+function navigateTo(index) {
+  index = Math.max(0, Math.min(chapters.length-1, index));
+  chapterIndex = index;
+  if (overviewOpen) setOverview(false);
+  const c = chapters[index];
+  exhibit.dataset.chapter = index;
+  document.querySelector('#chapter-kicker').textContent = c.kicker;
+  document.querySelector('#chapter-title').innerHTML = c.title;
+  document.querySelector('#chapter-summary').textContent = c.summary;
+  chapterAction.innerHTML = `${c.action} <span>→</span>`;
+  for (const [id,value] of [['chapter-date',c.date],['chapter-note-title',c.note],['chapter-note-detail',c.detail],['scene-category',c.category],['scene-caption',c.caption]]) document.getElementById(id).textContent = value;
+  document.querySelectorAll('.chapter-dots button').forEach(b=>{
+    if (+b.dataset.chapter === index) b.setAttribute('aria-current','step');
+    else b.removeAttribute('aria-current');
+  });
+  document.querySelector('#previous-chapter').disabled = index === 0;
+  document.querySelector('#next-chapter').disabled = index === chapters.length-1;
+  document.querySelector('#chapter-status').textContent = `${c.kicker}: ${c.title.replace('<br>',' ')}`;
+  window.dispatchEvent(new CustomEvent('portfolio-chapter', {detail:index}));
+}
+document.querySelectorAll('[data-chapter]').forEach(b=>{
+  if (b.tagName === 'BUTTON') b.addEventListener('click',()=>navigateTo(+b.dataset.chapter));
 });
-setTimeout(() => {
-  if (!document.querySelector('.webgl-ready')) window.dispatchEvent(new Event('identity-scene-unavailable'));
-}, 30000);
+chapterAction.addEventListener('click',()=>{
+  const c=chapters[chapterIndex];
+  if(c.project)openProject(c.project);
+  else {openLibrary(c.section);if(c.section==='projects')document.querySelector(`[data-filter="${c.filter||'all'}"]`).click();}
+});
+document.querySelector('#previous-chapter').addEventListener('click',()=>navigateTo(chapterIndex-1));
+document.querySelector('#next-chapter').addEventListener('click',()=>navigateTo(chapterIndex+1));
+overviewToggle.addEventListener('click',()=>setOverview(!overviewOpen));
+document.querySelector('#overview-close').addEventListener('click',()=>setOverview(false));
+let wheelTotal=0,lastWheel=0;
+window.addEventListener('wheel',e=>{
+  if(document.querySelector('dialog[open]')||overviewOpen||e.ctrlKey)return;
+  e.preventDefault();
+  if(performance.now()-lastWheel<850)return;
+  wheelTotal+=e.deltaY;
+  if(Math.abs(wheelTotal)>45){navigateTo(chapterIndex+Math.sign(wheelTotal));wheelTotal=0;lastWheel=performance.now();}
+},{passive:false});
+window.addEventListener('keydown',e=>{
+  if(document.querySelector('dialog[open]'))return;
+  if(e.key==='Escape'&&overviewOpen){setOverview(false);return;}
+  if(overviewOpen||e.altKey||e.metaKey||e.ctrlKey)return;
+  if(['ArrowRight','ArrowDown','PageDown','ArrowLeft','ArrowUp','PageUp','Home','End'].includes(e.key)){
+    e.preventDefault();
+    navigateTo(e.key==='Home'?0:e.key==='End'?6:chapterIndex+(['ArrowRight','ArrowDown','PageDown'].includes(e.key)?1:-1));
+  }
+});
+const stage=document.querySelector('#scene-viewport');
+let drag=null;
+stage.addEventListener('pointerdown',e=>{if(e.button===0){drag={x:e.clientX,y:e.clientY,id:e.pointerId};stage.setPointerCapture(e.pointerId);stage.classList.add('is-dragging');}});
+stage.addEventListener('pointerup',e=>{
+  if(!drag)return;
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  stage.classList.remove('is-dragging');
+  if(stage.hasPointerCapture(e.pointerId))stage.releasePointerCapture(e.pointerId);
+  if(Math.max(Math.abs(dx),Math.abs(dy))>45){
+    if(!overviewOpen)navigateTo(chapterIndex+(Math.abs(dx)>Math.abs(dy)?-Math.sign(dx):-Math.sign(dy)));
+  } else window.dispatchEvent(new CustomEvent('portfolio-pick',{detail:{x:e.clientX,y:e.clientY}}));
+  drag=null;
+});
+stage.addEventListener('pointercancel',()=>{drag=null;stage.classList.remove('is-dragging');});
+window.addEventListener('portfolio-project',e=>{chapterAction.focus();if(e.detail==='experience')openLibrary('experience');else openProject(e.detail);});
+window.addEventListener('portfolio-select',e=>navigateTo(e.detail));
+window.addEventListener('identity-scene-unavailable',()=>{
+  stage.classList.add('scene-unavailable');stage.classList.remove('webgl-ready');
+  document.querySelector('.scene-loading').hidden=true;
+  document.querySelector('.scene-fallback').hidden=false;
+  document.querySelector('#motion-toggle').hidden=true;
+  document.querySelector('.explore-hint span:last-child').innerHTML='Explore the chapters<small>3D unavailable · All content is accessible.</small>';
+});
+setTimeout(()=>{if(!stage.classList.contains('webgl-ready'))window.dispatchEvent(new Event('identity-scene-unavailable'));},20000);
+navigateTo(0);

@@ -1,48 +1,36 @@
-# Eonsang Son · Engineering Lab
+# Eonsang Son — Interactive Portfolio
 
-A personal Three.js workspace shaped by Eonsang Son's software and factory experience. A dual-monitor desk, miniature robot bench, original project screens, and a field notebook replace the standalone technology diagrams. This is a conceptual room, not a photograph or reconstruction of a real office.
+A full-screen Three.js portfolio built around Eonsang's identity, career, and projects. Seven spatial chapters replace the former engineering-room scene: a dimensional signature, experience timeline, PLC AI Studio, Water Treatment SCADA, industrial control, selected projects, and contact.
 
-Select a physical object or its numbered, keyboard-accessible button to open its story:
+Scroll, drag/swipe, use the arrow keys, or select a chapter from Overview. The project index provides direct access to all 11 existing records. The site starts immediately; there is no game, score, mission, or entry gate.
 
-- **01 — Main monitor:** Water Treatment SCADA
-- **02 — Code workspace:** PLC AI Studio
-- **03 — Robot and controller bench:** Industrial Embedded Controllers
-- **04 — Field notebook:** experience and education
+## Visuals and content
 
-The room, desk, workbench, and notes views move the camera without game controls. All 11 projects, About, Experience, and Contact remain directly accessible through the navigation, independently of WebGL. The interface is English; historical source screenshots retain their original language.
+- Original extruded typography, reflective geometry, layered controller assemblies, and canvas-drawn system diagrams.
+- **No project screenshots, photographs, or recordings are displayed or requested.** Project panels describe architecture and responsibilities with text and original diagrams. Historical media files remain in the repository for older cached pages.
+- Diagram labels are based on the existing portfolio records. They are conceptual explanations, not live telemetry or product screenshots.
+- The interface and diagrams are English. Career and education dates are retained from the existing portfolio; no university name is displayed.
+- Robin Payot's portfolio was requested as a reference for an immersive, full-screen, scroll-driven presentation. Public site information was reviewed, but the reference's live 3D experience could not be executed in the development environment. No reference code, imagery, or models are bundled.
 
-## Run
+## Run and build
 
 ```sh
+npm run preview
 npm run build
-python3 -m http.server 4173
 ```
 
-GitHub Pages serves the root. The build also generates `dist/` and content-versioned CSS/JavaScript references to prevent mixed cached revisions. Previously published versioned files remain for older cached HTML.
+The preview serves the checkout at `http://localhost:4173`. The build produces `dist/`, verifies entry-point assets, and updates the hashed CSS/JS filenames in `index.html`. Commit those generated assets with source changes so GitHub Pages serves matching versions. Older tracked bundles remain for cached HTML.
 
-## Project records and scene assets
+Three.js is vendored locally. The scene needs no external models, fonts, images, or HDR environments. The local `assets/immersive/letterforms.json` contains normalized glyph outlines from DejaVu Sans Bold; its license is included alongside it. Studio reflections and project diagrams are generated in the browser.
 
-`assets/lab/water.webp` and `assets/lab/controller.webp` are lightweight frames extracted at three seconds from the existing `imgs/water.gif` and `imgs/fortex_dif.gif` project recordings. They total about 104 KB; the large original GIFs load only when visitors request a recording in project details.
+## Accessibility and resilience
 
-The PLC AI Studio screen is labeled a concept interface. The notebook, room, furniture, robot, materials, and studio lighting are locally generated visuals. They do not imply ownership of a particular workspace or hardware. No external 3D models, HDR files, or runtime CDNs are required.
+Chapter buttons, project actions, a filterable project index, and standard dialogs provide access independently of canvas picking. Dialogs restore focus to the originating control. Reduced motion disables idle animation and makes camera transitions immediate; a separate motion toggle is available. Rendering pauses while the page is hidden or dialogs are open. If WebGL fails or its context is lost, the chapter navigation and all project details remain available.
 
-## Implementation
-
-- `index.html`: introduction, semantic object buttons, camera controls, and archive dialogs
-- `scene.js`: room geometry, original project textures, object raycasting, projected buttons, camera transitions, and ambient motion
-- `main.js`: object stories, archive filtering, focus restoration, and view descriptions
-- `main.css`: desktop and mobile layouts
-- `data.js`: source-backed project records
-- `vendor/`: vendored Three.js
-
-Reduced motion disables ambient movement and uses immediate camera changes. Rendering stops while dialogs are open or the page is hidden. Unsupported WebGL preserves direct project access and disables unavailable camera controls.
-
-## Verify
-
-With Playwright, Chromium, and the preview server running:
+## Verification
 
 ```sh
 CHROMIUM_PATH=/usr/bin/chromium python3 tests/showcase.py
 ```
 
-`PORTFOLIO_URL` overrides the URL; `SCREENSHOT_DIR` chooses screenshot output. Tests cover physical object selection, four numbered stories and camera views, focus restoration, 11 project records and filters, nested dialogs, responsive portrait/landscape layouts, animation/pause, English interface content, deep links, and WebGL fallback.
+Playwright covers all seven chapter actions; keyboard, wheel, drag, and overview navigation; actual 3D diagram picking; all 11 project details and filters; nested dialogs and focus return; portrait and landscape layouts; animation/pause; English interface; deep links; and unavailable-WebGL fallback. Network assertions ensure project screenshots and recordings are not requested. Screenshots can be saved with `SCREENSHOT_DIR=/absolute/path`.
