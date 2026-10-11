@@ -276,6 +276,27 @@ button:disabled {
   margin-left:10px;
   font-size:17px
 }
+/* Keep the first interaction in the reader's initial field of view. */
+@media(min-width:1001px) {
+  body:has(#portfolio[data-mode="road"]) #interaction-hint {
+    position:fixed;
+    top:112px;
+    left:50%;
+    transform:translateX(-50%);
+    min-width:0;
+    white-space:nowrap;
+    pointer-events:none
+  }
+  body:has(#portfolio[data-mode="road"]) .road-footer::before {
+    content:"";
+    min-width:210px
+  }
+}
+@media(min-width:1400px) {
+  body:has(#portfolio[data-mode="road"]) #interaction-hint {
+    top:46px
+  }
+}
 .road-scrubber {
   display:flex;
   gap:18px;
