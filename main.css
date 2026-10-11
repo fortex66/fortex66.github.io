@@ -3243,3 +3243,107 @@ body:has(.library-body) {
     font-size: 12px;
   }
 }
+
+/* Midnight exploration: one world, compact HUD, instructions beside the action. */
+:root { --mint: #a8c8ff; --dark: #080d18; }
+body:has(.library-body), .hero-world { background: #080d18; }
+.hero-world .world-experience { grid-template-rows: 54px minmax(0, 1fr) 54px 48px; background: #080d18; }
+.hero-world .scene-viewport { background: radial-gradient(ellipse at 50% 45%, #192b49 0%, #0c1424 55%, #080d18 100%); }
+.hero-world .scene-topline, .hero-world .world-toolbar, .hero-world .scene-tabs { background: #080d18; border-color: #253249; }
+.hero-world .scene-topline { padding: 0 24px; }
+.hero-world .scene-topline .mono { color: #9aabc5; font-size: 12px; letter-spacing: .08em; }
+.hero-world .scene-topline button { color: #b6c4d8; font-size: 13px; }
+.hero-world .world-intro { top: 76px; left: 28px; max-width: 330px; }
+.hero-world .world-intro::before, .hero-world .world-intro > .eyebrow { display: none; }
+.hero-world .world-intro h1 { font-size: 28px; margin: 0 0 8px; color: #f3f6ff; }
+.hero-world .world-intro .hero-description { display: block; font-size: 15px; color: #a9bdd9; }
+.hero-world .world-quest { top: 16px; right: 24px; left: auto; width: auto; height: auto; padding: 0; background: none; }
+.hero-world .world-quest > .eyebrow, .hero-world .world-quest strong, .hero-world .quest-track { display: none; }
+.hero-world .world-quest p { position: static; display: block; font-size: 16px; color: #bbd3ff; margin: 0; }
+.game-hud { top: 48px; right: 24px; bottom: auto; width: auto; padding: 0; display: flex; align-items: center; gap: 14px; border: 0; background: none; box-shadow: none; }
+.game-hud .eyebrow, .game-hud p { display: none; }
+.game-hud > strong { font-size: 19px; color: #ecf3ff; }
+.game-hud strong small, #game-chips { font-size: 13px; color: #a9bdd9; }
+.hero-world .world-marker { padding: 9px 13px; min-width: 0; border-radius: 12px; background: #101d32e8; border: 1px solid #47618a; color: #edf4ff; font-size: 16px; box-shadow: 0 8px 30px #0004; }
+.hero-world .world-marker small { display: inline; margin-right: 7px; color: #9abfff; font-size: 12px; }
+.hero-world .world-marker span { margin-left: 6px; color: #a8c8ff; }
+.hero-world .world-marker:hover { background: #223b61; border-color: #9abfff; }
+.hero-world .world-start { display: none; }
+.hero-world .world-toolbar { padding: 0 24px; gap: 18px; }
+.hero-world .world-toolbar p { font-size: 14px; color: #95a9c4; }
+.hero-world #world-terminal, .hero-world #world-reset { font-size: 15px; border-color: #3b5277; color: #c5d9ff; }
+.hero-world #world-terminal { background: #203859; padding: 8px 16px; border-radius: 8px; }
+.hero-world .scene-tabs button { padding: 8px 12px; font-size: 15px; color: #aec0dc; border-color: #293b58; }
+.hero-world .scene-tabs button > span { display: inline; margin-right: 10px; font-size: 11px; color: #739cd5; }
+.hero-world .scene-tabs button[aria-pressed="true"] { background: #122038; border-color: #85b5ff; color: #eef5ff; }
+.hero-world .world-interact { right: 24px; bottom: 24px; border: 1px solid #7294c6; border-radius: 12px; background: #213b61; color: #eaf2ff; font-size: 16px; }
+.hero-world .world-interact:disabled { visibility: hidden; }
+#boost-toggle, .scene-viewport:has(.world-start:not(.is-started)) #boost-toggle { left: 24px; bottom: 24px; background: #14243d; color: #bbd3ff; border-color: #3b5277; border-radius: 12px; font-size: 14px; }
+#boost-toggle[aria-pressed="true"] { background: #294c80; }
+#game-toast { background: #172b49; color: #e5efff; border-color: #5b85c3; }
+.hero-world .world-card { background: #101c30f5; border-color: #47618a; color: #e7efff; }
+.hero-world .world-card p, .hero-world .world-card .world-career { color: #bbcbe2; }
+.play-guide { position: absolute; top: 108px; left: 28px; z-index: 4; width: 310px; color: #c4d2e7; font-size: 15px; }
+.play-guide summary { cursor: pointer; color: #e9f2ff; font-size: 15px; list-style: none; display: flex; align-items: center; gap: 10px; width: fit-content; padding: 6px 0; }
+.play-guide summary span { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid #54729e; border-radius: 50%; font: 13px var(--mono); }
+.play-guide p { margin-top: 6px; line-height: 1.8; }
+.play-guide > div { margin-top: 10px; font-size: 13px; color: #8ea6c9; }
+.play-guide kbd { font: inherit; color: #c6dcff; }
+.scene-loading { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #0b1322; color: #bdd1ee; padding: 30px; text-align: center; }
+.scene-loading strong { font-size: 20px; font-weight: 500; }
+.scene-loading > span:last-child { font-size: 15px; color: #889fbd; }
+.loading-orbit { width: 32px; height: 32px; border: 2px solid #263c5d; border-top-color: #a6c8ff; border-radius: 50%; animation: loading-spin 1.3s linear infinite; }
+@keyframes loading-spin { to { transform: rotate(360deg); } }
+.webgl-ready .scene-loading { display: none; }
+.scene-unavailable .loading-orbit { display: none; }
+.scene-unavailable:not(.webgl-ready) .play-guide { display: none; }
+#identity-canvas { touch-action: none; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .loading-orbit { animation: none; } }
+@media (max-width: 900px) {
+  .hero-world .world-intro { left: 20px; }
+  .play-guide { left: 20px; width: 290px; }
+  .hero-world .world-marker { font-size: 14px; }
+}
+@media (max-width: 650px) {
+  .hero-world .world-experience { grid-template-rows: 44px minmax(0, 1fr) 52px 44px; }
+  .hero-world .scene-topline { padding: 0 14px; }
+  .hero-world .scene-topline .mono { font-size: 10px; max-width: 95px; line-height: 1.4; }
+  .hero-world .scene-topline button { font-size: 12px; }
+  .hero-world .world-intro { top: 60px; left: 16px; }
+  .hero-world .world-intro h1 { font-size: 23px; }
+  .hero-world .world-intro .hero-description { font-size: 13px; }
+  .play-guide { top: 85px; left: 16px; width: calc(100% - 32px); font-size: 14px; background: #0c1628df; border-radius: 10px; padding: 5px 10px; }
+  .play-guide summary { font-size: 14px; }
+  .play-guide > div { display: none; }
+  .play-guide p { margin: 2px 0 6px; line-height: 1.6; }
+  .hero-world .world-quest { top: 18px; right: 16px; }
+  .hero-world .world-quest p { font-size: 13px; }
+  .game-hud { top: auto; bottom: 128px; right: 16px; gap: 8px; flex-direction: column; align-items: flex-end; }
+  .game-hud > strong { font-size: 16px; }
+  #game-chips, .game-hud strong small { font-size: 12px; }
+  .hero-world .world-toolbar { padding: 0 16px; }
+  .hero-world .world-toolbar p { display: none; }
+  .hero-world .scene-tabs button { font-size: 13px; padding: 5px; }
+  .hero-world .scene-tabs button > span { display: none; }
+  .hero-world .world-interact { right: 16px; bottom: 20px; max-width: 160px; font-size: 14px; }
+  .hero-world .touch-controls { left: 16px; bottom: 16px; }
+  .hero-world .touch-controls button { width: 44px; height: 44px; border-radius: 12px; background: #172943d9; color: #cce0ff; border-color: #56759f; }
+  #boost-toggle, .scene-viewport:has(.world-start:not(.is-started)) #boost-toggle { left: 16px; bottom: 126px; font-size: 13px; padding: 8px 12px; }
+  .hero-world .world-card { z-index: 6; }
+}
+@media (max-height: 620px) and (min-width: 651px) {
+  .hero-world .world-experience { grid-template-rows: 42px minmax(0, 1fr) 42px 38px; }
+  .hero-world .world-intro { top: 55px; }
+  .hero-world .world-intro h1 { font-size: 22px; }
+  .hero-world .world-intro .hero-description { display: none; }
+  .play-guide { top: 48px; width: 270px; font-size: 13px; }
+  .play-guide > div { display: none; }
+}
+/* Keep the reading view quiet and neutral against the blue world. */
+:root { --ink: #1a2638; --muted: #64748b; --paper: #f5f7fb; --line: #d9e1ee; }
+dialog::backdrop { background: #040a16c9; }
+.library-body .projects-section, .library-body .featured-copy { background: #edf1f8; }
+.library-tabs button, #library-close, .library-header .eyebrow { color: #536c91; }
+.library-tabs button[aria-pressed="true"], .filters button[aria-pressed="true"] { background: #233e65; color: #f1f6ff; }
+a:focus-visible, button:focus-visible { outline-color: #779ee0; }

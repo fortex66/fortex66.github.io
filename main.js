@@ -315,3 +315,16 @@ window.addEventListener("identity-scene-unavailable", () => {
     .querySelectorAll(".game-hud, #boost-toggle, #quality-toggle")
     .forEach((el) => (el.hidden = true));
 });
+
+// Loading and failure states never reuse the profile artwork.
+const loadingPanel = document.querySelector('.scene-loading');
+function showSceneUnavailable() {
+  document.querySelector('#scene-viewport').classList.add('scene-unavailable');
+  loadingPanel.querySelector('strong').textContent = '이 브라우저에서는 3D를 표시할 수 없어요';
+  loadingPanel.querySelector('span:last-child').textContent = '아래 포트폴리오 버튼으로 모든 내용을 볼 수 있습니다.';
+}
+window.addEventListener('identity-scene-unavailable', showSceneUnavailable);
+// Includes a failed module download, not just unsupported WebGL.
+window.setTimeout(() => {
+  if (!document.querySelector('.webgl-ready')) window.dispatchEvent(new Event('identity-scene-unavailable'));
+}, 30000);

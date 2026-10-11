@@ -15,7 +15,12 @@ try {
 } catch {
   window.dispatchEvent(new Event("identity-scene-unavailable"));
 }
-if (renderer) initializeScene();
+if (renderer) {
+  try { initializeScene(); } catch (error) {
+    console.error("Scene initialization failed", error);
+    window.dispatchEvent(new Event("identity-scene-unavailable"));
+  }
+}
 
 function initializeScene() {
   let highQuality = true;
@@ -76,13 +81,13 @@ function initializeScene() {
   pmrem.dispose();
   const root = new THREE.Group();
   scene.add(root);
-  const colors = { ot: 0xe2ac78, it: 0x83cdb9, ai: 0xb6a1e7 };
+  const colors = { ot: 0xe2ac78, it: 0x83b7ff, ai: 0xb6a1e7 };
   const mat = (color, metalness = 0.3, roughness = 0.42) =>
     new THREE.MeshStandardMaterial({ color, metalness, roughness });
-  const dark = mat(0x21363b, 0.6);
-  const highlightedPad = mat(0x65756b, 0.15, 0.7);
+  const dark = mat(0x202a3b, 0.6);
+  const highlightedPad = mat(0x526885, 0.15, 0.7);
   const bronze = mat(colors.ot, 0.5);
-  const mint = mat(0x4b978b, 0.5);
+  const mint = mat(0x477cbc, 0.5);
   const metal = mat(0xc2d1d2, 0.7);
   const glow = (color) =>
     new THREE.MeshStandardMaterial({
@@ -770,7 +775,7 @@ function initializeScene() {
   terminal.position.set(4.45, 0, 2);
   root.add(terminal);
   const terminalBase = box(terminal, 0.85, 0.14, 0.8, dark, 0, -0.02, 0);
-  edge(terminalBase, 0xb0e4d2);
+  edge(terminalBase, 0x94beff);
   box(terminal, 0.22, 0.65, 0.22, metal, 0, 0.32, 0);
   const terminalScreen = box(
     terminal,
@@ -783,14 +788,14 @@ function initializeScene() {
     0,
   );
   terminalScreen.rotation.x = -0.2;
-  edge(terminalScreen, 0xb0e4d2);
+  edge(terminalScreen, 0x94beff);
   for (let i = 0; i < 3; i++)
     box(
       terminal,
       0.46 - i * 0.08,
       0.025,
       0.02,
-      glow(0xb0e4d2),
+      glow(0x94beff),
       -0.06,
       0.97 - i * 0.1,
       0.1,
@@ -804,7 +809,7 @@ function initializeScene() {
   floor.material.transparent = true;
   floor.material.opacity = 0.18;
   root.add(floor);
-  const routeMaterial = glow(0x426e5c);
+  const routeMaterial = glow(0x395f97);
   // Illuminated corridor: the front of each station is a clear walking route.
   for (let x = -4.3; x <= 4.3; x += 0.32)
     box(root, 0.1, 0.025, 0.08, routeMaterial, x, -0.13, 2.7);
@@ -865,7 +870,7 @@ function initializeScene() {
   explorer.add(shadow);
   const targetRing = new THREE.Mesh(
     new THREE.TorusGeometry(0.23, 0.012, 8, 36),
-    glow(0xb0e4d2),
+    glow(0x94beff),
   );
   targetRing.rotation.x = Math.PI / 2;
   targetRing.position.y = -0.1;
@@ -942,6 +947,7 @@ function initializeScene() {
   const markers = [...document.querySelectorAll("[data-destination]")];
   const interact = document.querySelector("#world-interact");
   const startUI = document.querySelector(".world-start");
+  startUI.classList.add("is-started");
   const destinations = Object.fromEntries(
     Object.entries(positions).map(([id, p]) => [
       id,
@@ -957,7 +963,7 @@ function initializeScene() {
     previous = 0,
     autopilot = null,
     nearby = null,
-    started = false,
+    started = true,
     walkTime = 0;
   const raycaster = new THREE.Raycaster(),
     pointer = new THREE.Vector2();
@@ -1003,7 +1009,7 @@ function initializeScene() {
       const marker = markers.find((m) => m.dataset.destination === id);
       marker.style.left = `${(p.x + 1) * 0.5 * container.clientWidth}px`;
       const projectedY = (1 - p.y) * 0.5 * container.clientHeight;
-      marker.style.top = `${innerWidth < 650 ? Math.max(265, projectedY) : projectedY}px`;
+      marker.style.top = `${innerWidth < 650 ? Math.max(170, projectedY) : projectedY}px`;
       marker.classList.add("positioned");
       marker.hidden = Math.abs(p.x) > 0.78 || p.y > 1 || p.y < -0.75;
     });
@@ -1033,8 +1039,8 @@ function initializeScene() {
     pads[id].children[0].material = highlightedPad;
     beacons[id].material.emissiveIntensity = 1.8;
     if (visited.size === 3) {
-      routeMaterial.color.setHex(0xb0e4d2);
-      routeMaterial.emissive.setHex(0x70c39e);
+      routeMaterial.color.setHex(0x94beff);
+      routeMaterial.emissive.setHex(0x668eff);
       coreMat.opacity = 0.45;
     }
     document
@@ -1068,6 +1074,7 @@ function initializeScene() {
     }
   }
   function begin() {
+    document.querySelector(".play-guide").removeAttribute("open");
     started = true;
     startUI.classList.add("is-started");
     canvas.focus({ preventScroll: true });
@@ -1238,7 +1245,8 @@ function initializeScene() {
     render();
     if (!paused || hasInput()) wake();
   }
-  canvas.addEventListener("keydown", (event) => {
+  document.addEventListener("keydown", (event) => {
+    if (!focusable() || event.target.closest("button, input, textarea, select, summary, a")) return;
     const key = event.key.toLowerCase();
     if (
       [
@@ -1369,11 +1377,11 @@ function initializeScene() {
     targetRing.visible = false;
     explorer.position.set(0, -0.1, 3.5);
     explorer.rotation.y = 0;
-    started = false;
-    startUI.classList.remove("is-started");
+    started = true;
+    startUI.classList.add("is-started");
     coreMat.opacity = 0.25;
-    routeMaterial.color.setHex(0x426e5c);
-    routeMaterial.emissive.setHex(0x426e5c);
+    routeMaterial.color.setHex(0x395f97);
+    routeMaterial.emissive.setHex(0x395f97);
     Object.values(pads).forEach((p) => (p.children[0].material = dark));
     Object.values(beacons).forEach((b) => (b.material.emissiveIntensity = 0.6));
     nearby = undefined;

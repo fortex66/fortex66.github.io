@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#10181d" />
+    <meta name="theme-color" content="#080d18" />
     <meta name="author" content="Eonsang Son" />
     <meta
       name="description"
@@ -21,10 +21,10 @@
     <meta property="og:url" content="https://fortex66.github.io/" />
     <title>Eonsang Son — Manufacturing Software Engineer</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./main-62f7684103bb.css" />
+    <link rel="stylesheet" href="./main-a1c7e26dc031.css" />
     <script defer src="./data-16697dca69e7.js"></script>
-    <script defer src="./main-28d3f1093aac.js"></script>
-    <script type="module" src="./scene-87d17dd6dc1c.js"></script>
+    <script defer src="./main-2140aa651574.js"></script>
+    <script type="module" src="./scene-94c35b7a0e86.js"></script>
   </head>
   <body>
     <a class="skip-link" href="#world-terminal">안내 단말로 바로 가기</a>
@@ -33,15 +33,15 @@
         <div class="shell hero-grid">
           <div class="world-intro">
             <p class="eyebrow">EONSANG SON / 손언상</p>
-            <h1 id="hero-title">Engineering Island<span>OT × IT × AI</span></h1>
+            <h1 id="hero-title">Engineering Island</h1>
             <p class="hero-description">
-              현장과 소프트웨어, 지능을 연결합니다.
+              손언상의 포트폴리오 · OT / IT / AI
             </p>
           </div>
           <div class="world-experience">
             <div class="scene-topline">
               <span class="mono"
-                >ENGINEERING ISLAND / INTERACTIVE PORTFOLIO</span
+                >EONSANG SON / PLAYABLE PORTFOLIO</span
               ><button id="quality-toggle" type="button" aria-pressed="true">
                 화질 · 고화질</button
               ><button
@@ -54,11 +54,16 @@
               </button>
             </div>
             <div class="scene-viewport" id="scene-viewport">
-              <img
-                class="scene-fallback"
-                src="./assets/scene-fallback.svg"
-                alt="Equipment, Data, Intelligence를 연결하는 엔지니어링 구조도"
-              />
+              <div class="scene-loading" role="status">
+                <span class="loading-orbit" aria-hidden="true"></span>
+                <strong>탐험 공간을 준비하고 있어요</strong>
+                <span>준비되면 바로 움직일 수 있습니다.</span>
+              </div>
+              <details class="play-guide" open>
+                <summary>플레이 방법 <span>?</span></summary>
+                <p>바닥을 클릭·탭해서 이동하세요.<br/>OT · IT · AI를 연결하면 프로젝트가 열립니다.</p>
+                <div><kbd>WASD</kbd> / 방향키 이동 · <kbd>E</kbd> 연결</div>
+              </details>
               <canvas
                 id="identity-canvas"
                 tabindex="0"
@@ -81,7 +86,7 @@
                 type="button"
                 aria-label="Equipment 구역으로 이동"
               >
-                <small>01 / OT</small>Equipment <span>↗</span>
+                <small>OT</small>로봇 <span>↗</span>
               </button>
               <button
                 class="world-marker"
@@ -89,7 +94,7 @@
                 type="button"
                 aria-label="Data 구역으로 이동"
               >
-                <small>02 / IT</small>Data <span>↗</span>
+                <small>IT</small>서버 <span>↗</span>
               </button>
               <button
                 class="world-marker"
@@ -97,7 +102,7 @@
                 type="button"
                 aria-label="Intelligence 구역으로 이동"
               >
-                <small>03 / AI</small>Intelligence <span>↗</span>
+                <small>AI</small>워크스테이션 <span>↗</span>
               </button>
               <button
                 class="world-marker terminal-marker"
@@ -105,7 +110,7 @@
                 type="button"
                 aria-label="안내 단말로 이동"
               >
-                <small>PORTFOLIO / INFO</small>안내 단말 <span>↗</span>
+                <small>INFO</small>포트폴리오 <span>↗</span>
               </button>
               <aside class="game-hud" aria-label="탐험 점수">
                 <span class="eyebrow" id="game-rank">EXPLORER</span>
@@ -187,10 +192,9 @@
             </div>
             <div class="world-toolbar">
               <p id="world-controls">
-                <kbd>W A S D</kbd> / <kbd>↑ ↓ ← →</kbd> 이동 <span>·</span>
-                <kbd>E</kbd> / <kbd>Enter</kbd> 연결
+                클릭·탭 이동 <span>·</span> 구역을 누르면 자동 이동
               </p>
-              <button id="world-terminal" type="button">안내 단말 ↗</button
+              <button id="world-terminal" type="button">포트폴리오 ↗</button
               ><button id="world-reset" type="button">Reset ↺</button>
             </div>
             <div class="scene-tabs" role="group" aria-label="구역 바로 탐험">
