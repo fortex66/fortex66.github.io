@@ -1,4 +1,5 @@
 import os
+import re
 from playwright.sync_api import sync_playwright
 from pathlib import Path
 out=Path(os.environ.get('SCREENSHOT_DIR','/tmp/showcase-qa'));out.mkdir(exist_ok=True)
@@ -8,7 +9,7 @@ with sync_playwright() as p:
  page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(os.environ.get('PORTFOLIO_URL','http://localhost:4173'),wait_until='networkidle');page.wait_for_selector('.webgl-ready');page.screenshot(path=str(out/'desktop.png'))
  for view in ['ot','it','ai']:
-  page.locator(f'[data-view="{view}"]').click();page.wait_for_timeout(500)
+  page.locator(f'[data-view="{view}"]').click();page.wait_for_function(f"document.querySelector('[data-view=\"{view}\"]').getAttribute('aria-current')==='true'",timeout=15000)
   assert page.locator(f'[data-view="{view}"]').get_attribute('aria-current')=='true'
  page.screenshot(path=str(out/'ai.png'))
  page.locator('#chapter-ai [data-open-library]').click();assert page.locator('#projects').is_visible();assert page.locator('.archive-item').count()==2
@@ -19,6 +20,9 @@ with sync_playwright() as p:
  page.locator('#motion-toggle').click();assert page.locator('#motion-toggle').get_attribute('aria-pressed')=='false'
  page.locator('#motion-toggle').click();assert page.locator('#motion-toggle').get_attribute('aria-pressed')=='true'
  page.goto(os.environ.get('PORTFOLIO_URL','http://localhost:4173')+'/#experience',wait_until='networkidle');assert page.locator('#experience').is_visible()
+ for section in ['identity','projects','experience','contact']:
+  page.locator(f'[data-library="{section}"]').click()
+  assert not re.search(r'[가-힣]',page.locator('#library-dialog').inner_text()),section
  page.close()
  page=b.new_page(viewport={'width':390,'height':844})
  page.add_init_script("const g=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(t,...a){return t.startsWith('webgl')?null:g.call(this,t,...a)}")
@@ -26,5 +30,9 @@ with sync_playwright() as p:
  assert not page.locator('#motion-toggle').is_visible()
  page.locator('.showcase-nav [data-open-library="projects"]').click();assert page.locator('.archive-item').count()==11
  page.locator('.archive-item').first.click();assert page.locator('#project-dialog').evaluate('e=>e.open')
+ assert page.locator('html').get_attribute('lang') == 'en'
+ assert not re.search(r'[가-힣]',page.locator('body').inner_text())
+ for project in page.evaluate('window.portfolioProjects'):
+  assert not re.search(r'[가-힣]',str(project)),project['id']
  assert not errors,errors
- b.close();print('PASS showcase navigation, filtered archive, nested dialogs, responsive widths; no JS errors')
+ b.close();print('PASS showcase navigation, filtered archive, nested dialogs, responsive widths, English interface and all 11 project records; no JS errors')

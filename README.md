@@ -33,3 +33,9 @@ CHROMIUM_PATH=/usr/bin/chromium python3 tests/showcase.py
 ```
 
 `PORTFOLIO_URL` overrides the preview URL. `SCREENSHOT_DIR` selects screenshot output. Checks cover chapter navigation, project filters and dialogs, responsive layouts, reduced motion, motion controls, direct section links, and WebGL fallback.
+
+## Visual direction
+
+The studio uses thin machined plinths, coated-metal robot castings, glass rack panels, fine mounting details, and local studio environment reflections. All geometry and material textures are generated locally; no external model or HDR downloads are required. English is used throughout the interface and project descriptions. Original project recordings are preserved and can contain Korean source interfaces.
+
+Reference review: [Sanghoon Lee](https://hun0130.github.io/) for a clear professional identity, [Lusion](https://lusion.co/) for visual storytelling, and [Robin Payot](https://robinpayot.com/) for a portfolio centered on a 3D experience. These informed the direction; their assets, content, and implementations are not reused.

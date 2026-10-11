@@ -17,14 +17,14 @@ function openProject(id) {
   const project = projects.find((p) => p.id === id);
   if (!project) return;
   previousFocus = document.activeElement;
-  content.innerHTML = `<p class="eyebrow">${escapeHTML(project.label)}</p><h2 id="dialog-title">${escapeHTML(project.title)}</h2><p class="dialog-summary">${escapeHTML(project.summary)}</p>${flowMarkup(project.flow)}<p class="project-detail">${escapeHTML(project.details)}</p><dl class="project-facts"><div><dt>ROLE</dt><dd>${escapeHTML(project.role)}</dd></div><div><dt>TOOLS</dt><dd>${project.stack.map(escapeHTML).join(" · ")}</dd></div>${project.status ? `<div><dt>STATUS</dt><dd>${escapeHTML(project.status)}</dd></div>` : ""}</dl><div class="dialog-links">${(project.links || []).map((link) => `<a class="button button-dark" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(link.label)} ↗</a>`).join("")}</div>${project.demo ? '<div class="demo-area"><button type="button" class="demo-button text-link">기존 프로젝트 데모 보기 ↓</button><p class="demo-note">실제 프로젝트 기록 · 애니메이션 이미지가 로드됩니다.</p></div>' : ""}`;
+  content.innerHTML = `<p class="eyebrow">${escapeHTML(project.label)}</p><h2 id="dialog-title">${escapeHTML(project.title)}</h2><p class="dialog-summary">${escapeHTML(project.summary)}</p>${flowMarkup(project.flow)}<p class="project-detail">${escapeHTML(project.details)}</p><dl class="project-facts"><div><dt>ROLE</dt><dd>${escapeHTML(project.role)}</dd></div><div><dt>TOOLS</dt><dd>${project.stack.map(escapeHTML).join(" · ")}</dd></div>${project.status ? `<div><dt>STATUS</dt><dd>${escapeHTML(project.status)}</dd></div>` : ""}</dl><div class="dialog-links">${(project.links || []).map((link) => `<a class="button button-dark" href="${escapeHTML(link.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(link.label)} ↗</a>`).join("")}</div>${project.demo ? '<div class="demo-area"><button type="button" class="demo-button text-link">View original project recording ↓</button><p class="demo-note">Original project recording. Source interfaces may be in Korean.</p></div>' : ""}`;
   if (project.demo) {
     content.querySelector(".demo-button").addEventListener(
       "click",
       (event) => {
         const image = document.createElement("img");
         image.src = project.demo;
-        image.alt = `${project.title} 프로젝트 실행 화면`;
+        image.alt = `${project.title} project recording`;
         image.className = "project-demo";
         event.currentTarget.replaceWith(image);
       },
@@ -47,7 +47,7 @@ function renderArchive(filter = "all") {
     )
     .join("");
   document.querySelector("#filter-status").textContent =
-    `${visible.length}개 프로젝트 표시`;
+    `${visible.length} projects shown`;
 }
 document.querySelector("#featured-projects").innerHTML = projects
   .filter((p) => p.featured)
@@ -141,8 +141,8 @@ window.addEventListener('scroll', updateChapter, {passive:true});
 window.addEventListener('resize', updateChapter);
 window.addEventListener('showcase-ready', updateChapter);
 window.addEventListener('identity-scene-unavailable', () => {
-  document.querySelector('.scene-loading strong').textContent = '설비 → 소프트웨어 → AI';
-  document.querySelector('.scene-loading > span:last-child').textContent = '3D를 지원하지 않는 환경입니다. 프로젝트 메뉴에서 작업을 살펴보세요.';
+  document.querySelector('.scene-loading strong').textContent = 'Equipment → Software → AI';
+  document.querySelector('.scene-loading > span:last-child').textContent = '3D is unavailable in this browser. Explore my work through the Projects menu.';
   document.querySelector('.loading-orbit').hidden = true;
   document.querySelector('#motion-toggle').hidden = true;
 });
