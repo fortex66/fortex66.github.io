@@ -3448,3 +3448,73 @@ body:has(dialog[open]) { overflow: hidden; }
   .chapter-stack { display: none; }
   .showcase-link { font-size: 12px; margin-top: 10px; }
 }
+
+/* Visual engineering studio: large objects, restrained captions. */
+.showcase-stage { background: radial-gradient(ellipse at 67% 39%,#1c2a41 0%,#0c1423 47%,#080d18 80%); }
+.product-scene { width: 79%; height: 84%; right: -3%; top: 9%; }
+.chapter-copy { width: 26%; max-width: 370px; }
+.chapter-copy h1, .chapter-copy h2 { font-size: clamp(32px,3.05vw,50px); line-height: 1.12; letter-spacing: -.05em; font-weight: 500; }
+.chapter-copy em { color: #a1badd; }
+.chapter-copy .eyebrow { font-size: 9px; letter-spacing: .15em; color: #819bbf; margin-bottom: 24px; }
+.chapter-copy > p:not(.eyebrow) { font-size: 14px; line-height: 1.7; max-width: 230px; margin-top: 22px; }
+.chapter-stack { font-size: 9px; letter-spacing: .04em; }
+.chapter-copy small { font-size: 9px; letter-spacing: .1em; }
+.showcase-link { font-size: 13px; border-color: #43546e; }
+.showcase-dock { gap: 24px; }
+.current-role { font: 9px var(--mono); letter-spacing: .06em; color: #c1ccdc; margin-left: auto; }
+.current-role span { display: block; color: #6e829f; font-size: 9px; line-height: 2; }
+.scene-note { bottom: 8px; font-size: 10px; color: #a3b6d1; }
+.scene-note span { color: #607693; font-size: 8px; }
+.showcase-nav { height: 82px; }
+.showcase-nav nav { gap: 26px; }
+.library-header h2 { letter-spacing: -.035em; }
+@media (max-width: 800px) {
+  .showcase-nav { height: 72px; }
+  .showcase-nav nav { gap: 12px; }
+  .showcase-nav button { font-size: 11px; }
+  .showcase-nav .about-link { display: none; }
+  .product-scene { top: 9%; right: -5%; width: 110%; height: 56%; }
+  .chapter { padding-bottom: 100px; }
+  .chapter-copy { width: 100%; max-width: 360px; }
+  .chapter-copy h1, .chapter-copy h2 { font-size: 32px; }
+  .chapter-copy .eyebrow { margin-bottom: 12px; font-size: 8px; }
+  .chapter-copy > p:not(.eyebrow) { margin-top: 14px; font-size: 13px; max-width: none; }
+  .chapter-stack { margin-top: 10px; }
+  .showcase-link { margin-top: 14px; padding-block: 6px; }
+  .current-role { display: none; }
+  .showcase-dock { gap: 10px; }
+  .showcase-dock a { padding-inline: 10px; }
+  .showcase-dock button { font-size: 10px; white-space: nowrap; }
+}
+@media (max-width: 380px) {
+  .signature { font-size: 16px; }
+  .showcase-nav { padding-inline: 5%; }
+  .showcase-nav nav { gap: 10px; }
+  .showcase-nav button { font-size: 10px; }
+  .chapter-copy h1, .chapter-copy h2 { font-size: 29px; }
+  .chapter { padding-bottom: 90px; }
+  .showcase-dock a { padding-inline: 8px; }
+}
+@media (max-height: 650px) and (min-width: 801px) {
+  .showcase-nav { height: 54px; }
+  .chapter-copy h1, .chapter-copy h2 { font-size: 30px; }
+  .chapter-copy .eyebrow { margin-bottom: 12px; }
+  .chapter-copy > p:not(.eyebrow) { margin-top: 12px; font-size: 12px; }
+  .showcase-link { margin-top: 12px; }
+  .current-role { display: none; }
+}
+@media (max-height: 650px) and (max-width: 800px) {
+  .product-scene { top: 10%; height: 44%; }
+  .chapter-copy h1, .chapter-copy h2 { font-size: 27px; }
+}
+@media (max-height: 500px) and (max-width: 800px) {
+  .showcase-nav { height: 54px; }
+  .product-scene { width: 72%; height: 74%; top: 12%; right: -5%; }
+  .chapter { padding-bottom: 80px; }
+  .chapter-copy { width: 32%; }
+  .chapter-copy h1, .chapter-copy h2 { font-size: 26px; }
+  .chapter-copy > p:not(.eyebrow) { font-size: 12px; }
+}
+html:has(.showcase), body:has(.showcase) { overflow-x: clip; }
+.product-scene { mask-image: linear-gradient(to right,transparent,#000 4%,#000 96%,transparent); }
+@media (max-width: 800px) { .product-scene { mask-image: none; } }
