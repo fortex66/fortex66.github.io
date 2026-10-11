@@ -11,300 +11,72 @@
     />
     <meta
       property="og:title"
-      content="Eonsang Son — An Interactive Portfolio"
+      content="Eonsang Son — The Factory Road"
     />
     <meta
       property="og:description"
-      content="Explore Eonsang Son’s career, industrial software, and applied AI through an interactive 3D portfolio."
+      content="Follow the factory line. Explore Eonsang Son’s industrial software, automation, applied AI, and career."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://fortex66.github.io/" />
     <title>Eonsang Son — Manufacturing Software Engineer</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./main-edeb955eeec1.css" />
+    <link rel="stylesheet" href="./main-eab8c75f769e.css" />
     <script defer src="./data-78ba64376c11.js"></script>
-    <script defer src="./main-b0974e05686f.js"></script>
-    <script type="module" src="./scene-f4d1c1cb3af9.js"></script>
+    <script defer src="./main-336ba3ddb638.js"></script>
+    <script type="module" src="./scene-1f22027b3bcb.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#chapter-title">Skip to current chapter</a>
-    <header class="exhibit-header">
-      <button class="wordmark" data-chapter="0" aria-label="Eonsang Son, introduction">EONSANG SON<span>SOFTWARE ENGINEER</span></button>
-      <nav aria-label="Main navigation">
-        <button id="overview-toggle" aria-expanded="false" aria-controls="overview"><span class="grid-icon" aria-hidden="true">⊞</span> Overview</button>
-        <button data-open-library="projects">Project index <span class="nav-count">11</span></button>
-        <button data-open-library="contact">Contact →</button>
+    <a class="skip-link" href="#list">Skip to project list</a>
+    <header class="site-header">
+      <button class="wordmark" data-mode="road" aria-label="Eonsang Son, return to road">EONSANG SON<span>ENGINEER / DEVELOPER</span></button>
+      <nav aria-label="Portfolio views" class="mode-nav">
+        <button data-mode="road" aria-current="page">ROAD</button>
+        <button data-mode="overview">OVERVIEW</button>
+        <button data-mode="list">LIST</button>
+        <button data-mode="about">ABOUT</button>
       </nav>
     </header>
-    <main class="exhibit" aria-labelledby="chapter-title" data-chapter="0">
-      <div id="scene-viewport" class="exhibit-stage">
-        <span class="object-tooltip" hidden aria-hidden="true"></span>
-        <canvas id="identity-canvas" aria-label="An interactive 3D portfolio of Eonsang Son. Use the chapter navigation, scroll, or swipe to explore his identity, career, and projects."></canvas>
-        <div class="scene-loading" role="status"><span class="loading-orbit" aria-hidden="true"></span><strong>Shaping the story</strong><span>Projects and experience are also available from the menu.</span></div>
-        <div class="scene-fallback" hidden aria-hidden="true">EONSANG<br><span>SON.</span></div>
+    <main id="portfolio" data-mode="road">
+      <h1 class="sr-only">Eonsang Son — Software, automation, and applied AI</h1>
+      <div id="scene-viewport">
+        <canvas id="identity-canvas" aria-label="Three connected factory conveyor loops. Scroll or drag to follow the line. Overview and List provide direct access to every project."></canvas>
+        <div class="scene-loading" role="status"><span></span><p>Preparing the line</p></div>
+        <div class="scene-fallback" hidden><span>THE FACTORY ROAD</span><h2>Software.<br>Built from the field.</h2><p>3D is unavailable. Explore every project in List.</p><button data-mode="list">Open project list →</button></div>
+        <span id="object-tooltip" hidden aria-hidden="true"></span>
       </div>
-      <div class="scene-topline" aria-hidden="true"><span id="scene-category">A PERSONAL PORTFOLIO</span><span>SOFTWARE / AUTOMATION / APPLIED AI</span></div>
-      <article class="chapter-copy" id="chapter-copy">
-        <p class="chapter-kicker" id="chapter-kicker">01 — INTRODUCTION</p>
-        <h1 id="chapter-title" tabindex="-1">Software.<br>With a real-world instinct.</h1>
-        <p id="chapter-summary">I’m Eonsang. I develop software for machines, people, and the space between.</p>
-        <button id="chapter-action" class="chapter-action">Meet the engineer <span>→</span></button>
-      </article>
-      <aside class="chapter-note"><span id="chapter-date">CURRENTLY AT</span><strong id="chapter-note-title">SL Corporation</strong><span id="chapter-note-detail">Production Engineering Center</span></aside>
-      <div class="scene-caption" id="scene-caption">A story in seven scenes.</div>
-      <section id="overview" class="overview" aria-labelledby="overview-title" hidden>
-        <div class="overview-heading"><p class="chapter-kicker">THE WHOLE PICTURE</p><h2 id="overview-title">Choose a chapter.</h2><button id="overview-close" aria-label="Close overview">Close ×</button></div>
-        <div class="overview-grid">
-          <button data-chapter="0"><span>01 / IDENTITY</span><strong>Eonsang Son</strong><small>Software, shaped by the field.</small></button>
-          <button data-chapter="1"><span>02 / EXPERIENCE</span><strong>The path so far</strong><small>Education → software → manufacturing.</small></button>
-          <button data-chapter="2"><span>03 / APPLIED AI</span><strong>PLC AI Studio</strong><small>Context. Reasoning. Human review.</small></button>
-          <button data-chapter="3"><span>04 / INDUSTRIAL WEB</span><strong>Water Treatment</strong><small>From plant data to the browser.</small></button>
-          <button data-chapter="4"><span>05 / AUTOMATION</span><strong>Closer to the machine</strong><small>Control software and factory projects.</small></button>
-          <button data-chapter="5"><span>06 / SELECTED WORK</span><strong>Beyond one discipline</strong><small>Energy, collaboration, and the web.</small></button>
-          <button data-chapter="6"><span>07 / CONTACT</span><strong>Let’s talk</strong><small>Have something in mind?</small></button>
+      <div id="overview-markers" hidden aria-label="Factory project stations"></div>
+      <section id="station-card" aria-labelledby="station-title">
+        <p><span id="station-number">01</span><span id="station-category">AUTOMOTIVE / PROCESS ENGINEERING</span></p>
+        <h2 id="station-title">G90 · GV90 Programs</h2>
+        <button id="station-open">Explore project <span>→</span></button>
+      </section>
+      <section id="list-panel" class="content-panel" aria-labelledby="list-title" hidden>
+        <div class="panel-heading"><h2 id="list-title">Selected work<span> / 11</span></h2><p>2020 — PRESENT</p></div>
+        <div id="project-list" tabindex="-1"></div>
+      </section>
+      <section id="about-panel" class="content-panel" aria-labelledby="about-title" hidden>
+        <div class="about-intro"><p class="eyebrow">ABOUT THE ENGINEER</p><h2 id="about-title">Eonsang<br>Son.</h2><p class="about-role">Software engineer.<br>Robotics. Automation. Applied AI.</p><p class="about-description">I build software with an understanding of the machines it runs on and the people who use it.</p></div>
+        <div class="about-details">
+          <div class="career-row"><span>2025.07 — PRESENT</span><div><h3>SL Corporation</h3><p>Production Engineering Center</p></div></div>
+          <div class="career-row"><span>2020.10 — 2023.06</span><div><h3>Automation Company</h3><p>Software Developer</p></div></div>
+          <div class="career-row"><span>2018.03 — 2025.02</span><div><h3>Bachelor’s Degree</h3><p>Computer Science</p></div></div>
+          <div class="about-recognition"><span>RECOGNITION</span><p>Korea Information Industry Association Award<br><small>ICT Mentoring Program · JourneyMate · 2023</small></p></div>
+          <div class="about-recognition"><span>CREDENTIALS</span><p>Engineer Information Processing · SQLD<br><small>Computer Specialist in Spreadsheet & Database · Level 1</small></p></div>
+          <div class="about-contact"><a href="mailto:fortex66@naver.com">Email →</a><a href="https://github.com/fortex66" target="_blank" rel="noopener noreferrer">GitHub →</a><a href="https://fortex66.tistory.com/" target="_blank" rel="noopener noreferrer">Journal →</a></div>
         </div>
       </section>
-      <p id="chapter-status" class="sr-only" aria-live="polite"></p>
+      <p id="road-status" class="sr-only" aria-live="polite"></p>
     </main>
-    <footer class="exhibit-footer">
-      <div class="explore-hint"><span class="scroll-symbol" aria-hidden="true">↓</span><span>Scroll or drag to explore<small>Arrow keys work, too.</small></span></div>
-      <nav class="chapter-nav" aria-label="3D portfolio chapters">
-        <button id="previous-chapter" aria-label="Previous chapter">←</button>
-        <div class="chapter-dots">
-          <button data-chapter="0" aria-label="1. Introduction" aria-current="step"><span>01</span></button>
-          <button data-chapter="1" aria-label="2. Experience"><span>02</span></button>
-          <button data-chapter="2" aria-label="3. PLC AI Studio"><span>03</span></button>
-          <button data-chapter="3" aria-label="4. Water Treatment SCADA"><span>04</span></button>
-          <button data-chapter="4" aria-label="5. Automation"><span>05</span></button>
-          <button data-chapter="5" aria-label="6. Selected work"><span>06</span></button>
-          <button data-chapter="6" aria-label="7. Contact"><span>07</span></button>
-        </div>
-        <button id="next-chapter" aria-label="Next chapter">→</button>
-      </nav>
-      <button id="motion-toggle" aria-pressed="false">Pause motion</button>
+    <footer class="road-footer">
+      <span id="interaction-hint">Scroll to follow the line <span>↓</span></span>
+      <div class="road-scrubber"><span id="road-position">01 / 11</span><input id="road-progress" type="range" min="0" max="1000" value="0" aria-label="Position along the factory road" /></div>
+      <button id="motion-toggle" aria-pressed="false" aria-label="Pause ambient motion">Motion on <span>◌</span></button>
     </footer>
-    <dialog id="library-dialog" aria-labelledby="library-title">
-      <div class="library-header">
-        <div>
-          <p class="eyebrow">EONSANG SON / PORTFOLIO</p>
-          <h2 id="library-title">Selected work & background</h2>
-        </div>
-        <button
-          type="button"
-          id="library-close"
-          aria-label="Close portfolio"
-        >
-          Close ×
-        </button>
-      </div>
-      <nav class="library-tabs" aria-label="Portfolio sections">
-        <button type="button" data-library="identity" aria-pressed="true">
-          Identity</button
-        ><button type="button" data-library="projects" aria-pressed="false">
-          Projects</button
-        ><button type="button" data-library="experience" aria-pressed="false">
-          Experience</button
-        ><button type="button" data-library="contact" aria-pressed="false">
-          Contact
-        </button>
-      </nav>
-      <div class="library-body">
-        <section
-          class="identity-section section shell"
-          id="identity"
-          hidden
-          aria-labelledby="identity-title"
-        >
-          <div class="section-heading">
-            <p class="eyebrow">01 / ENGINEERING IDENTITY</p>
-            <h2 id="identity-title">
-              Robotic automation. Manufacturing software.<br /><span
-                >Applied AI for the factory floor.</span
-              >
-            </h2>
-          </div>
-          <div class="identity-grid">
-            <p class="identity-summary">
-              My work spans robotic automation, industrial control, embedded software, and factory monitoring. I bring that production experience to AI-assisted engineering tools, including PLC program analysis and review.
-            </p>
-            <div class="capabilities">
-              <article>
-                <span class="layer-number">01</span>
-                <div>
-                  <h3>Robotic Automation</h3>
-                  <p>PLC · LabVIEW · Robotics · Vision</p>
-                </div>
-              </article>
-              <article>
-                <span class="layer-number">02</span>
-                <div>
-                  <h3>Factory Software</h3>
-                  <p>Python · C++ / Qt · React · Node.js · SQL</p>
-                </div>
-              </article>
-              <article>
-                <span class="layer-number">03</span>
-                <div>
-                  <h3>Applied Manufacturing AI</h3>
-                  <p>Local LLM · Tool calling · Rule-based validation</p>
-                </div>
-              </article>
-            </div>
-          </div>
-          <div class="research-note">
-            <span class="eyebrow">RESEARCH DIRECTION</span>
-            <p>Knowledge-guided manufacturing AI</p>
-            <span
-              >Process knowledge + data + engineering constraints → human decision support</span
-            >
-          </div>
-        </section>
-        <section
-          class="work-section section"
-          id="projects"
-          hidden
-          aria-labelledby="projects-title"
-        >
-          <div class="shell">
-            <div class="section-heading heading-row">
-              <div>
-                <p class="eyebrow">02 / SELECTED WORK & PROJECT ARCHIVE</p>
-                <h2 id="projects-title">
-                  Software built<br />from the field.
-                </h2>
-              </div>
-              <p class="section-aside">
-                Industrial automation to manufacturing AI. Select a project to see the system and my role.
-              </p>
-            </div>
-            <div class="archive-heading">
-              <h3>Project archive <span id="project-count"></span></h3>
-              <div class="filters" role="group" aria-label="Filter projects">
-                <button type="button" data-filter="all" aria-pressed="true">
-                  All</button
-                ><button type="button" data-filter="ai" aria-pressed="false">
-                  AI</button
-                ><button
-                  type="button"
-                  data-filter="industrial"
-                  aria-pressed="false"
-                >
-                  Industrial</button
-                ><button
-                  type="button"
-                  data-filter="software"
-                  aria-pressed="false"
-                >
-                  Software
-                </button>
-              </div>
-            </div>
-            <div id="project-archive" class="project-archive"></div>
-            <p id="filter-status" class="sr-only" aria-live="polite"></p>
-          </div>
-        </section>
-        <section
-          class="experience-section section shell"
-          id="experience"
-          hidden
-          aria-labelledby="experience-title"
-        >
-          <div class="section-heading">
-            <p class="eyebrow">03 / EXPERIENCE & EDUCATION</p>
-            <h2 id="experience-title">Built on the field.</h2>
-          </div>
-          <div class="experience-grid">
-            <article>
-              <p class="eyebrow">CURRENT</p>
-              <h3>SL Corporation</h3>
-              <p class="experience-role">Production Engineering Center</p>
-              <p class="mono">2025.07 — PRESENT</p>
-              <p class="experience-detail">
-                Manufacturing process improvement, industrial system integration, and AI-assisted control-program analysis.
-              </p>
-            </article>
-            <article>
-              <p class="eyebrow">PREVIOUS</p>
-              <h3>Automation Company</h3>
-              <p class="experience-role">Software Developer</p>
-              <p class="mono">2020.10 — 2023.06</p>
-              <p class="experience-detail">
-                Industrial embedded controllers and real-time equipment monitoring software.
-              </p>
-            </article>
-            <article>
-              <p class="eyebrow">EDUCATION</p>
-              <h3>Bachelor’s Degree</h3>
-              <p class="experience-role">Computer Science</p>
-              <p class="mono">2018.03 — 2025.02</p>
-              <p class="experience-detail">
-                Graduation project: EV battery thermal management and charging control.
-              </p>
-            </article>
-          </div>
-          <div class="credentials">
-            <div>
-              <span class="eyebrow">RECOGNITION</span>
-              <p>Korea Information Industry Association Award</p>
-              <span>ICT Mentoring Program · Dec. 2023 / JourneyMate</span>
-            </div>
-            <div>
-              <span class="eyebrow">CERTIFICATIONS</span>
-              <p>Engineer Information Processing · SQLD</p>
-              <span
-                >Computer Specialist in Spreadsheet & Database · Level 1</span
-              >
-            </div>
-          </div>
-        </section>
-        <footer class="contact-section" id="contact" hidden>
-          <div class="shell">
-            <p class="eyebrow">04 / LET’S CONNECT</p>
-            <h2>Build the next process<br /><span>with me.</span></h2>
-            <div class="contact-links">
-              <a href="mailto:fortex66@naver.com"
-                >Email <span>fortex66@naver.com →</span></a
-              ><a
-                href="https://github.com/fortex66"
-                target="_blank"
-                rel="noopener noreferrer"
-                >GitHub <span>fortex66 →</span></a
-              ><a
-                href="https://fortex66.tistory.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Tech Blog <span>fortex66.tistory.com →</span></a
-              >
-            </div>
-            <div class="footer-bottom">
-              <span>Eonsang Son</span
-              ><span class="mono">ROBOTICS. AUTOMATION. APPLIED AI.</span
-              ><button type="button" data-return-world>
-                Back to the experience →
-              </button>
-            </div>
-          </div>
-        </footer>
-      </div>
-    </dialog>
     <dialog id="project-dialog" aria-labelledby="dialog-title">
-      <div class="dialog-top">
-        <span class="eyebrow">PROJECT NOTES</span
-        ><button
-          class="dialog-close"
-          type="button"
-          aria-label="Close project details"
-        >
-          Close ×
-        </button>
-      </div>
+      <div class="dialog-top"><span id="dialog-index">PROJECT / 01</span><button class="dialog-close" aria-label="Close project details">Close ×</button></div>
       <div id="dialog-content"></div>
     </dialog>
-    <noscript
-      ><p class="noscript-notice">
-        The project archive and interactive 3D require JavaScript.
-        <a href="https://github.com/fortex66">View projects on GitHub</a>
-      </p></noscript
-    >
+    <noscript><p class="noscript-notice">The interactive portfolio requires JavaScript. <a href="https://github.com/fortex66">View projects on GitHub →</a></p></noscript>
   </body>
 </html>
