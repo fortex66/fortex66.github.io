@@ -10,6 +10,7 @@ url=os.environ.get('PORTFOLIO_URL','http://localhost:4173')
 with sync_playwright() as p:
     browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH'),args=['--no-sandbox','--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
     page=browser.new_page(viewport={'width':1440,'height':900},reduced_motion='reduce')
+    page.set_default_timeout(120000)  # Allow software WebGL shader compilation in CI.
     errors,images=[],[]
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:images.append(r.url) if re.search(r'\.(gif|webp|png|jpg)(\?|$)',r.url) else None)
