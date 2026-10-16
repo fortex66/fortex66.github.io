@@ -122,7 +122,7 @@ function createFactory(){
   const carrier=new THREE.Group();scene.add(carrier);rounded(carrier,.76,.12,.66,graphite,0,.13,0);rounded(carrier,.48,.28,.4,white,0,.32,0);box(carrier,.22,.015,.1,glow,0,.47,0);
 
   function platform(spec,index){
-    const group=new THREE.Group();group.position.copy(spec.point).addScaledVector(spec.normal,3.25);group.position.y=.06;group.rotation.y=Math.atan2(-spec.normal.x,-spec.normal.z);scene.add(group);
+    const group=new THREE.Group();group.name=`station-${stops[index].id}`;group.userData.stopIndex=index;group.position.copy(spec.point).addScaledVector(spec.normal,3.25);group.position.y=.06;group.rotation.y=Math.atan2(-spec.normal.x,-spec.normal.z);scene.add(group);
     rounded(group,4.5,.18,3.4,graphite,0,.05,0,.07);
     rounded(group,4.36,.025,3.26,standard(0x63717b,.5,.5),0,.15,0,.04);
     box(group,3.9,.014,.022,cobalt,0,.18,1.42);
@@ -138,8 +138,8 @@ function createFactory(){
     box(g,width-.22,.06,.15,steel,0,.48,.45);for(let i=0;i<6;i++)box(g,.1,.08,.12,cobalt,-width*.28+i*width*.11,.36,.45);
     screen(g,'CONTROL','PLC / I-O',width*.7,width*.34,0,1.7,.47);return g;
   }
-  function robot(parent,x,z,scale=1){
-    const g=new THREE.Group();g.position.set(x,.22,z);g.scale.setScalar(scale);parent.add(g);
+  function robot(parent,x,z,scale=1,options={}){
+    const g=new THREE.Group();g.name=options.name||'industrial-robot';g.userData.role=options.tool||'gripper';g.position.set(x,.22,z);g.scale.setScalar(scale);g.rotation.y=options.yaw||0;parent.add(g);
     cylinder(g,.49,.15,graphite,0,.07,0);cylinder(g,.33,.49,white,0,.35,0);const arm=new THREE.Group();arm.position.y=.64;g.add(arm);
     const p=[new THREE.Vector3(0,0,0),new THREE.Vector3(-.35,.95,0),new THREE.Vector3(.42,1.66,0),new THREE.Vector3(1.14,1,.08)];
     for(let i=0;i<3;i++){
@@ -149,8 +149,19 @@ function createFactory(){
       const seal=ring(arm,.12-i*.015,.014,amber,p[i].x,p[i].y,.22);
     }
     tube(arm,[[.12,-.1,-.2],[-.53,.75,-.23],[-.42,1.08,-.18],[.26,1.83,-.15],[.9,1.42,-.15],[1.14,1,.05]],.038,black);
-    rounded(arm,.26,.18,.23,graphite,1.14,.87,.08);box(arm,.035,.23,.11,steel,1.05,.67,.08);box(arm,.035,.23,.11,steel,1.23,.67,.08);
-    animations.push(t=>arm.rotation.y=Math.sin(t*.45+x)*.13);return g;
+    rounded(arm,.26,.18,.23,graphite,1.14,.87,.08);
+    if(options.tool==='dispenser'){
+      cylinder(arm,.065,.34,steel,1.14,.61,.08);cylinder(arm,.025,.16,amber,1.14,.36,.08);
+      const strand=cylinder(arm,.012,.08,glow,1.14,.24,.08);strand.name='dispensing-stream';
+      tube(arm,[[0,.1,-.2],[-.45,1,-.25],[.3,1.9,-.2],[1.1,1.2,-.12],[1.14,.75,.08]],.028,cobalt);
+    }else{
+      box(arm,.035,.23,.11,steel,1.05,.67,.08);box(arm,.035,.23,.11,steel,1.23,.67,.08);
+      if(options.tool==='vision'){
+        const camera=sensor(arm,1.14,.89,.32);camera.rotation.x=Math.PI/2;camera.scale.setScalar(.55);
+        const optic=ring(arm,.13,.018,glow,1.14,.53,.08);optic.rotation.x=Math.PI/2;
+      }
+    }
+    animateStation(parent,t=>{arm.rotation.y=options.sweep?options.sweep(t):Math.sin(t*.45+(options.phase??x))*.13;});return g;
   }
   function gantry(parent){
     for(const x of [-1.75,1.75])column(parent,x,.21,-.8,2.7);
@@ -175,7 +186,7 @@ function createFactory(){
   }
   function headlamp(parent){
     // An original, generic automotive lamp: tapered housing, optics and twin DRLs.
-    const lamp=new THREE.Group();lamp.name='automotive-headlamp';lamp.position.set(.78,1.62,.4);parent.add(lamp);
+    const lamp=new THREE.Group();lamp.name='automotive-headlamp';lamp.position.set(0,1.62,.15);parent.add(lamp);
     const outline=new THREE.Shape();outline.moveTo(-1.1,-.37);outline.lineTo(.84,-.32);outline.quadraticCurveTo(1.15,-.27,1.18,-.05);outline.lineTo(.98,.29);outline.quadraticCurveTo(.88,.4,.68,.4);outline.lineTo(-1.06,.34);outline.quadraticCurveTo(-1.18,.28,-1.1,-.37);
     const housingGeometry=new THREE.ExtrudeGeometry(outline,{depth:.34,bevelEnabled:true,bevelThickness:.045,bevelSize:.04,bevelSegments:3,curveSegments:16,steps:1});housingGeometry.translate(0,0,-.2);
     mesh(lamp,housingGeometry,graphite);
@@ -193,6 +204,18 @@ function createFactory(){
     const glass=new THREE.MeshPhysicalMaterial({color:0xc4e5f4,metalness:.08,roughness:.08,transparent:true,opacity:.13,clearcoat:1,side:THREE.DoubleSide,depthWrite:false});
     const cover=mesh(lamp,new THREE.ShapeGeometry(outline),glass,0,0,.41);cover.castShadow=false;
     for(const x of [-.75,.65]){box(lamp,.13,.18,.15,steel,x,-.46,0);cylinder(lamp,.035,.07,black,x,-.37,.22).rotation.x=Math.PI/2;}
+    const beamFade=texture((c,w,h)=>{
+      const gradient=c.createLinearGradient(0,0,0,h);
+      gradient.addColorStop(0,'#dddddd');gradient.addColorStop(.35,'#666666');gradient.addColorStop(1,'#000000');
+      c.fillStyle=gradient;c.fillRect(0,0,w,h);
+    },32,128);beamFade.colorSpace=THREE.NoColorSpace;
+    const beamMaterial=new THREE.MeshBasicMaterial({color:0xb5dfff,alphaMap:beamFade,transparent:true,opacity:.09,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,depthWrite:false});
+    for(const x of [-.69,-.08,.53]){
+      const beam=mesh(lamp,new THREE.ConeGeometry(.34,1.6,24,1,true),beamMaterial,x,0,1.21);
+      beam.name='headlamp-beam';beam.rotation.x=-Math.PI/2;beam.castShadow=false;beam.receiveShadow=false;
+    }
+    const spill=new THREE.PointLight(0xb8dfff,2.2,4,2);spill.position.set(0,0,.65);lamp.add(spill);
+    animateStation(parent,t=>{const intensity=.9+Math.sin(t*.9)*.1;led.emissiveIntensity=2.6*intensity;beamMaterial.opacity=.1*intensity;spill.intensity=2.2*intensity;});
     return lamp;
   }
   function llmMonitoring(parent){
@@ -242,26 +265,217 @@ function createFactory(){
     column(cell,1.73,.2,-2.05,2.4);cylinder(cell,.075,.13,glow,1.73,2.7,-2.05);cylinder(cell,.075,.13,amber,1.73,2.54,-2.05);
     tube(cell,[[-1,.5,-1.63],[-1.2,.26,-1.24],[-1.2,.26,-.8],[-1,.43,-.55]],.034,black);
   }
+  // Update only nearby stations in Road mode. Texture redraws are capped at 10 Hz.
+  function animateStation(station,update){
+    animations.push(t=>{if(mode==='overview'||Math.abs(current-positions[station.userData.stopIndex])<.065)update(t);});
+  }
+  function statusMaterial(color){return new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.7,roughness:.35});}
+  const aqua=statusMaterial(0x59cbdc),green=statusMaterial(0x6dcca3),copper=standard(0xbd8054,.7,.3);
+  function dataLink(station,name,points,material=aqua,bidirectional=false){
+    const path=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p)));
+    const cable=mesh(station,new THREE.TubeGeometry(path,32,.023,6,false),graphite);cable.name=name;
+    const packets=[sphere(station,.05,material),sphere(station,.05,material)];
+    packets.forEach(p=>{p.castShadow=false;p.name=`${name}-packet`;});
+    const point=new THREE.Vector3();
+    const update=t=>packets.forEach((packet,i)=>{
+      let u=(t*.22+i*.5)%1;if(bidirectional&&i)u=1-u;
+      path.getPointAt(u,point);packet.position.copy(point);
+    });update(0);animateStation(station,update);return cable;
+  }
+  function dashboard(station,name,title,paint,{x=0,y=2,z=-.8,w=2.6,h=1.5}={}){
+    const panel=new THREE.Group();panel.name=name;panel.position.set(x,y,z);station.add(panel);
+    rounded(panel,w+.12,h+.12,.16,graphite,0,0,0,.06);
+    const c=document.createElement('canvas');c.width=1200;c.height=720;const ctx=c.getContext('2d');
+    const map=new THREE.CanvasTexture(c);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),8);
+    mesh(panel,new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map,toneMapped:false}),0,0,.091);
+    const render=t=>{
+      ctx.fillStyle='#091724';ctx.fillRect(0,0,1200,720);
+      ctx.fillStyle='#e0eff8';ctx.font='600 58px Arial';ctx.fillText(title,42,76);
+      ctx.fillStyle='#7798b2';ctx.font='22px monospace';ctx.fillText('ILLUSTRATIVE DATA / LIVE DEMO',44,121);
+      paint(ctx,t);map.needsUpdate=true;
+    };
+    render(0);let lastTime=0;
+    animateStation(station,t=>{if(Math.abs(t-lastTime)<.1)return;lastTime=t;render(t);});
+    return panel;
+  }
+  function chart(ctx,x,y,w,h,t,color='#7cdbed',phase=0){
+    ctx.strokeStyle='#254156';ctx.lineWidth=2;
+    for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(x,y+i*h/3);ctx.lineTo(x+w,y+i*h/3);ctx.stroke();}
+    ctx.strokeStyle=color;ctx.lineWidth=5;ctx.beginPath();
+    for(let i=0;i<64;i++){const px=x+i*w/63,py=y+h*.5+Math.sin(i*.19-t+phase)*h*.23+Math.cos(i*.47+phase)*h*.08;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.stroke();
+  }
+  function fixture(parent,x=0,z=0){
+    rounded(parent,1.25,.44,1.1,white,x,.5,z);rounded(parent,1.4,.12,1.22,steel,x,.8,z);
+    for(const dx of [-.5,.5])for(const dz of [-.4,.4])cylinder(parent,.036,.1,graphite,x+dx,.9,z+dz);
+  }
+  function lampCell(g){
+    g.userData.equipment='dual-robot-headlamp-cell';
+    robot(g,-1.62,-.18,.86,{name:'lamp-robot-left'});
+    robot(g,1.62,-.18,.86,{name:'lamp-robot-right',yaw:Math.PI,phase:1.8});
+    rounded(g,1.95,.48,.95,white,0,.6,.15,.09);rounded(g,1.8,.15,.8,graphite,0,.96,.15);
+    for(const x of [-.64,.64])cylinder(g,.045,.35,steel,x,1.16,.18);
+    headlamp(g);
+    for(const x of [-1.93,1.93])column(g,x,.2,-1.1,2.7);
+    box(g,3.96,.11,.11,aluminum,0,2.9,-1.1);screen(g,'LAMP INSPECTION','DUAL ROBOT CELL',1.4,.42,0,2.65,-1.05);
+  }
+  function visionCell(g){
+    g.userData.equipment='four-direction-vision-and-pick-place';
+    fixture(g,0,0);rounded(g,.66,.14,.48,graphite,0,.97,0);
+    rounded(g,.35,.12,.28,white,0,1.1,0);
+    // The four bases form a compass around the shared alignment fixture.
+    const specs=[['west',-1.65,0,0,'gripper',.72],['east',1.65,0,Math.PI,'gripper',.72],['north',0,-1.2,-Math.PI/2,'vision',.65],['south',0,1.2,Math.PI/2,'vision',.6]];
+    specs.forEach(([direction,x,z,yaw,tool,scale],i)=>robot(g,x,z,scale,{name:`vision-robot-${direction}`,yaw,tool,phase:i*1.6}));
+    for(const x of [-1.55,1.55]){
+      rounded(g,.7,.11,.46,graphite,x,.38,.93);
+      for(const dx of [-.17,.17])rounded(g,.16,.07,.18,white,x+dx,.48,.93);
+    }
+    const optic=ring(g,.27,.02,aqua,0,1.19,0);optic.rotation.x=-Math.PI/2;optic.name='alignment-target';
+    box(g,.54,.008,.018,aqua,0,1.18,0);box(g,.018,.008,.5,aqua,0,1.18,0);
+    const pulse=new THREE.MeshBasicMaterial({color:0x80ddf0,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false});
+    const scan=mesh(g,new THREE.PlaneGeometry(.7,.5),pulse,0,1.24,0);scan.rotation.x=-Math.PI/2;scan.castShadow=false;scan.name='vision-scan';
+    animateStation(g,t=>{scan.position.y=1.22+(Math.sin(t*1.2)+1)*.09;pulse.opacity=.1+(Math.sin(t*1.2)+1)*.06;});
+    for(const x of [-1.6,1.6])column(g,x,.2,-1.5,2.5);
+    box(g,3.3,.09,.09,aluminum,0,2.7,-1.5);
+    screen(g,'PICK & PLACE / ACTIVE ALIGN','FOUR ROBOTS / SHARED FIXTURE',2.6,.47,0,2.43,-1.45);
+  }
+
+  function dispensingCell(g){
+    g.userData.equipment='robot-dispensing-feedback-cell';
+    const sweep=t=>Math.sin(t*.5)*.28;
+    robot(g,-1.25,.1,.9,{name:'dispensing-robot',tool:'dispenser',sweep});
+    rounded(g,1.45,.55,1.05,white,-.2,.55,.2);
+    rounded(g,1.5,.13,1.1,steel,-.2,.91,.2);
+    rounded(g,1.12,.04,.74,graphite,-.2,.995,.2);
+    // The deposited bead follows the actual nozzle's horizontal sweep.
+    const beadPoints=[];for(let i=0;i<=40;i++){
+      const a=-.28+i*.56/40;
+      beadPoints.push([-1.25+.9*(Math.cos(a)*1.14+Math.sin(a)*.08),1.023,.1+.9*(-Math.sin(a)*1.14+Math.cos(a)*.08)]);
+    }
+    const bead=tube(g,beadPoints,.025,aqua.clone());bead.name='deposited-bead';
+    tank(g,-1.65,-1.05,.27,1.05);
+    tube(g,[[-1.65,1.8,-1.05],[-1.8,2,-.7],[-1.35,1.6,-.15],[-1.25,.9,-.05]],.035,cobalt);
+    rounded(g,.82,1.5,.58,white,1.5,.98,-.15);column(g,1.5,.2,-.15,.3);
+    const controller=dashboard(g,'dispensing-controller','DISPENSE CONTROL',(c,t)=>{
+      c.fillStyle='#81d9e9';c.font='600 115px Arial';c.fillText((48+Math.sin(t*.5)*3).toFixed(1),56,285);
+      c.font='30px monospace';c.fillText('FLOW / DEMO',60,335);chart(c,56,390,1080,175,t);
+      c.fillStyle='#a3bacc';c.font='34px Arial';c.fillText('SETPOINT  /  MEASURE  /  ADJUST',56,654);
+    },{x:1.5,y:1.45,z:.17,w:.72,h:.8});
+    controller.userData.control='variable-flow-feedback';
+    // A separate networked machine makes controller-to-equipment communication visible.
+    rounded(g,1.4,.8,.7,graphite,.05,.66,-1.12);
+    rounded(g,1.26,.54,.07,white,.05,.75,-.72);
+    screen(g,'EQUIPMENT','COMMAND / FEEDBACK',1.13,.37,.05,1.36,-.68);
+    for(const x of [-.45,0,.45])box(g,.08,.08,.04,green,x,.72,-.66);
+    dataLink(g,'controller-equipment-link',[[1.5,.54,-.15],[1.18,.3,-.65],[.65,.3,-1.12],[.6,.75,-1.12]],aqua,true);
+    dataLink(g,'nozzle-feedback-link',[[-.2,1.03,.4],[.45,.32,.62],[1.45,.32,.62],[1.5,.74,.18]],green);
+    animateStation(g,t=>{bead.material.emissiveIntensity=.65+Math.sin(t*.5)*.12;});
+  }
+  function waterCell(g){
+    g.userData.equipment='remote-water-treatment-scada';
+    // Process hardware behind the operator's console, on its own service plinth.
+    rounded(g,4.05,.15,1.55,graphite,0,.12,-1.68);
+    for(const [x,height] of [[-1.35,1.65],[0,1.95],[1.35,1.5]]){
+      const vessel=tank(g,x,-1.65,.49,height);vessel.name='water-treatment-vessel';
+      const gauge=box(g,.09,height*.55,.055,aqua,x,.75+height*.25,-1.14);gauge.name='tank-level-indicator';
+    }
+    tube(g,[[-1.35,.85,-1.15],[-1.35,.5,-.87],[0,.5,-.87],[0,.85,-1.15]],.06,steel);
+    tube(g,[[0,2.65,-1.65],[0,2.9,-1.65],[1.35,2.9,-1.65],[1.35,2.18,-1.65]],.055,steel);
+    for(const x of [-.85,.65]){
+      cylinder(g,.16,.35,cobalt,x,.47,-.78).rotation.z=Math.PI/2;
+      const valve=ring(g,.12,.025,amber,x,.72,-.78);valve.rotation.x=-Math.PI/2;
+    }
+    dataLink(g,'water-flow',[[-1.35,.86,-1.1],[-1.35,.52,-.83],[0,.52,-.83],[0,.86,-1.1]],aqua);
+    for(const x of [-.95,.95])column(g,x,.2,.65,1.45);
+    dashboard(g,'scada-supervisory-monitor','WATER TREATMENT / SCADA',(c,t)=>{
+      const levels=[.56+Math.sin(t*.25)*.06,.73+Math.sin(t*.25+.8)*.05,.43+Math.sin(t*.25+1.8)*.04];
+      for(let i=0;i<3;i++){
+        const x=65+i*250;c.fillStyle='#20394e';c.fillRect(x,192,150,235);
+        c.fillStyle='#4baacb';c.fillRect(x+9,419-218*levels[i],132,218*levels[i]);
+        c.strokeStyle='#adcadd';c.lineWidth=3;c.strokeRect(x,192,150,235);
+        c.fillStyle='#d7eaf5';c.font='34px monospace';c.fillText(`${Math.round(levels[i]*100)}%`,x+38,474);
+        c.font='25px monospace';c.fillText(['RAW','TREAT','OUT'][i],x+25,170);
+      }
+      c.strokeStyle='#61b5d1';c.lineWidth=7;c.beginPath();c.moveTo(215,330);c.lineTo(315,330);c.moveTo(465,330);c.lineTo(565,330);c.stroke();
+      c.fillStyle='#94e4c0';c.font='34px Arial';c.fillText('REMOTE',865,205);c.fillText('CONTROL',865,246);
+      c.fillStyle='#254d50';c.fillRect(850,286,270,78);c.fillStyle='#baf1d8';c.font='34px Arial';c.fillText('PUMP ON',885,337);
+      c.fillStyle='#88aabf';c.font='26px monospace';c.fillText('STATUS / ACK',865,405);
+      chart(c,65,520,1040,105,t*.4);c.fillStyle='#8faec3';c.font='25px monospace';c.fillText('PLC TELEMETRY  /  REMOTE COMMANDS',65,685);
+    },{x:-.18,y:1.75,z:.77,w:2.65,h:1.57});
+    rounded(g,2.95,.12,.56,white,-.18,.82,1.02);rounded(g,1.6,.035,.31,graphite,-.36,.91,1.05);
+    rounded(g,.63,1.2,.56,white,1.7,.88,-.4);screen(g,'PLC','NETWORK',.49,.32,1.7,1.2,-.09);
+    const tablet=dashboard(g,'remote-control-terminal','REMOTE',(c,t)=>{
+      c.fillStyle='#86d6e6';c.font='64px Arial';c.fillText('WEB CONTROL',65,240);
+      c.fillStyle='#25504c';c.fillRect(65,300,1060,160);c.fillStyle='#c0f7d8';c.font='70px Arial';c.fillText('PUMP / VALVE',125,402);
+      c.fillStyle='#9fbbce';c.font='40px monospace';c.fillText('COMMAND ↔ STATUS',65,565);
+    },{x:1.68,y:1.34,z:.98,w:.68,h:.92});tablet.rotation.y=-.2;
+    column(g,1.68,.2,.95,.6);
+    dataLink(g,'scada-plc-network',[[1.7,1,-.09],[1.72,.4,.4],[.9,.4,.72],[.9,1.2,.77]],aqua,true);
+    dataLink(g,'remote-command-link',[[1.68,.85,.98],[1.92,.4,.8],[1.92,.4,-.36],[1.7,.75,-.4]],green,true);
+  }
+  function batteryCell(g){
+    g.userData.equipment='battery-charge-discharge-monitoring';
+    rounded(g,2.14,.24,1.65,graphite,-.94,.42,.28);
+    const cells=new THREE.Group();cells.name='battery-cell-pack';g.add(cells);
+    for(let row=0;row<2;row++)for(let col=0;col<6;col++){
+      const x=-1.8+col*.34,z=-.12+row*.8;
+      const cell=cylinder(cells,.136,.64,cobalt,x,.88,z);cell.name='battery-cell';
+      cylinder(cells,.1,.03,steel,x,1.216,z);cylinder(cells,.04,.025,copper,x,1.24,z);
+    }
+    for(const z of [-.12,.68])box(g,1.86,.023,.055,copper,-.95,1.26,z);
+    const board=new THREE.Group();board.name='charge-discharge-circuit';board.position.set(1.05,.68,.04);g.add(board);
+    rounded(board,1.34,.1,1.28,standard(0x1d5d59,.25,.55));
+    for(const x of [-.51,.51])for(const z of [-.5,.5])cylinder(board,.025,.11,steel,x,.01,z);
+    for(const x of [-.28,.28]){
+      rounded(board,.33,.12,.39,black,x,.12,0);
+      for(let k=0;k<5;k++)box(board,.4,.035,.022,steel,x,.14,-.15+k*.07);
+    }
+    for(const z of [-.4,.4]){
+      cylinder(board,.095,.2,graphite,-.46,.16,z);
+      const coil=ring(board,.1,.035,copper,.43,.13,z);coil.rotation.x=-Math.PI/2;
+      for(const x of [-.2,0,.2])box(board,.1,.028,.045,amber,x,.075,z);
+      box(board,.9,.008,.016,copper,0,.059,z+.08);
+    }
+    const supply=new THREE.Group();supply.name='bidirectional-charger';g.add(supply);
+    rounded(supply,1.28,.46,.62,white,1.06,.46,1.01);screen(supply,'CHARGE ↔ DISCHARGE','CURRENT CONTROL',1.05,.29,1.06,.5,1.34);
+    const positive=standard(0xc46359,.25,.4);
+    tube(g,[[-.05,1.26,-.12],[.28,1.32,-.12],[.3,.85,.1],[.4,.78,.1]],.027,positive);
+    tube(g,[[-.05,1.26,.68],[.25,1.1,.72],[.35,.81,.38],[.43,.78,.35]],.027,black);
+    tube(g,[[1.05,.72,.6],[1.05,.82,.78],[1.05,.72,1.02]],.03,black);
+    const energyCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(1.05,.76,1.02),new THREE.Vector3(.5,.86,.8),new THREE.Vector3(.1,1.3,.5),new THREE.Vector3(-.94,1.3,.28)]);
+    mesh(g,new THREE.TubeGeometry(energyCurve,32,.018,6,false),graphite);
+    const chargeDot=sphere(g,.055,green);chargeDot.name='charge-discharge-current';chargeDot.castShadow=false;
+    const sample=t=>{const phase=(t%16)/16;return{charging:phase<.5,soc:62+12*(1-Math.cos(phase*Math.PI*2))/2};};
+    const point=new THREE.Vector3();
+    const flow=t=>{const state=sample(t),u=(t*.25)%1;energyCurve.getPointAt(state.charging?u:1-u,point);chargeDot.position.copy(point);chargeDot.material=state.charging?green:aqua;};flow(0);animateStation(g,flow);
+    for(const x of [-1.35,1.35])column(g,x,.2,-1.02,1.5);
+    dashboard(g,'battery-live-monitor','BATTERY / LIVE MONITORING',(c,t)=>{
+      const state=sample(t);c.fillStyle=state.charging?'#92e9b9':'#88d9ff';c.font='600 46px Arial';c.fillText(state.charging?'CHARGING':'DISCHARGING',48,195);
+      c.fillStyle='#deeff8';c.font='56px Arial';c.fillText(`${state.soc.toFixed(0)}% SOC`,48,278);c.fillText(`${state.charging?'+':'−'}2.4 A`,440,278);c.fillText(`${(28+Math.sin(t*.3)*.8).toFixed(1)}°C`,840,278);
+      for(let i=0;i<12;i++){
+        const height=90+state.soc*.65+Math.sin(i*.8+t*.3)*13,x=50+i*92;
+        c.fillStyle='#234052';c.fillRect(x,324,62,185);c.fillStyle=i%3?'#65bbd0':'#84dac7';c.fillRect(x,509-height,62,height);
+        c.fillStyle='#aac9dd';c.font='22px monospace';c.fillText(String(i+1).padStart(2,'0'),x+16,542);
+      }
+      chart(c,50,574,1090,80,t*.5);c.fillStyle='#92b5cb';c.font='23px monospace';c.fillText('CELL VOLTAGES  /  CURRENT  /  TEMPERATURE',50,695);
+    },{x:0,y:2.25,z:-.87,w:3.15,h:1.48});
+  }
+
   stationSpecs.forEach((spec,i)=>{
     const g=platform(spec,i),id=window.factoryStops[i].id;
     if(id==='g90'){
-      robot(g,-1.45,-.4,.9);rounded(g,1.95,.48,.95,white,.78,.6,.3,.09);rounded(g,1.8,.15,.8,graphite,.78,.96,.3);
-      for(const x of [.14,1.4])cylinder(g,.045,.35,steel,x,1.16,.35);
-      headlamp(g);
-      for(const x of [-1.8,1.8])column(g,x,.2,-1.05,2.8);box(g,3.7,.11,.11,aluminum,0,3,-1.05);box(g,1.1,.02,.06,glow,0,2.93,-1.05);
+      lampCell(g);
     }else if(id==='vision'){
-      gantry(g);sensor(g,-.7,2.43,-.55);sensor(g,.7,2.43,-.55);rounded(g,1.8,.22,1.2,steel,0,.47,.2);rounded(g,.6,.45,.4,white,0,.8,.2);robot(g,-1.4,.2,.65);
-      const scan=mesh(g,new THREE.PlaneGeometry(1.5,1.2),new THREE.MeshBasicMaterial({color:0x81c7ee,transparent:true,opacity:.12,side:THREE.DoubleSide,depthWrite:false}),0,1.5,-.05);scan.rotation.x=-.65;
+      visionCell(g);
     }else if(id==='process'){
-      gantry(g);tank(g,-1.2,.35,.39,1.15);tank(g,1.2,.35,.39,1.15);tube(g,[[-1.2,1.9,.35],[-1.2,2.3,-.4],[.35,2.3,-.7]],.045,steel);tube(g,[[1.2,1.9,.35],[1.2,2.3,-.4],[.35,2.3,-.7]],.045,steel);screen(g,'FEEDBACK','MEASURE / CONTROL',.96,.48,0,1.1,.7);
+      dispensingCell(g);
     }else if(id==='embedded'){
       cabinet(g,-.7,-.35,1.7);screen(g,'EMBEDDED','C++ / Qt / Linux',1.5,.9,1,1.45,.35);column(g,1,.2,.3,.7);tube(g,[[-.7,.5,.2],[-.3,.3,.6],[1,.3,.6],[1,.8,.5]],.035,black);
     }else if(id==='water'){
-      tank(g,-1.2,-.45,.57,1.7);tank(g,.25,-.5,.57,1.7);tank(g,1.43,-.2,.36,1.05);tube(g,[[-1.2,.8,.2],[-1.2,.55,.9],[.3,.55,.9],[.3,.8,.1]],.065,steel);tube(g,[[.3,2.35,-.5],[.3,2.72,-.5],[1.43,2.72,-.2],[1.43,1.78,-.2]],.055,steel);screen(g,'SCADA','PLC → WEB',1.05,.58,-.4,1,.95);
+      waterCell(g);
     }else if(id==='viewer'){
       cabinet(g,-1,-.4,1.1);column(g,.8,.2,-.25,1.3);screen(g,'ForTex-Viewer','DATA / VISUALIZATION',2.12,1.22,.7,1.93,-.12);rounded(g,1.7,.07,.7,graphite,.7,1.1,.25);for(let k=0;k<7;k++)box(g,.07,.12+k*.055,.04,cobalt,-.1+k*.22,1.7,-.01);
     }else if(id==='battery'){
-      rounded(g,3.25,.3,1.8,graphite,0,.43,0);for(let r=0;r<2;r++)for(let c=0;c<7;c++){cylinder(g,.16,.68,cobalt,-1.25+c*.42,.9,-.4+r*.8);cylinder(g,.11,.03,steel,-1.25+c*.42,1.255,-.4+r*.8);}for(const z of [-.4,.4])box(g,2.8,.026,.055,aluminum,0,1.29,z);screen(g,'BATTERY','SENSORS / CONTROL',1.4,.65,0,2,-.75);column(g,0,.2,-.8,1.35);
+      batteryCell(g);
     }else if(id==='smartfarm'){
       for(const x of [-1.7,1.7])column(g,x,.2,-.7,2.6);box(g,3.5,.1,.13,aluminum,0,2.8,-.7);
       for(const z of [-.5,.5]){rounded(g,3.3,.2,.57,white,0,.72,z);for(let j=0;j<6;j++){cylinder(g,.12,.15,graphite,-1.3+j*.52,.85,z);const sprout=sphere(g,.11,standard(0x6b8990,.1,.75),-1.3+j*.52,1.02,z);sprout.scale.set(.55,1.7,.7);}}

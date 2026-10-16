@@ -44,7 +44,7 @@ window.portfolioProjects = [
       "Node.js + MySQL",
       "Web dashboard"
     ],
-    "details": "Connects PLC data to a web dashboard with operating status, alarms, historical records, and CSV export. Built jointly with seonghyeon0312.",
+    "details": "Connects water treatment equipment to a web dashboard for remote monitoring and control, operating status, alarms, historical records, and CSV export. Built jointly with seonghyeon0312.",
     "links": [
       {
         "label": "Repository",
@@ -94,7 +94,7 @@ window.portfolioProjects = [
     "title": "Variable Control Technology Development",
     "category": "industrial",
     "label": "PROCESS / CLOSED-LOOP CONTROL",
-    "summary": "Feedback-driven control for more consistent manufacturing processes.",
+    "summary": "Robot dispensing with variable control and equipment communication.",
     "role": "Control concept design · Industrial communication · Logic development and validation",
     "stack": [
       "PLC",
@@ -102,12 +102,12 @@ window.portfolioProjects = [
       "Feedback control"
     ],
     "flow": [
-      "Process",
+      "Robot dispensing",
       "Measurement",
-      "Control logic",
-      "Next cycle"
+      "Variable controller",
+      "Equipment feedback"
     ],
-    "details": "Developed feedback control and validation workflows around process data and engineering constraints, improving process repeatability and quality.",
+    "details": "Developed control logic and equipment communication for robot dispensing, with feedback and validation workflows around process data and engineering constraints.",
     "status": "Industrial project · Public overview"
   },
   {
@@ -115,7 +115,7 @@ window.portfolioProjects = [
     "title": "Vision Robot Active Align",
     "category": "industrial",
     "label": "VISION / ROBOTICS / MES",
-    "summary": "Connecting vision, robotics, and production data.",
+    "summary": "Pick-and-place and vision active alignment in an integrated robot cell.",
     "role": "Equipment integration · Process improvement · Production data connectivity",
     "stack": [
       "Vision",
@@ -124,12 +124,12 @@ window.portfolioProjects = [
       "MES"
     ],
     "flow": [
+      "Pick & place",
       "Vision",
-      "Robot",
-      "Process",
+      "Active alignment",
       "Production data"
     ],
-    "details": "Reviewed equipment workflows and data flows together, improving integration between vision and robotics equipment and production systems.",
+    "details": "Integrated pick-and-place and vision active alignment within a shared robot cell, connecting equipment workflows and production data.",
     "status": "Industrial project · Public overview"
   },
   {
@@ -213,7 +213,7 @@ window.portfolioProjects = [
     "title": "EV Battery Management",
     "category": "industrial",
     "label": "ENERGY / SENSORS / CONTROL",
-    "summary": "Battery thermal management and charge/discharge control.",
+    "summary": "Battery cells, charge/discharge control, and real-time monitoring.",
     "role": "Sensor integration · Monitoring and control development",
     "stack": [
       "Sensors",
@@ -221,12 +221,12 @@ window.portfolioProjects = [
       "Monitoring"
     ],
     "flow": [
+      "Battery cells",
+      "Charge / discharge circuit",
       "Sensors",
-      "Temperature data",
-      "Control",
-      "Battery"
+      "Real-time monitoring"
     ],
-    "details": "A graduation project focused on temperature management and charge/discharge control for lithium-ion EV batteries.",
+    "details": "A graduation project combining lithium-ion battery cells, charge/discharge circuitry, temperature management, and real-time battery monitoring.",
     "links": [
       {
         "label": "Repository",
