@@ -119,7 +119,40 @@ function createFactory(){
     const lower=railPoints.map(p=>p.clone().add(new THREE.Vector3(0,-.33,0)));mesh(scene,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(lower),800,.065,6,false),graphite);
   }
   // A small carrier follows the visitor's actual scroll position, never auto-drives.
-  const carrier=new THREE.Group();scene.add(carrier);rounded(carrier,.76,.12,.66,graphite,0,.13,0);rounded(carrier,.48,.28,.4,white,0,.32,0);box(carrier,.22,.015,.1,glow,0,.47,0);
+  const carrier=new THREE.Group();carrier.name='road-carrier';scene.add(carrier);
+  rounded(carrier,.8,.12,.72,graphite,0,.13,0);
+  rounded(carrier,.68,.025,.6,cobalt,0,.205,0);
+  // An original duck-like inspection companion rides along with the visitor.
+  const companion=new THREE.Group();companion.name='road-companion';companion.rotation.y=Math.PI*.72;carrier.add(companion);
+  const beakMaterial=standard(0xe6a34b,.25,.4);
+  for(const x of [-.14,.14])rounded(companion,.2,.09,.29,beakMaterial,x,.26,.07,.04);
+  const body=new THREE.Group();body.position.y=.52;companion.add(body);
+  sphere(body,.28,white).scale.set(1,.94,.86);
+  rounded(body,.21,.16,.045,cobalt,0,.015,.225,.035);
+  rounded(body,.09,.026,.02,glow,0,.03,.254,.009);
+  const wings=[];
+  for(const side of [-1,1]){
+    const wing=new THREE.Group();wing.position.set(side*.27,.06,0);body.add(wing);wings.push(wing);
+    sphere(wing,.065,graphite);
+    sphere(wing,.13,white,side*.015,-.105,0).scale.set(.55,1.2,.8);
+  }
+  const head=new THREE.Group();head.name='companion-head';head.position.y=.33;body.add(head);
+  sphere(head,.32,white).scale.set(1,.83,.85);
+  rounded(head,.47,.22,.105,black,0,.025,.23,.07);
+  const eyes=[];
+  for(const x of [-.105,.105]){
+    const eye=rounded(head,.065,.105,.018,glow,x,.035,.293,.02);eyes.push(eye);
+  }
+  sphere(head,.12,beakMaterial,0,-.105,.3).scale.set(1,.4,1.05);
+  cylinder(head,.024,.11,steel,0,.29,-.04);
+  sphere(head,.044,glow,0,.36,-.04);
+  animations.push(t=>{
+    body.position.y=.52+Math.sin(t*1.8)*.012;
+    head.rotation.y=Math.sin(t*.65)*.13;head.rotation.z=Math.sin(t*.9)*.045;
+    const blink=Math.max(.08,Math.min(1,Math.abs((t%5.2)-4.8)/.1));
+    eyes.forEach(eye=>eye.scale.y=blink);
+    wings.forEach((wing,i)=>wing.rotation.z=(i?1:-1)*(.12+Math.sin(t*1.8)*.06));
+  });
 
   function platform(spec,index){
     const group=new THREE.Group();group.name=`station-${stops[index].id}`;group.userData.stopIndex=index;group.position.copy(spec.point).addScaledVector(spec.normal,3.25);group.position.y=.06;group.rotation.y=Math.atan2(-spec.normal.x,-spec.normal.z);scene.add(group);
@@ -334,9 +367,32 @@ function createFactory(){
     const pulse=new THREE.MeshBasicMaterial({color:0x80ddf0,transparent:true,opacity:.13,side:THREE.DoubleSide,depthWrite:false});
     const scan=mesh(g,new THREE.PlaneGeometry(.7,.5),pulse,0,1.24,0);scan.rotation.x=-Math.PI/2;scan.castShadow=false;scan.name='vision-scan';
     animateStation(g,t=>{scan.position.y=1.22+(Math.sin(t*1.2)+1)*.09;pulse.opacity=.1+(Math.sin(t*1.2)+1)*.06;});
-    for(const x of [-1.6,1.6])column(g,x,.2,-1.5,2.5);
-    box(g,3.3,.09,.09,aluminum,0,2.7,-1.5);
-    screen(g,'PICK & PLACE / ACTIVE ALIGN','FOUR ROBOTS / SHARED FIXTURE',2.6,.47,0,2.43,-1.45);
+    for(const x of [-1.6,1.6])column(g,x,.2,-1.5,3.05);
+    box(g,3.3,.12,.12,aluminum,0,3.25,-1.5);
+    for(const x of [-.38,.38])box(g,.075,.12,1.2,steel,x,3.25,-.9);
+    box(g,.9,.12,.14,aluminum,0,3.25,-.3);
+    cylinder(g,.08,.25,steel,0,3.08,-.3);
+    const cameraRig=new THREE.Group();cameraRig.name='overhead-vision-camera';cameraRig.position.set(0,2.9,-.3);g.add(cameraRig);
+    const target=new THREE.Vector3(0,1.19,0);
+    cameraRig.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),target.clone().sub(cameraRig.position).normalize());
+    rounded(cameraRig,.64,.48,.4,graphite,0,0,0,.06);
+    for(const x of [-.24,.24])box(cameraRig,.04,.36,.3,steel,x,0,-.015);
+    for(let i=0;i<5;i++)box(cameraRig,.3,.018,.018,black,0,-.12+i*.06,-.21);
+    const barrel=cylinder(cameraRig,.19,.26,black,0,0,.31);barrel.rotation.x=Math.PI/2;
+    ring(cameraRig,.19,.025,steel,0,0,.4);
+    const lens=cylinder(cameraRig,.135,.025,cobalt,0,0,.445);lens.rotation.x=Math.PI/2;lens.name='overhead-camera-lens';
+    const lightMaterial=aqua.clone();
+    ring(cameraRig,.245,.035,lightMaterial,0,0,.42);
+    sphere(cameraRig,.025,glow,.21,.15,.215);
+    tube(g,[[.23,2.94,-.48],[.36,3.12,-.53],[.38,3.34,-.9],[.38,3.34,-1.5],[1.55,3.34,-1.5],[1.6,2.2,-1.5]],.022,black);
+    // Fine optical sight-lines reveal the inspected area without covering the robots.
+    const sightMaterial=new THREE.LineBasicMaterial({color:0x78d2ee,transparent:true,opacity:.22,depthWrite:false});
+    const origin=new THREE.Vector3(0,0,.47).applyQuaternion(cameraRig.quaternion).add(cameraRig.position);
+    const points=[];
+    for(const x of [-.35,.35])for(const z of [-.25,.25])points.push(origin,new THREE.Vector3(x,1.2,z));
+    const sights=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(points),sightMaterial);g.add(sights);
+    animateStation(g,t=>{lightMaterial.emissiveIntensity=.65+Math.sin(t*1.2)*.15;sightMaterial.opacity=.18+(Math.sin(t*1.2)+1)*.035;});
+    screen(g,'PICK & PLACE / ACTIVE ALIGN','OVERHEAD VISION / SHARED FIXTURE',2.6,.4,0,2.61,-1.45);
   }
 
   function dispensingCell(g){
