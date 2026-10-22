@@ -18,7 +18,7 @@ with sync_playwright() as p:
         response = route.fetch()
         source = response.text().replace(
             "window.dispatchEvent(new CustomEvent('factory-ready'",
-            "window.equipmentQA={stations,at(t){time=t;draw();}};"
+            "window.equipmentQA={stations,carrier,at(t){time=t;draw();}};"
             "window.dispatchEvent(new CustomEvent('factory-ready'")
         route.fulfill(response=response, body=source)
 
@@ -30,6 +30,15 @@ with sync_playwright() as p:
         page.evaluate('(i)=>window.dispatchEvent(new CustomEvent("factory-visit",{detail:i}))', index)
         page.wait_for_function('(i)=>document.querySelector("#scene-viewport").dataset.currentStation===String(i)', arg=index)
 
+    # Ambient gestures never move the carrier along the route; scrolling does.
+    visit(0)
+    initial_carrier = page.evaluate('equipmentQA.carrier.position.toArray()')
+    assert page.evaluate('''() => {
+        const carrier=equipmentQA.carrier,head=carrier.getObjectByName('companion-head');
+        equipmentQA.at(0);const position=carrier.position.clone(),rotation=head.rotation.y;
+        equipmentQA.at(2);return carrier.position.equals(position) && head.rotation.y!==rotation;
+    }''')
+    page.screenshot(path=str(out/'companion-desktop.png'))
     # Lamps sit between the two robot bases; four vision robots face the fixture.
     visit(2)
     assert page.evaluate('''() => {
@@ -39,6 +48,7 @@ with sync_playwright() as p:
     }''')
     page.screenshot(path=str(out/'lamp.png'))
     visit(3)
+    assert page.evaluate('equipmentQA.carrier.position.toArray()') != initial_carrier
     assert page.evaluate('''() => {
         const robots=equipmentQA.stations[3].children.filter(o=>o.name.startsWith('vision-robot-'));
         return robots.length===4 && robots.every(robot=>{
@@ -47,6 +57,22 @@ with sync_playwright() as p:
             return reach.dot(inward)>.99;
         });
     }''')
+    # The overhead optical axis intersects the shared fixture from above the arms.
+    assert page.evaluate('''() => {
+        const g=equipmentQA.stations[3],camera=g.getObjectByName('overhead-vision-camera');
+        const target=camera.position.clone().set(0,1.19,0).sub(camera.position).normalize();
+        const axis=target.clone().set(0,0,1).applyQuaternion(camera.quaternion);
+        g.updateWorldMatrix(true,true);
+        const lens=g.getObjectByName('overhead-camera-lens');
+        const point=g.worldToLocal(lens.getWorldPosition(lens.position.clone()));
+        return axis.dot(target)>.999 && point.y>2.2;
+    }''')
+    page.screenshot(path=str(out/'vision-desktop.png'))
+    page.set_viewport_size({'width':390,'height':844})
+    page.screenshot(path=str(out/'vision-mobile.png'))
+    visit(0)
+    page.screenshot(path=str(out/'companion-mobile.png'))
+    page.set_viewport_size({'width':1000,'height':700})
     # The dispensing tip remains above the workpiece throughout its sweep.
     visit(4)
     assert page.evaluate('''() => {
@@ -87,4 +113,4 @@ with sync_playwright() as p:
     assert before==page.locator('canvas').screenshot()
     assert not errors, errors
     browser.close()
-    print('PASS robot layout, nozzle/workpiece alignment, remote SCADA, animated telemetry, charge/discharge reversal, reduced motion')
+    print('PASS scroll companion, overhead optics, robot layout, nozzle/workpiece alignment, remote SCADA, animated telemetry, charge/discharge reversal, reduced motion')
